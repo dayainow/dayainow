@@ -1,18 +1,18 @@
 <div align="center">
 
-# dayainow
+# Personal Projects
 
 ### 아이디어를 직접 만들어 보고, 쓸 만한 것은 제품으로 남기는 개발자
 
 웹·모바일·백엔드·3D·AI 워크플로우까지 **여러 스택과 방법을 직접 시도**해 왔습니다.  
 공공데이터 앱, 커뮤니티, AI 큐레이션 플랫폼, 감정 일기, 에이전트 하네스까지 — 빠르게 프로토타입하고, 검증된 패턴은 재사용 가능한 구조로 정리합니다.
 
-[![GitHub](https://img.shields.io/badge/GitHub-dayainow-181717?style=flat-square&logo=github)](https://github.com/dayainow)
+[![GitHub](https://img.shields.io/badge/GitHub-Profile-181717?style=flat-square&logo=github)](https://github.com/dayainow)
 [![TypeScript](https://img.shields.io/badge/TypeScript-주력-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Expo](https://img.shields.io/badge/Expo-React%20Native-000020?style=flat-square&logo=expo)](https://expo.dev/)
 [![Next.js](https://img.shields.io/badge/Next.js-App%20Router-000000?style=flat-square&logo=next.js)](https://nextjs.org/)
 
-[📄 채용 담당자용 PDF 프로필](./dayainow-profile.pdf)
+[📄 Personal Projects PDF](./personal-projects.pdf)
 
 </div>
 
