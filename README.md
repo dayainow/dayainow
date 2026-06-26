@@ -12,7 +12,7 @@
 [![Expo](https://img.shields.io/badge/Expo-React%20Native-000020?style=flat-square&logo=expo)](https://expo.dev/)
 [![Next.js](https://img.shields.io/badge/Next.js-App%20Router-000000?style=flat-square&logo=next.js)](https://nextjs.org/)
 
-[📄 PDF 프로필 보기/다운로드](./dayainow-profile.pdf)
+[📄 채용 담당자용 PDF 프로필](./dayainow-profile.pdf)
 
 </div>
 
