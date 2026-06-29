@@ -22,7 +22,7 @@
 
 | 영역 | 경험 요약 |
 | --- | --- |
-| **AI 개발** | 역할 분리형 에이전트 하네스 설계·템플릿화, **UI 격리 Component Harness**, Cursor/Claude 워크플로우, **Figma ↔ Next.js 양방향 MCP**, Lighthouse 기반 성능 분석 스킬 |
+| **AI 개발** | 역할 분리형 에이전트 하네스 설계·템플릿화, **UI 격리 Component Harness**, Cursor/Claude 워크플로우, **Figma ↔ Next.js 양방향 MCP**, Lighthouse + Web Vitals 기반 성능 분석 하네스 |
 | **프로덕트** | 일상 문제를 푸는 소규모 앱·웹 서비스를 기획부터 배포까지 직접 수행 |
 | **풀스택** | Next.js · NestJS · Vercel serverless · Prisma · Supabase 조합 경험 |
 | **모바일** | Expo/React Native 기반 위치·검색·즐겨찾기 앱 2종 출시/배포 |
@@ -42,6 +42,7 @@ AI를 단일 코드 생성기가 아닌 **협업 가능한 개발 시스템**으
 | [**Figma Publish Harness**](https://github.com/dayainow/figma-publish) | Cursor + Figma MCP로 **Figma ↔ Next.js 양방향** 퍼블·동기화를 Skill · Rule · Prompt로 표준화. `get_metadata` 재귀 퍼블, `generate_figma_design` + `use_figma` 병렬 캡처 | Cursor · Figma MCP · Next.js · Tailwind | GitHub |
 | [**Role-Based AI Harness**](https://github.com/dayainow/ai-agent-harness-methodology) | AI를 단일 코드 생성기가 아닌 **소규모 제품 팀**처럼 운영하는 역할·핸드오프 방법론 | 방법론 · 문서 | GitHub |
 | [**Web Performance Audit Skill**](https://github.com/dayainow/web-performance-audit-skill) | Lighthouse 결과를 **측정 → 증거 추출 → 병목 진단 → 코드 개선안 → 재검증** 흐름으로 연결하는 AI 성능 분석 스킬 | Codex Skill · Lighthouse · Next.js Performance | GitHub |
+| [**Web Vitals RUM Harness**](https://github.com/dayainow/web-vitals-rum-harness) | 실제 사용자 브라우저에서 **LCP · INP · CLS · TTFB**를 수집하고, 페이지·기기별 대시보드와 NDJSON 로그로 Lighthouse 분석 대상까지 연결하는 RUM 하네스 | Next.js App Router · web-vitals · RUM | GitHub |
 | [**HarnessHub**](https://github.com/dayainow/harness-hub) | GitHub에 흩어진 AI 에이전트를 **발견·평가·설치**하는 카탈로그 플랫폼. 3D 갤럭시 UI, 라이선스 분류, 크롤러, CLI | Next.js · NestJS · R3F · Redis | GitHub |
 
 ### 하네스 설계 관점
@@ -60,11 +61,13 @@ UI 격리: spec.md → sandbox/components → registry → /harness/sandbox/:id?
 Design → Code: get_variable_defs → get_metadata (재귀) → get_design_context
 Code → Figma: generate_figma_design (캡처) + use_figma (DS 조립) → 캡처 레이어 삭제
 Lighthouse: JSON → metrics/evidence → bottleneck → code fixes → re-audit
+Web Vitals RUM: field data → page/device breakdown → poor metric → Lighthouse deep dive
 ```
 
 - **역할·산출물·검증 루프**를 명시해 맥락 손실과 품질 편차를 줄입니다.
 - **install.sh 한 번**으로 `.cursor/` Skill · Rule · Prompt를 프로젝트에 이식합니다.
 - Figma Publish 데모: [examples/demo-app](https://github.com/dayainow/figma-publish/tree/main/examples/demo-app)
+- 성능 개선은 **RUM으로 문제 페이지 발견 → Lighthouse로 원인 분석 → 코드 수정 → RUM으로 실제 사용자 개선 확인** 흐름으로 운영합니다.
 
 ---
 
@@ -92,7 +95,7 @@ Lighthouse: JSON → metrics/evidence → bottleneck → code fixes → re-audit
 다음 기술들을 **프로젝트 단위로 실제 적용**해 보았습니다.
 
 ```text
-Dev / AI   Cursor · Claude Code · MCP · Figma MCP · 역할 기반 에이전트 · Component Harness · App Delivery Harness · Lighthouse Audit Skill
+Dev / AI   Cursor · Claude Code · MCP · Figma MCP · 역할 기반 에이전트 · Component Harness · App Delivery Harness · Lighthouse Audit Skill · Web Vitals RUM
 Frontend   TypeScript · React · Next.js · Tailwind CSS · Zustand · TanStack Query
 Mobile     Expo · React Native · EAS Build · 위치 권한 · AsyncStorage
 Backend    NestJS · Node.js · Vercel Serverless · Redis · Prisma
