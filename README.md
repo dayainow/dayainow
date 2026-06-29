@@ -78,7 +78,7 @@ Web Vitals RUM: field data → page/device breakdown → poor metric → Lightho
 | 프로젝트 | 소개 | 스택 | 링크 |
 | --- | --- | --- | --- |
 | [**OlaLab**](https://github.com/dayainow/ola) | 100+ AI 도구를 탐색하고 커뮤니티·실험실 모임으로 연결하는 **AI 큐레이션 플랫폼** | Next.js · NestJS · Prisma · Supabase | GitHub |
-| [**인류애협회**](https://github.com/dayainow/humanity-association) | "오늘의 인류애, 우리가 지킨다" — 하찮은 일상을 국가급 실적으로 인정하는 **익명 커뮤니티** 웹 MVP | Next.js · Zustand · Tailwind | [배포](https://humanity-association.vercel.app) |
+| [**인류애협회**](https://github.com/dayainow/humanity-association) | "오늘의 인류애, 우리가 지킨다" — 하찮은 일상을 국가급 실적으로 인정하는 **익명 커뮤니티** 웹 MVP | Next.js · Zustand · Tailwind | GitHub |
 | [**HarnessHub**](https://github.com/dayainow/harness-hub) | GitHub에 흩어진 AI 에이전트를 **발견·평가·설치**하는 카탈로그 플랫폼. 3D 갤럭시 UI, 라이선스 분류, 크롤러, CLI | Next.js · NestJS · R3F · Redis | GitHub |
 
 ### 앱 서비스
