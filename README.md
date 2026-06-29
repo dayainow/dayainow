@@ -4,8 +4,8 @@
 
 ### 아이디어를 직접 만들어 보고, 쓸 만한 것은 제품으로 남기는 개발자
 
-웹·모바일·백엔드·3D·AI 워크플로우까지 **여러 스택과 방법을 직접 시도**해 왔습니다.  
-공공데이터 앱, 커뮤니티, AI 큐레이션 플랫폼, 감정 일기, 에이전트 하네스까지 — 빠르게 프로토타입하고, 검증된 패턴은 재사용 가능한 구조로 정리합니다.
+웹·모바일·백엔드·3D·**AI 워크플로우**까지 여러 스택과 방법을 직접 시도해 왔습니다.  
+특히 **AI 에이전트 하네스** — Cursor · MCP · 역할 분리 — 를 제품 개발에 맞게 템플릿화하고, 검증된 패턴은 재사용 가능한 오픈소스로 정리합니다.
 
 [![GitHub](https://img.shields.io/badge/GitHub-Profile-181717?style=flat-square&logo=github)](https://github.com/dayainow)
 [![TypeScript](https://img.shields.io/badge/TypeScript-주력-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -22,29 +22,43 @@
 
 | 영역 | 경험 요약 |
 | --- | --- |
+| **AI 개발** | 역할 분리형 에이전트 하네스 설계·템플릿화, Cursor/Claude 워크플로우, **Figma ↔ Next.js 양방향 MCP**, Lighthouse 기반 성능 분석 스킬 |
 | **프로덕트** | 일상 문제를 푸는 소규모 앱·웹 서비스를 기획부터 배포까지 직접 수행 |
 | **풀스택** | Next.js · NestJS · Vercel serverless · Prisma · Supabase 조합 경험 |
 | **모바일** | Expo/React Native 기반 위치·검색·즐겨찾기 앱 2종 출시/배포 |
 | **인터랙션** | Three.js · React Three Fiber로 3D 갤럭시·마을 프로토타입 구현 |
-| **AI 개발** | 역할 분리형 에이전트 하네스 설계·템플릿화, Cursor/Claude 워크플로우, **Figma ↔ Next.js 양방향 MCP**, Lighthouse 기반 성능 분석 스킬 |
 
 ---
 
-## 기술 스택
+## AI 개발 워크플로우
 
-다음 기술들을 **프로젝트 단위로 실제 적용**해 보았습니다.
+AI를 단일 코드 생성기가 아닌 **협업 가능한 개발 시스템**으로 쓰기 위해, Skill · Rule · Prompt · MCP 호출 순서를 **이식 가능한 하네스**로 묶어 두었습니다.  
+아래 저장소는 실제로 제품 개발·퍼블·동기화·성능 분석 과정에서 검증한 워크플로우이며, **추가 하네스를 계속 확장**할 예정입니다.
+
+| 프로젝트 | 소개 | 스택 | 링크 |
+| --- | --- | --- | --- |
+| [**3-Layer Harness**](https://github.com/dayainow/3-layer-harness) | Hooks · 공유 지침 · 전문 에이전트로 구성된 **이식 가능한 AI 개발 하네스** 템플릿 | Shell · Claude/Cursor 구조 | GitHub |
+| [**Figma Publish Harness**](https://github.com/dayainow/figma-publish) | Cursor + Figma MCP로 **Figma ↔ Next.js 양방향** 퍼블·동기화를 Skill · Rule · Prompt로 표준화. `get_metadata` 재귀 퍼블, `generate_figma_design` + `use_figma` 병렬 캡처 | Cursor · Figma MCP · Next.js · Tailwind | GitHub |
+| [**Role-Based AI Harness**](https://github.com/dayainow/ai-agent-harness-methodology) | AI를 단일 코드 생성기가 아닌 **소규모 제품 팀**처럼 운영하는 역할·핸드오프 방법론 | 방법론 · 문서 | GitHub |
+| [**Web Performance Audit Skill**](https://github.com/dayainow/web-performance-audit-skill) | Lighthouse 결과를 **측정 → 증거 추출 → 병목 진단 → 코드 개선안 → 재검증** 흐름으로 연결하는 AI 성능 분석 스킬 | Codex Skill · Lighthouse · Next.js Performance | GitHub |
+| [**HarnessHub**](https://github.com/dayainow/harness-hub) | GitHub에 흩어진 AI 에이전트를 **발견·평가·설치**하는 카탈로그 플랫폼. 3D 갤럭시 UI, 라이선스 분류, 크롤러, CLI | Next.js · NestJS · R3F · Redis | GitHub |
+
+### 하네스 설계 관점
 
 ```text
-Frontend   TypeScript · React · Next.js · Tailwind CSS · Zustand · TanStack Query
-Mobile     Expo · React Native · EAS Build · 위치 권한 · AsyncStorage
-Backend    NestJS · Node.js · Vercel Serverless · Redis · Prisma
-3D / UX    Three.js · React Three Fiber · Framer Motion · WebGL Shader
-Data       공공데이터포털 API · CDN 캐시 · cron 갱신 · seed fallback
-Dev / AI   Cursor · Claude Code · MCP · Figma MCP · 역할 기반 에이전트 · App Delivery Harness · Lighthouse Audit Skill
-Infra      Vercel · GitHub Actions · SEO/OG · JSON-LD · Rate Limiting
+planner → domain-designer → data-contract → implementation → qa-reviewer
+         Skill · Rule · Prompt · MCP 호출 순서 · 품질 게이트
 ```
 
-한 가지 스택에만 머무르기보다, **제품에 맞는 조합을 고르고 빠르게 검증**하는 방식을 선호합니다.
+```text
+Design → Code: get_variable_defs → get_metadata (재귀) → get_design_context
+Code → Figma: generate_figma_design (캡처) + use_figma (DS 조립) → 캡처 레이어 삭제
+Lighthouse: JSON → metrics/evidence → bottleneck → code fixes → re-audit
+```
+
+- **역할·산출물·검증 루프**를 명시해 맥락 손실과 품질 편차를 줄입니다.
+- **install.sh 한 번**으로 `.cursor/` Skill · Rule · Prompt를 프로젝트에 이식합니다.
+- Figma Publish 데모: [examples/demo-app](https://github.com/dayainow/figma-publish/tree/main/examples/demo-app)
 
 ---
 
@@ -55,7 +69,6 @@ Infra      Vercel · GitHub Actions · SEO/OG · JSON-LD · Rate Limiting
 | 프로젝트 | 소개 | 스택 | 링크 |
 | --- | --- | --- | --- |
 | [**OlaLab**](https://github.com/dayainow/ola) | 100+ AI 도구를 탐색하고 커뮤니티·실험실 모임으로 연결하는 **AI 큐레이션 플랫폼** | Next.js · NestJS · Prisma · Supabase | GitHub |
-| [**HarnessHub**](https://github.com/dayainow/harness-hub) | GitHub에 흩어진 AI 에이전트를 **발견·평가·설치**하는 카탈로그 플랫폼. 3D 갤럭시 UI, 라이선스 분류, 크롤러, CLI | Next.js · NestJS · R3F · Redis | GitHub |
 | [**인류애협회**](https://github.com/dayainow/humanity-association) | "오늘의 인류애, 우리가 지킨다" — 하찮은 일상을 국가급 실적으로 인정하는 **익명 커뮤니티** 웹 MVP | Next.js · Zustand · Tailwind | [배포](https://humanity-association.vercel.app) |
 
 ### 앱 서비스
@@ -66,14 +79,23 @@ Infra      Vercel · GitHub Actions · SEO/OG · JSON-LD · Rate Limiting
 | [**오늘의 도서관**](https://github.com/dayainow/today-library) | 전국 공공도서관 데이터로 **지금 열린 곳**을 가까운 순으로 보여주는 모바일 앱. 검색·필터·즐겨찾기·길찾기 지원 | Expo · TypeScript · Vercel API | [배포](https://today-library-sigma.vercel.app) |
 | [**메모빌**](https://github.com/dayainow/memoville) | 감정 일기를 쓰면 **3D 마을**이 자라는 인터랙티브 다이어리 앱 프로토타입 | Expo · Three.js · R3F · WebView | [프로토타입](https://prototype-web-eosin.vercel.app) |
 
-### AI 개발 워크플로우
+---
 
-| 프로젝트 | 소개 | 스택 | 링크 |
-| --- | --- | --- | --- |
-| [**3-Layer Harness**](https://github.com/dayainow/3-layer-harness) | Hooks · 공유 지침 · 전문 에이전트로 구성된 **이식 가능한 AI 개발 하네스** 템플릿 | Shell · Claude/Cursor 구조 | GitHub |
-| [**Figma Publish Harness**](https://github.com/dayainow/figma-publish) | Cursor + Figma MCP로 **Figma ↔ Next.js 양방향** 퍼블·동기화를 Skill · Rule · Prompt로 표준화. `get_metadata` 재귀 퍼블, `generate_figma_design` + `use_figma` 병렬 캡처 | Cursor · Figma MCP · Next.js · Tailwind | GitHub |
-| [**Role-Based AI Harness**](https://github.com/dayainow/ai-agent-harness-methodology) | AI를 단일 코드 생성기가 아닌 **소규모 제품 팀**처럼 운영하는 역할·핸드오프 방법론 | 방법론 · 문서 | GitHub |
-| [**Web Performance Audit Skill**](https://github.com/dayainow/web-performance-audit-skill) | Lighthouse 결과를 **측정 → 증거 추출 → 병목 진단 → 코드 개선안 → 재검증** 흐름으로 연결하는 AI 성능 분석 스킬 | Codex Skill · Lighthouse · Next.js Performance | GitHub |
+## 기술 스택
+
+다음 기술들을 **프로젝트 단위로 실제 적용**해 보았습니다.
+
+```text
+Dev / AI   Cursor · Claude Code · MCP · Figma MCP · 역할 기반 에이전트 · App Delivery Harness · Lighthouse Audit Skill
+Frontend   TypeScript · React · Next.js · Tailwind CSS · Zustand · TanStack Query
+Mobile     Expo · React Native · EAS Build · 위치 권한 · AsyncStorage
+Backend    NestJS · Node.js · Vercel Serverless · Redis · Prisma
+3D / UX    Three.js · React Three Fiber · Framer Motion · WebGL Shader
+Data       공공데이터포털 API · CDN 캐시 · cron 갱신 · seed fallback
+Infra      Vercel · GitHub Actions · SEO/OG · JSON-LD · Rate Limiting
+```
+
+한 가지 스택에만 머무르기보다, **제품에 맞는 조합을 고르고 빠르게 검증**하는 방식을 선호합니다.
 
 ---
 
@@ -99,33 +121,6 @@ DiaryEntry → DiaryMemory → VillageEffect[] → VillageSnapshot → Three.js 
 ```
 
 짧은 감정 기록이 날씨·건물·주민 반응으로 시각화되는 **감정 다이어리 + 3D 마을** 실험을 이어가고 있습니다.
-
-### Figma Publish Harness — Design ↔ Code 양방향 MCP
-
-```text
-Design → Code: get_variable_defs → get_metadata (재귀) → get_design_context
-Code → Figma: generate_figma_design (캡처) + use_figma (DS 조립) → 캡처 레이어 삭제
-```
-
-Figma 퍼블과 역동기화를 **하네스 3계층(Skill · Rule · Prompt)** 으로 고정해, AI 에이전트의 UI 누락·토큰 낭비·품질 편차를 줄이는 워크플로우를 정리 중입니다.  
-데모 앱: [examples/demo-app](https://github.com/dayainow/figma-publish/tree/main/examples/demo-app)
-
-### 역할 기반 AI 개발 하네스
-
-```text
-planner → domain-designer → data-contract → implementation → qa-reviewer
-```
-
-AI를 협업자로 쓰되, **역할·산출물·검증 루프**를 명시해 품질과 속도를 함께 잡는 방법을 정리 중입니다.
-
-### Web Performance Audit Skill — 성능 리포트를 코드 개선으로 연결
-
-```text
-Lighthouse JSON → metrics/evidence extraction → bottleneck diagnosis → code-level fixes → re-audit
-```
-
-Lighthouse 점수와 JSON 리포트가 실제 코드 개선으로 이어지지 않는 문제를 줄이기 위해, **Core Web Vitals · audit evidence · Next.js 개선 패턴**을 한 흐름으로 묶은 Codex 스킬을 만들었습니다.  
-`summary_latest.json`, `audit_report_latest.md`, `audit_prompt_latest.md`를 생성해 PR/이슈/AI 분석에 바로 재사용할 수 있게 구성했습니다.
 
 ---
 
