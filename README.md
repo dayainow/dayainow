@@ -22,7 +22,7 @@
 
 | 영역 | 경험 요약 |
 | --- | --- |
-| **AI 개발** | 역할 분리형 에이전트 하네스 설계·템플릿화, Cursor/Claude 워크플로우, **Figma ↔ Next.js 양방향 MCP**, Lighthouse 기반 성능 분석 스킬 |
+| **AI 개발** | 역할 분리형 에이전트 하네스 설계·템플릿화, **UI 격리 Component Harness**, Cursor/Claude 워크플로우, **Figma ↔ Next.js 양방향 MCP**, Lighthouse 기반 성능 분석 스킬 |
 | **프로덕트** | 일상 문제를 푸는 소규모 앱·웹 서비스를 기획부터 배포까지 직접 수행 |
 | **풀스택** | Next.js · NestJS · Vercel serverless · Prisma · Supabase 조합 경험 |
 | **모바일** | Expo/React Native 기반 위치·검색·즐겨찾기 앱 2종 출시/배포 |
@@ -38,6 +38,7 @@ AI를 단일 코드 생성기가 아닌 **협업 가능한 개발 시스템**으
 | 프로젝트 | 소개 | 스택 | 링크 |
 | --- | --- | --- | --- |
 | [**3-Layer Harness**](https://github.com/dayainow/3-layer-harness) | Hooks · 공유 지침 · 전문 에이전트로 구성된 **이식 가능한 AI 개발 하네스** 템플릿 | Shell · Claude/Cursor 구조 | GitHub |
+| [**Component Harness**](https://github.com/dayainow/component-harness) | Vite + React에 붙이는 **Micro-Storybook**. AI가 특정 UI만 `/harness` 샌드박스에서 격리 개발. `spec.md` · `Plans.md` · Story URL로 deterministic 검증 | Vite · React · Tailwind v4 · react-router | GitHub |
 | [**Figma Publish Harness**](https://github.com/dayainow/figma-publish) | Cursor + Figma MCP로 **Figma ↔ Next.js 양방향** 퍼블·동기화를 Skill · Rule · Prompt로 표준화. `get_metadata` 재귀 퍼블, `generate_figma_design` + `use_figma` 병렬 캡처 | Cursor · Figma MCP · Next.js · Tailwind | GitHub |
 | [**Role-Based AI Harness**](https://github.com/dayainow/ai-agent-harness-methodology) | AI를 단일 코드 생성기가 아닌 **소규모 제품 팀**처럼 운영하는 역할·핸드오프 방법론 | 방법론 · 문서 | GitHub |
 | [**Web Performance Audit Skill**](https://github.com/dayainow/web-performance-audit-skill) | Lighthouse 결과를 **측정 → 증거 추출 → 병목 진단 → 코드 개선안 → 재검증** 흐름으로 연결하는 AI 성능 분석 스킬 | Codex Skill · Lighthouse · Next.js Performance | GitHub |
@@ -48,6 +49,11 @@ AI를 단일 코드 생성기가 아닌 **협업 가능한 개발 시스템**으
 ```text
 planner → domain-designer → data-contract → implementation → qa-reviewer
          Skill · Rule · Prompt · MCP 호출 순서 · 품질 게이트
+```
+
+```text
+UI 격리: spec.md → sandbox/components → registry → /harness/sandbox/:id?story=
+         Tailwind 격리 · 프로덕션 번들 제외 · install.mjs로 타 프로젝트 이식
 ```
 
 ```text
@@ -86,7 +92,7 @@ Lighthouse: JSON → metrics/evidence → bottleneck → code fixes → re-audit
 다음 기술들을 **프로젝트 단위로 실제 적용**해 보았습니다.
 
 ```text
-Dev / AI   Cursor · Claude Code · MCP · Figma MCP · 역할 기반 에이전트 · App Delivery Harness · Lighthouse Audit Skill
+Dev / AI   Cursor · Claude Code · MCP · Figma MCP · 역할 기반 에이전트 · Component Harness · App Delivery Harness · Lighthouse Audit Skill
 Frontend   TypeScript · React · Next.js · Tailwind CSS · Zustand · TanStack Query
 Mobile     Expo · React Native · EAS Build · 위치 권한 · AsyncStorage
 Backend    NestJS · Node.js · Vercel Serverless · Redis · Prisma
