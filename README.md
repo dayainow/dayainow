@@ -26,7 +26,7 @@
 | **풀스택** | Next.js · NestJS · Vercel serverless · Prisma · Supabase 조합 경험 |
 | **모바일** | Expo/React Native 기반 위치·검색·즐겨찾기 앱 2종 출시/배포 |
 | **인터랙션** | Three.js · React Three Fiber로 3D 갤럭시·마을 프로토타입 구현 |
-| **AI 개발** | 역할 분리형 에이전트 하네스 설계·템플릿화, Cursor/Claude 워크플로우 운영 |
+| **AI 개발** | 역할 분리형 에이전트 하네스 설계·템플릿화, Cursor/Claude 워크플로우, **Figma ↔ Next.js 양방향 MCP** |
 
 ---
 
@@ -40,7 +40,7 @@ Mobile     Expo · React Native · EAS Build · 위치 권한 · AsyncStorage
 Backend    NestJS · Node.js · Vercel Serverless · Redis · Prisma
 3D / UX    Three.js · React Three Fiber · Framer Motion · WebGL Shader
 Data       공공데이터포털 API · CDN 캐시 · cron 갱신 · seed fallback
-Dev / AI   Cursor · Claude Code · MCP · 역할 기반 에이전트 · App Delivery Harness
+Dev / AI   Cursor · Claude Code · MCP · Figma MCP · 역할 기반 에이전트 · App Delivery Harness
 Infra      Vercel · GitHub Actions · SEO/OG · JSON-LD · Rate Limiting
 ```
 
@@ -71,6 +71,7 @@ Infra      Vercel · GitHub Actions · SEO/OG · JSON-LD · Rate Limiting
 | 프로젝트 | 소개 | 스택 | 링크 |
 | --- | --- | --- | --- |
 | [**3-Layer Harness**](https://github.com/dayainow/3-layer-harness) | Hooks · 공유 지침 · 전문 에이전트로 구성된 **이식 가능한 AI 개발 하네스** 템플릿 | Shell · Claude/Cursor 구조 | GitHub |
+| [**Figma Publish Harness**](https://github.com/dayainow/figma-publish) | Cursor + Figma MCP로 **Figma ↔ Next.js 양방향** 퍼블·동기화를 Skill · Rule · Prompt로 표준화. `get_metadata` 재귀 퍼블, `generate_figma_design` + `use_figma` 병렬 캡처 | Cursor · Figma MCP · Next.js · Tailwind | GitHub |
 | [**Role-Based AI Harness**](https://github.com/dayainow/ai-agent-harness-methodology) | AI를 단일 코드 생성기가 아닌 **소규모 제품 팀**처럼 운영하는 역할·핸드오프 방법론 | 방법론 · 문서 | GitHub |
 
 ---
@@ -97,6 +98,16 @@ DiaryEntry → DiaryMemory → VillageEffect[] → VillageSnapshot → Three.js 
 ```
 
 짧은 감정 기록이 날씨·건물·주민 반응으로 시각화되는 **감정 다이어리 + 3D 마을** 실험을 이어가고 있습니다.
+
+### Figma Publish Harness — Design ↔ Code 양방향 MCP
+
+```text
+Design → Code: get_variable_defs → get_metadata (재귀) → get_design_context
+Code → Figma: generate_figma_design (캡처) + use_figma (DS 조립) → 캡처 레이어 삭제
+```
+
+Figma 퍼블과 역동기화를 **하네스 3계층(Skill · Rule · Prompt)** 으로 고정해, AI 에이전트의 UI 누락·토큰 낭비·품질 편차를 줄이는 워크플로우를 정리 중입니다.  
+데모 앱: [examples/demo-app](https://github.com/dayainow/figma-publish/tree/main/examples/demo-app)
 
 ### 역할 기반 AI 개발 하네스
 
