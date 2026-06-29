@@ -43,7 +43,7 @@ AI를 단일 코드 생성기가 아닌 **협업 가능한 개발 시스템**으
 | [**Role-Based AI Harness**](https://github.com/dayainow/ai-agent-harness-methodology) | AI를 단일 코드 생성기가 아닌 **소규모 제품 팀**처럼 운영하는 역할·핸드오프 방법론 | 방법론 · 문서 | GitHub |
 | [**Web Performance Audit Skill**](https://github.com/dayainow/web-performance-audit-skill) | Lighthouse 결과를 **측정 → 증거 추출 → 병목 진단 → 코드 개선안 → 재검증** 흐름으로 연결하는 AI 성능 분석 스킬 | Codex Skill · Lighthouse · Next.js Performance | GitHub |
 | [**Web Vitals RUM Harness**](https://github.com/dayainow/web-vitals-rum-harness) | 실제 사용자 브라우저에서 **LCP · INP · CLS · TTFB**를 수집하고, 페이지·기기별 대시보드와 NDJSON 로그로 Lighthouse 분석 대상까지 연결하는 RUM 하네스 | Next.js App Router · web-vitals · RUM | GitHub |
-| [**HarnessHub**](https://github.com/dayainow/harness-hub) | GitHub에 흩어진 AI 에이전트를 **발견·평가·설치**하는 카탈로그 플랫폼. 3D 갤럭시 UI, 라이선스 분류, 크롤러, CLI | Next.js · NestJS · R3F · Redis | GitHub |
+| [**Auth Permission Harness**](https://github.com/dayainow/auth-permission-harness) | 모노레포 환경에서 사용자 권한(Role)과 소속 기관을 쉽게 모의(Mocking)하여 테스트할 수 있는 **전역 인증 하네스** | Zustand · React · Tailwind | GitHub |
 
 ### 하네스 설계 관점
 
@@ -79,6 +79,7 @@ Web Vitals RUM: field data → page/device breakdown → poor metric → Lightho
 | --- | --- | --- | --- |
 | [**OlaLab**](https://github.com/dayainow/ola) | 100+ AI 도구를 탐색하고 커뮤니티·실험실 모임으로 연결하는 **AI 큐레이션 플랫폼** | Next.js · NestJS · Prisma · Supabase | GitHub |
 | [**인류애협회**](https://github.com/dayainow/humanity-association) | "오늘의 인류애, 우리가 지킨다" — 하찮은 일상을 국가급 실적으로 인정하는 **익명 커뮤니티** 웹 MVP | Next.js · Zustand · Tailwind | [배포](https://humanity-association.vercel.app) |
+| [**HarnessHub**](https://github.com/dayainow/harness-hub) | GitHub에 흩어진 AI 에이전트를 **발견·평가·설치**하는 카탈로그 플랫폼. 3D 갤럭시 UI, 라이선스 분류, 크롤러, CLI | Next.js · NestJS · R3F · Redis | GitHub |
 
 ### 앱 서비스
 
