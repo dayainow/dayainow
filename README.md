@@ -46,6 +46,7 @@ AI를 단일 코드 생성기가 아닌 **협업 가능한 개발 시스템**으
 | [**Auth Permission Harness**](https://github.com/dayainow/auth-permission-harness) | 모노레포 환경에서 사용자 권한(Role)과 소속 기관을 쉽게 모의(Mocking)하여 테스트할 수 있는 **전역 인증 하네스** | Zustand · React · Tailwind | GitHub |
 | [**Audio Player Harness**](https://github.com/dayainow/audio-player-harness) | Zustand 등 전역 오디오 스토어에 트랙을 주입하고 MP3·HLS·에러 시나리오를 검증하는 **플레이어 상태 Dev Harness**. 전용 `HarnessAudioEngine`으로 프로덕션 엔진과 분리 | React · Next.js · Zustand · hls.js | GitHub |
 | [**WebView Bridge Harness**](https://github.com/dayainow/webview-bridge-harness) | Flutter WebView 브릿지를 브라우저에서 목(Mock)으로 대체해 **네이티브 앱 없이** 로그인·IAP·다운로드·콜백 연동을 개발·검증. 대시보드에서 핸들러 응답 모드를 실시간 제어하고 브릿지 로그를 확인 | Next.js · Flutter WebView Bridge Mock | GitHub |
+| [**Frontend Collab Kit**](https://github.com/dayainow/frontend-collab-kit) | 팀 단위 프론트엔드 협업을 위한 **강제화된 린트/포맷팅 룰(Husky)**과 **컴포넌트 자동 스캐폴딩 CLI**를 제공하는 단일 진실 공급원 하네스 패키지 | ESLint · Husky · Plop.js | GitHub |
 
 ### 하네스 설계 관점
 
