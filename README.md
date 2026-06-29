@@ -22,7 +22,7 @@
 
 | 영역 | 경험 요약 |
 | --- | --- |
-| **AI 개발** | 역할 분리형 에이전트 하네스 설계·템플릿화, **UI 격리 Component Harness**, Cursor/Claude 워크플로우, **Figma ↔ Next.js 양방향 MCP**, Lighthouse + Web Vitals 기반 성능 분석 하네스 |
+| **AI 개발** | 역할 분리형 에이전트 하네스 설계·템플릿화, **UI 격리 Component Harness**, **오디오 플레이어 상태 주입 Dev Harness**, Cursor/Claude 워크플로우, **Figma ↔ Next.js 양방향 MCP**, Lighthouse + Web Vitals 기반 성능 분석 하네스 |
 | **프로덕트** | 일상 문제를 푸는 소규모 앱·웹 서비스를 기획부터 배포까지 직접 수행 |
 | **풀스택** | Next.js · NestJS · Vercel serverless · Prisma · Supabase 조합 경험 |
 | **모바일** | Expo/React Native 기반 위치·검색·즐겨찾기 앱 2종 출시/배포 |
@@ -44,6 +44,7 @@ AI를 단일 코드 생성기가 아닌 **협업 가능한 개발 시스템**으
 | [**Web Performance Audit Skill**](https://github.com/dayainow/web-performance-audit-skill) | Lighthouse 결과를 **측정 → 증거 추출 → 병목 진단 → 코드 개선안 → 재검증** 흐름으로 연결하는 AI 성능 분석 스킬 | Codex Skill · Lighthouse · Next.js Performance | GitHub |
 | [**Web Vitals RUM Harness**](https://github.com/dayainow/web-vitals-rum-harness) | 실제 사용자 브라우저에서 **LCP · INP · CLS · TTFB**를 수집하고, 페이지·기기별 대시보드와 NDJSON 로그로 Lighthouse 분석 대상까지 연결하는 RUM 하네스 | Next.js App Router · web-vitals · RUM | GitHub |
 | [**Auth Permission Harness**](https://github.com/dayainow/auth-permission-harness) | 모노레포 환경에서 사용자 권한(Role)과 소속 기관을 쉽게 모의(Mocking)하여 테스트할 수 있는 **전역 인증 하네스** | Zustand · React · Tailwind | GitHub |
+| [**Audio Player Harness**](https://github.com/dayainow/audio-player-harness) | Zustand 등 전역 오디오 스토어에 트랙을 주입하고 MP3·HLS·에러 시나리오를 검증하는 **플레이어 상태 Dev Harness**. 전용 `HarnessAudioEngine`으로 프로덕션 엔진과 분리 | React · Next.js · Zustand · hls.js | GitHub |
 
 ### 하네스 설계 관점
 
@@ -62,6 +63,7 @@ Design → Code: get_variable_defs → get_metadata (재귀) → get_design_cont
 Code → Figma: generate_figma_design (캡처) + use_figma (DS 조립) → 캡처 레이어 삭제
 Lighthouse: JSON → metrics/evidence → bottleneck → code fixes → re-audit
 Web Vitals RUM: field data → page/device breakdown → poor metric → Lighthouse deep dive
+Audio Player: adapter → store inject → HarnessAudioEngine → MP3/HLS/에러 시나리오 · JSON 모니터
 ```
 
 - **역할·산출물·검증 루프**를 명시해 맥락 손실과 품질 편차를 줄입니다.
