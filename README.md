@@ -5,7 +5,7 @@
 ### 아이디어를 직접 만들어 보고, 쓸 만한 것은 제품으로 남기는 개발자
 
 웹·모바일·백엔드·3D·**AI 워크플로우**까지 여러 스택과 방법을 직접 시도해 왔습니다.  
-특히 **AI 에이전트 하네스** — Cursor · MCP · 역할 분리 — 를 제품 개발에 맞게 템플릿화하고, 검증된 패턴은 재사용 가능한 오픈소스로 정리합니다.
+특히 **AI 에이전트 하네스** — Cursor · MCP · 역할 분리 · CI/CD 자동화 — 를 제품 개발에 맞게 템플릿화하고, 검증된 패턴은 재사용 가능한 오픈소스로 정리합니다.
 
 [![GitHub](https://img.shields.io/badge/GitHub-Profile-181717?style=flat-square&logo=github)](https://github.com/dayainow)
 [![TypeScript](https://img.shields.io/badge/TypeScript-주력-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -22,7 +22,7 @@
 
 | 영역 | 경험 요약 |
 | --- | --- |
-| **AI 개발** | 역할 분리형 에이전트 하네스 설계·템플릿화, **UI 격리 Component Harness**, **오디오 플레이어 상태 주입 Dev Harness**, **Flutter WebView 브릿지 목 하네스**, Cursor/Claude 워크플로우, **Figma ↔ Next.js 양방향 MCP**, Lighthouse + Web Vitals 기반 성능 분석 하네스 |
+| **AI 개발** | 역할 분리형 에이전트 하네스 설계·템플릿화, **CI/CD 자동화 Harness**, **UI 격리 Component Harness**, **오디오 플레이어 상태 주입 Dev Harness**, **Flutter WebView 브릿지 목 하네스**, Cursor/Claude 워크플로우, **Figma ↔ Next.js 양방향 MCP**, Lighthouse + Web Vitals 기반 성능 분석 하네스 |
 | **프로덕트** | 일상 문제를 푸는 소규모 앱·웹 서비스를 기획부터 배포까지 직접 수행 |
 | **풀스택** | Next.js · NestJS · Vercel serverless · Prisma · Supabase 조합 경험 |
 | **모바일** | Expo/React Native 기반 위치·검색·즐겨찾기 앱 2종 출시/배포 |
@@ -38,6 +38,7 @@ AI를 단일 코드 생성기가 아닌 **협업 가능한 개발 시스템**으
 | 프로젝트 | 소개 | 스택 | 링크 |
 | --- | --- | --- | --- |
 | [**3-Layer Harness**](https://github.com/dayainow/3-layer-harness) | Hooks · 공유 지침 · 전문 에이전트로 구성된 **이식 가능한 AI 개발 하네스** 템플릿 | Shell · Claude/Cursor 구조 | GitHub |
+| [**CI/CD Harness**](https://github.com/dayainow/ci-cd-harness) | Node.js 프로젝트의 `build → test → deploy` 흐름을 표준화하고, GitHub Actions Summary · HTML 테스트 리포트 · Slack/Discord 알림까지 포함한 **배포 자동화 하네스** | TypeScript · GitHub Actions · Node.js | GitHub |
 | [**Component Harness**](https://github.com/dayainow/component-harness) | Vite + React에 붙이는 **Micro-Storybook**. AI가 특정 UI만 `/harness` 샌드박스에서 격리 개발. `spec.md` · `Plans.md` · Story URL로 deterministic 검증 | Vite · React · Tailwind v4 · react-router | GitHub |
 | [**Figma Publish Harness**](https://github.com/dayainow/figma-publish) | Cursor + Figma MCP로 **Figma ↔ Next.js 양방향** 퍼블·동기화를 Skill · Rule · Prompt로 표준화. `get_metadata` 재귀 퍼블, `generate_figma_design` + `use_figma` 병렬 캡처 | Cursor · Figma MCP · Next.js · Tailwind | GitHub |
 | [**Role-Based AI Harness**](https://github.com/dayainow/ai-agent-harness-methodology) | AI를 단일 코드 생성기가 아닌 **소규모 제품 팀**처럼 운영하는 역할·핸드오프 방법론 | 방법론 · 문서 | GitHub |
@@ -67,6 +68,7 @@ Lighthouse: JSON → metrics/evidence → bottleneck → code fixes → re-audit
 Web Vitals RUM: field data → page/device breakdown → poor metric → Lighthouse deep dive
 Audio Player: adapter → store inject → HarnessAudioEngine → MP3/HLS/에러 시나리오 · JSON 모니터
 WebView Bridge: webview-bridge-mock.js → __WEBVIEW_HARNESS__ API → 대시보드 모드 제어 → 브릿지 로그
+CI/CD Harness: git push → GitHub Actions → build/test/deploy → HTML 리포트 artifact → Slack/Discord 알림
 ```
 
 - **역할·산출물·검증 루프**를 명시해 맥락 손실과 품질 편차를 줄입니다.
@@ -107,7 +109,7 @@ Mobile     Expo · React Native · EAS Build · 위치 권한 · AsyncStorage
 Backend    NestJS · Node.js · Vercel Serverless · Redis · Prisma
 3D / UX    Three.js · React Three Fiber · Framer Motion · WebGL Shader
 Data       공공데이터포털 API · CDN 캐시 · cron 갱신 · seed fallback
-Infra      Vercel · GitHub Actions · SEO/OG · JSON-LD · Rate Limiting
+Infra      Vercel · GitHub Actions · CI/CD Harness · SEO/OG · JSON-LD · Rate Limiting
 ```
 
 한 가지 스택에만 머무르기보다, **제품에 맞는 조합을 고르고 빠르게 검증**하는 방식을 선호합니다.
