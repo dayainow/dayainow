@@ -1,13 +1,15 @@
 <div align="center">
 
-# dayainow
+# Personal Projects
 
-### 프론트엔드 중심 풀스택 제품 개발자 · AI 워크플로우 설계
+### 개인 프로젝트를 만들고, 개발 워크플로우를 실험하는 공간
 
-**기획 → 구현 → 배포**까지 직접 수행하며,  
-웹·모바일 서비스를 만들고 **재사용 가능한 개발 자동화 도구**를 오픈소스로 정리합니다.
+아이디어가 생기면 **웹·모바일로 직접 만들어 보는** 개인 GitHub입니다.  
+프론트엔드 중심 풀스택으로 기획 → 구현 → 배포까지 해보고,  
+AI 협업·CI/CD·자동화 도구 같은 **워크플로우도 함께 시도**합니다.  
+괜찮아진 것은 오픈소스로 남깁니다.
 
-[![GitHub](https://img.shields.io/badge/GitHub-dayainow-181717?style=flat-square&logo=github)](https://github.com/dayainow)
+[![GitHub](https://img.shields.io/badge/GitHub-Profile-181717?style=flat-square&logo=github)](https://github.com/dayainow)
 [![TypeScript](https://img.shields.io/badge/TypeScript-주력-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-App%20Router-000000?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![Expo](https://img.shields.io/badge/Expo-React%20Native-000020?style=flat-square&logo=expo)](https://expo.dev/)
@@ -19,17 +21,16 @@
 
 ---
 
-## 채용 담당자용 요약
+## 요약
 
 | | |
 | --- | --- |
-| **포지션 적합** | 프론트엔드 · 풀스택 · 프로덕트 엔지니어 (B2C 웹/앱, 어드민·커머스 UI) |
-| **강점** | TypeScript/React 생태계, **실서비스 배포 경험**, 복잡한 UI·상태 설계, AI 도구를 팀 워크플로로 정리하는 역량 |
-| **제품** | 모바일 앱 2종 배포 · 웹 서비스 다수 MVP~운영 · 3D 인터랙션 프로토타입 |
+| **주요 영역** | 프론트엔드 · 풀스택 · 프로덕트 (웹/앱, 어드민·커머스 UI) |
+| **제품** | 모바일 앱 2종 배포 · 웹 서비스 MVP~운영 · 3D 인터랙션 프로토타입 |
 | **오픈소스** | CI/CD 자동화, Figma↔코드 동기화, 컴포넌트 격리 개발, 성능 분석 등 **10+ 재사용 패키지** |
-| **협업·품질** | ESLint/Husky 표준화, GitHub Actions 파이프라인, 역할 분리형 AI 개발 방법론 |
+| **관심사** | TypeScript/React, 복잡한 UI·상태 설계, AI를 검증 가능한 워크플로로 쓰는 것 |
 
-> 한 줄로: **사용자에게 닿는 제품을 끝까지 만들고**, 그 과정에서 검증된 패턴을 **도구와 문서로 남기는** 개발자입니다.
+> **사용자에게 닿는 제품을 끝까지 만들고**, 검증된 패턴은 **도구와 문서로 남깁니다.**
 
 ---
 
@@ -43,7 +44,6 @@
 | --- | --- | --- | --- |
 | [**OlaLab**](https://github.com/dayainow/ola) | 100+ AI 도구 큐레이션·커뮤니티 플랫폼 | Next.js · NestJS · Prisma · Supabase | [GitHub](https://github.com/dayainow/ola) |
 | [**HarnessHub**](https://github.com/dayainow/harness-hub) | AI 에이전트·하네스 **발견·평가·설치** 카탈로그 (3D UI, CLI) | Next.js · NestJS · R3F · Redis | [GitHub](https://github.com/dayainow/harness-hub) |
-| [**인류애협회**](https://github.com/dayainow/humanity-association) | 익명 커뮤니티 웹 MVP | Next.js · Zustand · Tailwind | [GitHub](https://github.com/dayainow/humanity-association) |
 
 ### 모바일 · 인터랙션
 
@@ -85,14 +85,14 @@ AI Workflow  Cursor · MCP · Figma MCP · 역할 분리 에이전트 · Skill/R
 
 ### 배포 · 품질
 
-| 프로젝트 | 채용 관점에서의 가치 |
+| 프로젝트 | 소개 |
 | --- | --- |
 | [**CI/CD Harness**](https://github.com/dayainow/ci-cd-harness) | `build → test → deploy` 표준화, GHA Summary·HTML 리포트·Slack/Discord 알림 |
 | [**Frontend Collab Kit**](https://github.com/dayainow/frontend-collab-kit) | 팀 단위 ESLint/Prettier/Husky + 컴포넌트 스캐폴딩 CLI |
 
 ### AI 협업 · 디자인 연동
 
-| 프로젝트 | 채용 관점에서의 가치 |
+| 프로젝트 | 소개 |
 | --- | --- |
 | [**Figma Publish Harness**](https://github.com/dayainow/figma-publish) | Figma ↔ Next.js **양방향** 퍼블·동기화 (Skill · Rule · MCP 순서 표준화) |
 | [**Role-Based AI Harness**](https://github.com/dayainow/ai-agent-harness-methodology) | planner → 설계 → 구현 → QA **역할·핸드오프** 방법론 |
@@ -101,7 +101,7 @@ AI Workflow  Cursor · MCP · Figma MCP · 역할 분리 에이전트 · Skill/R
 
 ### 프론트엔드 개발 · 검증
 
-| 프로젝트 | 채용 관점에서의 가치 |
+| 프로젝트 | 소개 |
 | --- | --- |
 | [**Component Harness**](https://github.com/dayainow/component-harness) | UI **격리 샌드박스** — spec 기반 deterministic 검증 |
 | [**Auth Permission Harness**](https://github.com/dayainow/auth-permission-harness) | 모노레포 **권한·기관 Mock** — 로그인 없이 RBAC UI 개발 |
@@ -170,7 +170,7 @@ DiaryEntry → DiaryMemory → VillageEffect[] → VillageSnapshot → Three.js 
 
 <div align="center">
 
-📫 협업·채용 문의: [GitHub Issues](https://github.com/dayainow/dayainow/issues) 또는 프로필 연락처
+📫 문의: [GitHub Issues](https://github.com/dayainow/dayainow/issues)
 
 작은 것을 만들고, 쓸 만해지면 더 단단하게 만듭니다.
 
