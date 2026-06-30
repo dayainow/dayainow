@@ -1,147 +1,176 @@
 <div align="center">
 
-# Personal Projects
+# dayainow
 
-### 아이디어를 직접 만들어 보고, 쓸 만한 것은 제품으로 남기는 개발자
+### 프론트엔드 중심 풀스택 제품 개발자 · AI 워크플로우 설계
 
-웹·모바일·백엔드·3D·**AI 워크플로우**까지 여러 스택과 방법을 직접 시도해 왔습니다.  
-특히 **AI 에이전트 하네스** — Cursor · MCP · 역할 분리 · CI/CD 자동화 — 를 제품 개발에 맞게 템플릿화하고, 검증된 패턴은 재사용 가능한 오픈소스로 정리합니다.
+**기획 → 구현 → 배포**까지 직접 수행하며,  
+웹·모바일 서비스를 만들고 **재사용 가능한 개발 자동화 도구**를 오픈소스로 정리합니다.
 
-[![GitHub](https://img.shields.io/badge/GitHub-Profile-181717?style=flat-square&logo=github)](https://github.com/dayainow)
+[![GitHub](https://img.shields.io/badge/GitHub-dayainow-181717?style=flat-square&logo=github)](https://github.com/dayainow)
 [![TypeScript](https://img.shields.io/badge/TypeScript-주력-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Expo](https://img.shields.io/badge/Expo-React%20Native-000020?style=flat-square&logo=expo)](https://expo.dev/)
 [![Next.js](https://img.shields.io/badge/Next.js-App%20Router-000000?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![Expo](https://img.shields.io/badge/Expo-React%20Native-000020?style=flat-square&logo=expo)](https://expo.dev/)
+[![GitHub Actions](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white)](https://github.com/dayainow/ci-cd-harness)
 
-[📄 Personal Projects PDF](./personal-projects.pdf)
+[📄 프로젝트 상세 PDF](./personal-projects.pdf) · [HarnessHub 카탈로그](https://github.com/dayainow/harness-hub)
 
 </div>
 
 ---
 
-## 한눈에 보기
+## 채용 담당자용 요약
 
-| 영역 | 경험 요약 |
+| | |
 | --- | --- |
-| **AI 개발** | 역할 분리형 에이전트 하네스 설계·템플릿화, **CI/CD 자동화 Harness**, **UI 격리 Component Harness**, **오디오 플레이어 상태 주입 Dev Harness**, **Flutter WebView 브릿지 목 하네스**, Cursor/Claude 워크플로우, **Figma ↔ Next.js 양방향 MCP**, Lighthouse + Web Vitals 기반 성능 분석 하네스 |
-| **프로덕트** | 일상 문제를 푸는 소규모 앱·웹 서비스를 기획부터 배포까지 직접 수행 |
-| **풀스택** | Next.js · NestJS · Vercel serverless · Prisma · Supabase 조합 경험 |
-| **모바일** | Expo/React Native 기반 위치·검색·즐겨찾기 앱 2종 출시/배포 |
-| **인터랙션** | Three.js · React Three Fiber로 3D 갤럭시·마을 프로토타입 구현 |
+| **포지션 적합** | 프론트엔드 · 풀스택 · 프로덕트 엔지니어 (B2C 웹/앱, 어드민·커머스 UI) |
+| **강점** | TypeScript/React 생태계, **실서비스 배포 경험**, 복잡한 UI·상태 설계, AI 도구를 팀 워크플로로 정리하는 역량 |
+| **제품** | 모바일 앱 2종 배포 · 웹 서비스 다수 MVP~운영 · 3D 인터랙션 프로토타입 |
+| **오픈소스** | CI/CD 자동화, Figma↔코드 동기화, 컴포넌트 격리 개발, 성능 분석 등 **10+ 재사용 패키지** |
+| **협업·품질** | ESLint/Husky 표준화, GitHub Actions 파이프라인, 역할 분리형 AI 개발 방법론 |
+
+> 한 줄로: **사용자에게 닿는 제품을 끝까지 만들고**, 그 과정에서 검증된 패턴을 **도구와 문서로 남기는** 개발자입니다.
 
 ---
 
-## AI 개발 워크플로우
+## 대표 프로젝트
 
-AI를 단일 코드 생성기가 아닌 **협업 가능한 개발 시스템**으로 쓰기 위해, Skill · Rule · Prompt · MCP 호출 순서를 **이식 가능한 하네스**로 묶어 두었습니다.  
-아래 저장소는 실제로 제품 개발·퍼블·동기화·성능 분석 과정에서 검증한 워크플로우이며, **추가 하네스를 계속 확장**할 예정입니다.
-
-| 프로젝트 | 소개 | 스택 | 링크 |
-| --- | --- | --- | --- |
-| [**3-Layer Harness**](https://github.com/dayainow/3-layer-harness) | Hooks · 공유 지침 · 전문 에이전트로 구성된 **이식 가능한 AI 개발 하네스** 템플릿 | Shell · Claude/Cursor 구조 | GitHub |
-| [**CI/CD Harness**](https://github.com/dayainow/ci-cd-harness) | Node.js 프로젝트의 `build → test → deploy` 흐름을 표준화하고, GitHub Actions Summary · HTML 테스트 리포트 · Slack/Discord 알림까지 포함한 **배포 자동화 하네스** | TypeScript · GitHub Actions · Node.js | GitHub |
-| [**Component Harness**](https://github.com/dayainow/component-harness) | Vite + React에 붙이는 **Micro-Storybook**. AI가 특정 UI만 `/harness` 샌드박스에서 격리 개발. `spec.md` · `Plans.md` · Story URL로 deterministic 검증 | Vite · React · Tailwind v4 · react-router | GitHub |
-| [**Figma Publish Harness**](https://github.com/dayainow/figma-publish) | Cursor + Figma MCP로 **Figma ↔ Next.js 양방향** 퍼블·동기화를 Skill · Rule · Prompt로 표준화. `get_metadata` 재귀 퍼블, `generate_figma_design` + `use_figma` 병렬 캡처 | Cursor · Figma MCP · Next.js · Tailwind | GitHub |
-| [**Role-Based AI Harness**](https://github.com/dayainow/ai-agent-harness-methodology) | AI를 단일 코드 생성기가 아닌 **소규모 제품 팀**처럼 운영하는 역할·핸드오프 방법론 | 방법론 · 문서 | GitHub |
-| [**Web Performance Audit Skill**](https://github.com/dayainow/web-performance-audit-skill) | Lighthouse 결과를 **측정 → 증거 추출 → 병목 진단 → 코드 개선안 → 재검증** 흐름으로 연결하는 AI 성능 분석 스킬 | Codex Skill · Lighthouse · Next.js Performance | GitHub |
-| [**Web Vitals RUM Harness**](https://github.com/dayainow/web-vitals-rum-harness) | 실제 사용자 브라우저에서 **LCP · INP · CLS · TTFB**를 수집하고, 페이지·기기별 대시보드와 NDJSON 로그로 Lighthouse 분석 대상까지 연결하는 RUM 하네스 | Next.js App Router · web-vitals · RUM | GitHub |
-| [**Auth Permission Harness**](https://github.com/dayainow/auth-permission-harness) | 모노레포 환경에서 사용자 권한(Role)과 소속 기관을 쉽게 모의(Mocking)하여 테스트할 수 있는 **전역 인증 하네스** | Zustand · React · Tailwind | GitHub |
-| [**Audio Player Harness**](https://github.com/dayainow/audio-player-harness) | Zustand 등 전역 오디오 스토어에 트랙을 주입하고 MP3·HLS·에러 시나리오를 검증하는 **플레이어 상태 Dev Harness**. 전용 `HarnessAudioEngine`으로 프로덕션 엔진과 분리 | React · Next.js · Zustand · hls.js | GitHub |
-| [**WebView Bridge Harness**](https://github.com/dayainow/webview-bridge-harness) | Flutter WebView 브릿지를 브라우저에서 목(Mock)으로 대체해 **네이티브 앱 없이** 로그인·IAP·다운로드·콜백 연동을 개발·검증. 대시보드에서 핸들러 응답 모드를 실시간 제어하고 브릿지 로그를 확인 | Next.js · Flutter WebView Bridge Mock | GitHub |
-| [**Frontend Collab Kit**](https://github.com/dayainow/frontend-collab-kit) | 팀 단위 프론트엔드 협업을 위한 **강제화된 린트/포맷팅 룰(Husky)**과 **컴포넌트 자동 스캐폴딩 CLI**를 제공하는 단일 진실 공급원 하네스 패키지 | ESLint · Husky · Plop.js | GitHub |
-
-### 하네스 설계 관점
-
-```text
-planner → domain-designer → data-contract → implementation → qa-reviewer
-         Skill · Rule · Prompt · MCP 호출 순서 · 품질 게이트
-```
-
-```text
-UI 격리: spec.md → sandbox/components → registry → /harness/sandbox/:id?story=
-         Tailwind 격리 · 프로덕션 번들 제외 · install.mjs로 타 프로젝트 이식
-```
-
-```text
-Design → Code: get_variable_defs → get_metadata (재귀) → get_design_context
-Code → Figma: generate_figma_design (캡처) + use_figma (DS 조립) → 캡처 레이어 삭제
-Lighthouse: JSON → metrics/evidence → bottleneck → code fixes → re-audit
-Web Vitals RUM: field data → page/device breakdown → poor metric → Lighthouse deep dive
-Audio Player: adapter → store inject → HarnessAudioEngine → MP3/HLS/에러 시나리오 · JSON 모니터
-WebView Bridge: webview-bridge-mock.js → __WEBVIEW_HARNESS__ API → 대시보드 모드 제어 → 브릿지 로그
-CI/CD Harness: git push → GitHub Actions → build/test/deploy → HTML 리포트 artifact → Slack/Discord 알림
-```
-
-- **역할·산출물·검증 루프**를 명시해 맥락 손실과 품질 편차를 줄입니다.
-- **install.sh 한 번**으로 `.cursor/` Skill · Rule · Prompt를 프로젝트에 이식합니다.
-- Figma Publish 데모: [examples/demo-app](https://github.com/dayainow/figma-publish/tree/main/examples/demo-app)
-- 성능 개선은 **RUM으로 문제 페이지 발견 → Lighthouse로 원인 분석 → 코드 수정 → RUM으로 실제 사용자 개선 확인** 흐름으로 운영합니다.
-
----
-
-## 프로젝트
+배포·데모 링크가 있는 프로젝트를 우선 정리했습니다.
 
 ### 웹 서비스
 
-| 프로젝트 | 소개 | 스택 | 링크 |
+| 프로젝트 | 한 줄 소개 | 역할·기술 | 링크 |
 | --- | --- | --- | --- |
-| [**OlaLab**](https://github.com/dayainow/ola) | 100+ AI 도구를 탐색하고 커뮤니티·실험실 모임으로 연결하는 **AI 큐레이션 플랫폼** | Next.js · NestJS · Prisma · Supabase | GitHub |
-| [**인류애협회**](https://github.com/dayainow/humanity-association) | "오늘의 인류애, 우리가 지킨다" — 하찮은 일상을 국가급 실적으로 인정하는 **익명 커뮤니티** 웹 MVP | Next.js · Zustand · Tailwind | GitHub |
-| [**HarnessHub**](https://github.com/dayainow/harness-hub) | GitHub에 흩어진 AI 에이전트를 **발견·평가·설치**하는 카탈로그 플랫폼. 3D 갤럭시 UI, 라이선스 분류, 크롤러, CLI | Next.js · NestJS · R3F · Redis | GitHub |
+| [**OlaLab**](https://github.com/dayainow/ola) | 100+ AI 도구 큐레이션·커뮤니티 플랫폼 | Next.js · NestJS · Prisma · Supabase | [GitHub](https://github.com/dayainow/ola) |
+| [**HarnessHub**](https://github.com/dayainow/harness-hub) | AI 에이전트·하네스 **발견·평가·설치** 카탈로그 (3D UI, CLI) | Next.js · NestJS · R3F · Redis | [GitHub](https://github.com/dayainow/harness-hub) |
+| [**인류애협회**](https://github.com/dayainow/humanity-association) | 익명 커뮤니티 웹 MVP | Next.js · Zustand · Tailwind | [GitHub](https://github.com/dayainow/humanity-association) |
 
-### 앱 서비스
+### 모바일 · 인터랙션
 
-| 프로젝트 | 소개 | 스택 | 링크 |
+| 프로젝트 | 한 줄 소개 | 역할·기술 | 링크 |
 | --- | --- | --- | --- |
-| [**0원의품격**](https://github.com/dayainow/zero-won-poomgyeok) | 0원으로 즐길 수 있는 전시·공연·문화행사를 찾는 앱. 도서관 앱에서 검증한 구조를 확장한 문화 정보 서비스 | Expo · TypeScript · Vercel API | [배포](https://zero-won-poomgyeok.vercel.app) |
-| [**오늘의 도서관**](https://github.com/dayainow/today-library) | 전국 공공도서관 데이터로 **지금 열린 곳**을 가까운 순으로 보여주는 모바일 앱. 검색·필터·즐겨찾기·길찾기 지원 | Expo · TypeScript · Vercel API | [배포](https://today-library-sigma.vercel.app) |
-| [**메모빌**](https://github.com/dayainow/memoville) | 감정 일기를 쓰면 **3D 마을**이 자라는 인터랙티브 다이어리 앱 프로토타입 | Expo · Three.js · R3F · WebView | [프로토타입](https://prototype-web-eosin.vercel.app) |
+| [**오늘의 도서관**](https://github.com/dayainow/today-library) | 전국 공공도서관 **지금 열린 곳** 검색·즐겨찾기·길찾기 | Expo · TypeScript · Vercel API | [**배포**](https://today-library-sigma.vercel.app) |
+| [**0원의품격**](https://github.com/dayainow/zero-won-poomgyeok) | 0원 문화행사·전시 정보 앱 | Expo · TypeScript · Vercel API | [**배포**](https://zero-won-poomgyeok.vercel.app) |
+| [**메모빌**](https://github.com/dayainow/memoville) | 감정 일기 → **3D 마을** 성장 인터랙션 | Expo · Three.js · R3F | [**프로토타입**](https://prototype-web-eosin.vercel.app) |
+
+---
+
+## 핵심 역량
+
+```text
+Frontend     TypeScript · React · Next.js · Tailwind · Zustand · TanStack Query
+             복잡한 폼·권한·전역 상태 · 반응형 UI · Storybook/격리 개발 패턴
+
+Mobile       Expo · React Native · EAS · 위치·검색·오프라인 즐겨찾기
+
+Backend      NestJS · Node.js · Prisma · Supabase · Vercel Serverless · Redis
+
+Delivery     GitHub Actions(CI/CD) · Vercel 배포 · SEO/OG · Rate Limiting
+
+AI Workflow  Cursor · MCP · Figma MCP · 역할 분리 에이전트 · Skill/Rule 표준화
+```
+
+| 영역 | 실무에서 하는 일 |
+| --- | --- |
+| **프론트엔드** | B2C/B2B UI 구현, 디자인 시스템 연동, 성능·접근성 개선 |
+| **풀스택** | API 설계·연동, DB 스키마, 인증·권한, 배포 파이프라인 |
+| **AI 활용** | 코드 생성기가 아닌 **검증 가능한 워크플로**로 운영 (역할·게이트·재현) |
+| **도구화** | 반복 작업을 npm 패키지·GHA 워크플로·Cursor Skill로 추출 |
+
+---
+
+## 오픈소스 — 개발 자동화 & 워크플로
+
+제품 개발 중 만들어 검증한 도구입니다. 팀에 **이식 가능한 패키지·템플릿** 형태로 공개합니다.
+
+### 배포 · 품질
+
+| 프로젝트 | 채용 관점에서의 가치 |
+| --- | --- |
+| [**CI/CD Harness**](https://github.com/dayainow/ci-cd-harness) | `build → test → deploy` 표준화, GHA Summary·HTML 리포트·Slack/Discord 알림 |
+| [**Frontend Collab Kit**](https://github.com/dayainow/frontend-collab-kit) | 팀 단위 ESLint/Prettier/Husky + 컴포넌트 스캐폴딩 CLI |
+
+### AI 협업 · 디자인 연동
+
+| 프로젝트 | 채용 관점에서의 가치 |
+| --- | --- |
+| [**Figma Publish Harness**](https://github.com/dayainow/figma-publish) | Figma ↔ Next.js **양방향** 퍼블·동기화 (Skill · Rule · MCP 순서 표준화) |
+| [**Role-Based AI Harness**](https://github.com/dayainow/ai-agent-harness-methodology) | planner → 설계 → 구현 → QA **역할·핸드오프** 방법론 |
+| [**3-Layer Harness**](https://github.com/dayainow/3-layer-harness) | Hooks · 공유 지침 · 전문 에이전트 템플릿 |
+| [**Web Performance Audit Skill**](https://github.com/dayainow/web-performance-audit-skill) | Lighthouse → 병목 진단 → 개선안 → 재검증 루프 |
+
+### 프론트엔드 개발 · 검증
+
+| 프로젝트 | 채용 관점에서의 가치 |
+| --- | --- |
+| [**Component Harness**](https://github.com/dayainow/component-harness) | UI **격리 샌드박스** — spec 기반 deterministic 검증 |
+| [**Auth Permission Harness**](https://github.com/dayainow/auth-permission-harness) | 모노레포 **권한·기관 Mock** — 로그인 없이 RBAC UI 개발 |
+| [**Audio Player Harness**](https://github.com/dayainow/audio-player-harness) | 전역 플레이어 상태 주입·MP3/HLS/에러 시나리오 검증 |
+| [**WebView Bridge Harness**](https://github.com/dayainow/webview-bridge-harness) | Flutter WebView 브릿지 **브라우저 Mock** — 네이티브 없이 연동 개발 |
+| [**Web Vitals RUM Harness**](https://github.com/dayainow/web-vitals-rum-harness) | 실사용자 LCP·INP·CLS·TTFB 수집 → Lighthouse 분석 연결 |
+
+전체 목록·설치: [**HarnessHub**](https://github.com/dayainow/harness-hub)
+
+### 자동화 구성 방식 (요약)
+
+업계 표준에 맞춰, 프로젝트마다 아래 층을 조합합니다.
+
+```text
+① AI 규칙      Cursor Skill · Rule · Prompt  (협업 순서·품질 게이트)
+② 로컬 품질    Husky · ESLint · Prettier     (커밋 시)
+③ UI 검증      Component Harness · Storybook (개발 중)
+④ CI/CD        GitHub Actions · CI/CD Harness (push 후 build/test/deploy)
+```
+
+```text
+제품 루프:  planner → domain-design → data-contract → implementation → qa-reviewer
+디자인:     Figma MCP → metadata 재귀 → design_context → 코드 구현
+성능:       RUM(실사용자) → Lighthouse(원인) → 코드 수정 → RUM(개선 확인)
+```
 
 ---
 
 ## 기술 스택
 
-다음 기술들을 **프로젝트 단위로 실제 적용**해 보았습니다.
-
 ```text
-Dev / AI   Cursor · Claude Code · MCP · Figma MCP · 역할 기반 에이전트 · Component Harness · App Delivery Harness · Lighthouse Audit Skill · Web Vitals RUM
-Frontend   TypeScript · React · Next.js · Tailwind CSS · Zustand · TanStack Query
-Mobile     Expo · React Native · EAS Build · 위치 권한 · AsyncStorage
-Backend    NestJS · Node.js · Vercel Serverless · Redis · Prisma
-3D / UX    Three.js · React Three Fiber · Framer Motion · WebGL Shader
-Data       공공데이터포털 API · CDN 캐시 · cron 갱신 · seed fallback
-Infra      Vercel · GitHub Actions · CI/CD Harness · SEO/OG · JSON-LD · Rate Limiting
+Language   TypeScript (주력), JavaScript
+Frontend   React, Next.js App Router, Tailwind CSS, Zustand, TanStack Query
+Mobile     Expo, React Native, EAS Build
+Backend    NestJS, Node.js, Prisma, Supabase, Vercel Serverless
+3D / UX    Three.js, React Three Fiber, Framer Motion
+Data       공공데이터 API, CDN 캐시, cron, seed fallback
+Infra      Vercel, GitHub Actions, Redis, SEO/OG, JSON-LD
+Dev / AI   Cursor, Claude, MCP, Figma MCP, Lighthouse, web-vitals
 ```
-
-한 가지 스택에만 머무르기보다, **제품에 맞는 조합을 고르고 빠르게 검증**하는 방식을 선호합니다.
 
 ---
 
-## 개발 방식
+## 일하는 방식
 
 ```text
-아이디어 → 빠른 MVP → 실사용 검증 → 패턴 추출 → 다음 제품에 재사용
+아이디어 → MVP → 실사용 검증 → 패턴 추출 → 오픈소스·다음 제품에 재사용
 ```
 
-- **프로토타입 우선**: 먼저 동작하는 제품 루프를 만들고, 이후에 구조를 다듬습니다.
-- **역할 분리**: 기획·설계·구현·QA를 AI 에이전트 역할로 나누어 맥락 손실을 줄입니다.
-- **따뜻한 UX**: 정보 밀도는 높이되, 화면은 과하지 않게 — 읽기 쉬운 인터페이스를 지향합니다.
-- **배포까지**: Vercel 배포, Play Store 준비, 개인정보처리방침·OG 이미지 등 출시에 필요한 것까지 직접 다룹니다.
+- **End-to-end**: 기획·UI·API·배포·출시 준비(약관·OG 등)까지 직접 수행
+- **프로토타입 우선**: 동작하는 제품 루프를 먼저 만들고 구조를 다듬음
+- **품질 게이트**: 린트·테스트·CI를 코드와 함께 유지 — AI 산출물도 동일 기준 적용
+- **UX**: 정보는 충실하되 화면은 과하지 않게 — 읽기 쉬운 인터페이스 지향
 
 ---
 
-## 현재 관심 분야
+## 현재 관심
 
-### 메모빌 — 감정 기록이 마을로 이어지는 경험
+**메모빌** — 감정 일기가 3D 마을로 시각화되는 인터랙티브 다이어리
 
 ```text
 DiaryEntry → DiaryMemory → VillageEffect[] → VillageSnapshot → Three.js Village
 ```
 
-짧은 감정 기록이 날씨·건물·주민 반응으로 시각화되는 **감정 다이어리 + 3D 마을** 실험을 이어가고 있습니다.
-
 ---
 
 <div align="center">
+
+📫 협업·채용 문의: [GitHub Issues](https://github.com/dayainow/dayainow/issues) 또는 프로필 연락처
 
 작은 것을 만들고, 쓸 만해지면 더 단단하게 만듭니다.
 
