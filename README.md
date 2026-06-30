@@ -115,8 +115,6 @@ AI Workflow  Cursor · MCP · Figma MCP · 역할 분리 에이전트 · Skill/R
 | [**WebView Bridge Harness**](https://github.com/dayainow/webview-bridge-harness) | Flutter WebView 브릿지 **브라우저 Mock** — 네이티브 없이 연동 개발 |
 | [**Web Vitals RUM Harness**](https://github.com/dayainow/web-vitals-rum-harness) | 실사용자 LCP·INP·CLS·TTFB 수집 → Lighthouse 분석 연결 |
 
-전체 목록·설치: [**HarnessHub**](https://github.com/dayainow/harness-hub)
-
 ### 자동화 구성 방식 (요약)
 
 업계 표준에 맞춰, 프로젝트마다 아래 층을 조합합니다.
