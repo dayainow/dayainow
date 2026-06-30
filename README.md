@@ -92,6 +92,7 @@ AI Workflow  Cursor · MCP · Figma MCP · 역할 분리 에이전트 · Skill/R
 | 프로젝트 | 소개 |
 | --- | --- |
 | [**CI/CD Harness**](https://github.com/dayainow/ci-cd-harness) | `build → test → deploy` 표준화, GHA Summary·HTML 리포트·Slack/Discord 알림 |
+| [**Frontend Agent Orchestrator Kit**](https://github.com/dayainow/frontend-agent-orchestrator-kit) | 기획/디자인 → 컴포넌트 → Mocking → 테스트 → 배포 검증을 묶는 프론트엔드 AI 에이전트 하네스 |
 | [**Frontend Collab Kit**](https://github.com/dayainow/frontend-collab-kit) | 팀 단위 ESLint/Prettier/Husky + 컴포넌트 스캐폴딩 CLI |
 
 ### AI 협업 · 디자인 연동
