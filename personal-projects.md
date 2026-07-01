@@ -15,7 +15,7 @@ https://github.com/dayainow
 | --- | --- |
 | **주요 영역** | 프론트엔드 · 풀스택 · 프로덕트 (웹/앱, 어드민·커머스 UI) |
 | **제품** | 모바일 앱 2종 배포 · 웹 서비스 MVP~운영 · 3D 인터랙션 프로토타입 |
-| **오픈소스** | CI/CD 자동화, Figma↔코드 동기화, 컴포넌트 격리 개발, 성능 분석 등 10+ 재사용 패키지 |
+| **오픈소스** | CI/CD 자동화, Figma↔코드 동기화, 모바일 검증, 컴포넌트 격리 개발 등 14+ 재사용 패키지 |
 | **관심사** | TypeScript/React, 복잡한 UI·상태 설계, AI를 검증 가능한 워크플로로 쓰는 것 |
 
 사용자에게 닿는 제품을 끝까지 만들고, 검증된 패턴은 도구와 문서로 남깁니다.
@@ -86,6 +86,13 @@ https://github.com/dayainow
 - **Audio Player Harness** — 전역 플레이어 상태 주입·MP3/HLS/에러 시나리오
 - **WebView Bridge Harness** — Flutter WebView 브릿지 브라우저 Mock
 - **Web Vitals RUM Harness** — 실사용자 Web Vitals 수집 → Lighthouse 분석 연결
+
+### 모바일 · 앱 개발 검증
+
+- **Expo Release Harness** — Expo/EAS 빌드 · OTA 업데이트 · 스토어 배포 전 체크리스트 자동화
+- **Mobile Permission Harness** — 위치·카메라·알림·사진 접근 권한 Mock
+- **Deep Link Harness** — 앱 딥링크·Universal Link·App Link 라우팅 검증
+- **Offline Sync Harness** — 오프라인 저장·재시도 큐·네트워크 복구 시 동기화 시나리오 검증
 
 ### 자동화 구성 방식
 
