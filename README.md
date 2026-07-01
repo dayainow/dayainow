@@ -172,20 +172,8 @@ Dev / AI   Cursor, Claude, MCP, Figma MCP, Lighthouse, web-vitals
 
 ---
 
-## 현재 관심
-
-**메모빌** — 감정 일기가 3D 마을로 시각화되는 인터랙티브 다이어리
-
-```text
-DiaryEntry → DiaryMemory → VillageEffect[] → VillageSnapshot → Three.js Village
-```
-
----
-
 <div align="center">
 
 📫 문의: [GitHub Issues](https://github.com/dayainow/dayainow/issues)
-
-작은 것을 만들고, 쓸 만해지면 더 단단하게 만듭니다.
 
 </div>
