@@ -128,5 +128,3 @@ https://github.com/dayainow
 ---
 
 
-
-작은 것을 만들고, 쓸 만해지면 더 단단하게 만듭니다.
