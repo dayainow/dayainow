@@ -28,6 +28,7 @@ https://github.com/dayainow
 
 | 프로젝트 | 한 줄 소개 | 기술 |
 | --- | --- | --- |
+| CorpBrain | RBAC 기반 로컬 RAG 사내 문서 챗봇 — 문서 트리 탐색·Slack 연동·품질 게이트(Hit@3 80%)·옵션형 Cross-encoder 리랭킹 | Next.js · Ollama · AI SDK · PgVector · Redis |
 | OlaLab | 100+ AI 도구 큐레이션·커뮤니티 플랫폼 | Next.js · NestJS · Prisma · Supabase |
 | HarnessHub | AI 에이전트·하네스 발견·평가·설치 카탈로그 (3D UI, CLI) | Next.js · NestJS · R3F · Redis |
 
@@ -48,11 +49,11 @@ https://github.com/dayainow
 
 **Mobile** — Expo · React Native · EAS · 위치·검색·오프라인 즐겨찾기
 
-**Backend** — NestJS · Node.js · Prisma · Supabase · Vercel Serverless · Redis
+**Backend** — NestJS · Node.js · Prisma · Supabase · Vercel Serverless · Redis · PgVector
 
 **Delivery** — GitHub Actions(CI/CD) · Vercel 배포 · SEO/OG · Rate Limiting
 
-**AI Workflow** — Cursor · MCP · Figma MCP · 역할 분리 에이전트 · Skill/Rule 표준화
+**AI Workflow** — Cursor · MCP · Figma MCP · 역할 분리 에이전트 · Skill/Rule 표준화 · RAG 품질 게이트(Hit@K)
 
 | 영역 | 실무에서 하는 일 |
 | --- | --- |
