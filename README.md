@@ -109,6 +109,7 @@ AI Workflow  Cursor · MCP · Figma MCP · 역할 분리 에이전트 · Skill/R
 
 | 프로젝트 | 소개 |
 | --- | --- |
+| [**Frontend Security Suite**](https://github.com/dayainow/corp-brain) | 프론트엔드 **4대 보안(XSS, CSP, API Header, Storage)** 통합 검증 하네스 |
 | [**Component Harness**](https://github.com/dayainow/component-harness) | UI **격리 샌드박스** — spec 기반 deterministic 검증 |
 | [**Form Validation Harness**](https://github.com/dayainow/form-validation-harness) | 복잡한 폼 **Zod Chaos 주입** · 조건부 의존성 스위칭 · 타임머신 스냅샷 |
 | [**GA Analytics Harness**](https://github.com/dayainow/ga-analytics-harness) | Notion GA4 명세 → `trackEvent` 코드 · MSW 캡처 · compliance · Husky/GHA 게이트 |
