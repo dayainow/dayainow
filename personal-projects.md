@@ -127,12 +127,6 @@ https://github.com/dayainow
 
 ---
 
-## 현재 관심
 
-**메모빌** — 감정 일기가 3D 마을로 시각화되는 인터랙티브 다이어리
-
-DiaryEntry → DiaryMemory → VillageEffect[] → VillageSnapshot → Three.js Village
-
----
 
 작은 것을 만들고, 쓸 만해지면 더 단단하게 만듭니다.

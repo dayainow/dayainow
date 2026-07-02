@@ -174,22 +174,7 @@ Dev / AI   Cursor, Claude, MCP, Figma MCP, Lighthouse, web-vitals
 
 ---
 
-## 현재 관심
 
-**마음길잡이** — 카카오 PlayMCP에 등록된 정신건강·복지 안내 MCP 서버
-
-```text
-사용자 입력 → 위기 감지 → 상담기관 / 복지제도 연결 → 신청·이용 안내까지
-공공데이터 163개 기관 + 복지로 API 연동 진행 중
-```
-
-**메모빌** — 감정 일기가 3D 마을로 시각화되는 인터랙티브 다이어리
-
-```text
-DiaryEntry → DiaryMemory → VillageEffect[] → VillageSnapshot → Three.js Village
-```
-
----
 
 
 <div align="center">
