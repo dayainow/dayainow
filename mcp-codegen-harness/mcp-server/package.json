@@ -1,0 +1,30 @@
+{
+  "name": "mcp-codegen-agent",
+  "version": "0.1.0",
+  "description": "MCP server that detects API specs and generates TypeScript API layers.",
+  "type": "commonjs",
+  "bin": {
+    "mcp-codegen": "./dist/server.js"
+  },
+  "main": "./dist/server.js",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "dev": "tsx src/server.ts"
+  },
+  "dependencies": {
+    "yaml": "^2.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

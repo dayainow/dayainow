@@ -1,0 +1,19 @@
+{
+  "name": "mcp-codegen-harness",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local harness for the mcp-codegen-agent MCP server.",
+  "workspaces": [
+    "mcp-server"
+  ],
+  "scripts": {
+    "build": "npm --workspace mcp-codegen-agent run build",
+    "harness": "tsx run-harness.ts",
+    "test": "npm run build && npm run harness"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
