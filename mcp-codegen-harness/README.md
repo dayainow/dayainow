@@ -8,6 +8,60 @@
 - Zod 스키마
 - TanStack Query fetcher/hook
 
+## 어떤 문제를 해결하나요?
+
+프론트엔드에서 API를 붙일 때 자주 생기는 반복 작업을 줄입니다. 백엔드가 OpenAPI 스펙을 제공해도, 프론트엔드에서는 보통 타입 정의, 런타임 검증 스키마, fetcher, TanStack Query hook을 다시 손으로 만들게 됩니다. 이 과정에서 필드 이름이 틀리거나, API 응답 타입과 화면 코드가 어긋나거나, 엔드포인트가 바뀌었는데 일부 hook만 갱신되지 않는 문제가 자주 생깁니다.
+
+`mcp-codegen-agent`는 AI 클라이언트가 현재 프로젝트의 API 스펙을 직접 찾고, 사용자가 요청한 코드 레이어를 같은 규칙으로 생성하도록 돕습니다. 즉, "스펙은 있는데 프론트엔드 API 레이어를 매번 사람이 정리해야 하는 문제"를 MCP 도구로 자동화합니다.
+
+## 언제 쓰면 좋나요?
+
+- 백엔드에서 `openapi.yaml`, `swagger.json` 같은 API 스펙을 제공하는 프로젝트
+- 새 기능을 만들기 전에 `src/api/generated` 같은 폴더에 타입과 API hook을 먼저 깔아야 하는 상황
+- API 응답 타입, Zod 검증, TanStack Query hook을 화면마다 따로 만들다가 중복이 늘어난 상황
+- Cursor, Claude Desktop 같은 AI 클라이언트에게 "이 프로젝트의 API 스펙을 읽고 필요한 프론트엔드 코드까지 생성해줘"라고 맡기고 싶은 상황
+- 여러 프로젝트에서 같은 방식으로 API 레이어를 만들고 싶어 전역 MCP 도구가 필요한 상황
+
+반대로, API 스펙이 없거나 백엔드 응답 형태가 문서화되어 있지 않은 프로젝트에서는 먼저 OpenAPI 스펙을 준비해야 효과가 큽니다.
+
+## 사용 시나리오
+
+### 1. 새 프론트엔드 프로젝트를 시작할 때
+
+`openapi.yaml`만 프로젝트 루트에 두고 다음처럼 요청합니다.
+
+```text
+이 프로젝트의 openapi.yaml을 읽어서 src/api/generated에 TypeScript 타입, Zod 스키마, TanStack Query hook을 생성해줘.
+```
+
+AI 클라이언트는 `detect_api_spec`로 스펙을 찾고, `generate_code`로 필요한 파일을 생성합니다. 이후 화면 개발자는 생성된 타입과 hook을 가져다 쓰면 됩니다.
+
+### 2. API 스펙이 바뀐 뒤 프론트엔드 코드를 동기화할 때
+
+백엔드에서 필드나 엔드포인트가 바뀌면 손으로 타입을 찾아 고치는 대신 다시 생성합니다.
+
+```text
+openapi.yaml이 업데이트됐어. 기존 src/api/generated 폴더를 기준으로 타입, Zod, TanStack Query 코드를 다시 생성해줘.
+```
+
+이렇게 하면 API 계약 변경을 프론트엔드 코드에 빠르게 반영할 수 있습니다.
+
+### 3. 여러 서비스에서 같은 코드 생성 규칙을 쓰고 싶을 때
+
+`mcp-codegen`을 전역 CLI로 등록하면 프로젝트마다 별도 설정을 복사하지 않아도 됩니다. Cursor나 Claude Desktop이 열려 있는 프로젝트 루트 기준으로 상대경로를 해석하므로, A 프로젝트에서는 `./openapi.yaml`, B 프로젝트에서는 `./swagger.json`처럼 각각의 스펙을 읽어 생성할 수 있습니다.
+
+## 무엇이 생성되나요?
+
+예를 들어 Petstore 스펙을 입력하면 다음 같은 코드가 생성됩니다.
+
+- `types.ts`: OpenAPI schemas와 operation별 request/response 타입
+- `zod.ts`: 런타임 검증에 사용할 Zod schema
+- `tanstack-query.ts`: `fetch` 기반 API 함수와 `useXxxQuery` hook
+- `index.ts`: 생성 파일 re-export
+- `codegen-report.json`: 어떤 스펙에서 어떤 feature를 생성했는지 기록
+
+현재 구현은 OpenAPI 3.x YAML/JSON 생성을 지원합니다. GraphQL 파일은 탐지할 수 있지만, GraphQL codegen은 아직 구현 대상이 아닙니다.
+
 ## 구조
 
 ```text
