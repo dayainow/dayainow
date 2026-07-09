@@ -8,6 +8,7 @@ import { parse as parseYaml } from "yaml";
 type JsonObject = Record<string, unknown>;
 type JsonRpcId = string | number | null;
 type Feature = "types" | "zod" | "tanstack-query";
+type ApiSourceFormat = ApiSpecDetection["format"];
 
 type JsonRpcRequest = {
   jsonrpc?: string;
@@ -31,7 +32,7 @@ type ApiSpecDetection = {
     | "asyncapi-yaml"
     | "http-file";
   diagnosis: string;
-  generationSupport: "supported" | "detected-only";
+  generationSupport: "supported";
   recommendedAction: string;
 };
 
@@ -53,6 +54,42 @@ type Parameter = {
   type: string;
 };
 
+type GeneratedBundle = {
+  engine: string;
+  itemCount: number;
+  files: Array<{
+    fileName: string;
+    contents: string;
+  }>;
+};
+
+type RequestItem = {
+  name: string;
+  method: string;
+  url: string;
+  functionName: string;
+  typePrefix: string;
+  bodyType?: string;
+};
+
+type GraphqlField = {
+  name: string;
+  operationType: "query" | "mutation";
+  args: Parameter[];
+  responseType: string;
+  selection: string;
+};
+
+type GraphqlObjectType = {
+  kind: "type" | "input" | "interface";
+  fields: Array<{
+    name: string;
+    rawType: string;
+    type: string;
+    required: boolean;
+  }>;
+};
+
 const MCP_TOOLS = [
   {
     name: "detect_api_spec",
@@ -72,7 +109,7 @@ const MCP_TOOLS = [
   {
     name: "generate_code",
     description:
-      "API 스펙 파일을 읽어 TypeScript 타입, Zod 스키마, TanStack Query 훅을 자동 생성합니다. 현재 생성 엔진은 OpenAPI 3.x를 지원합니다.",
+      "API 스펙 파일을 읽어 TypeScript 타입, Zod 스키마, TanStack Query 훅 또는 API 클라이언트를 자동 생성합니다.",
     inputSchema: {
       type: "object",
       properties: {
@@ -229,6 +266,12 @@ function compareDetectedSpecs(a: ApiSpecDetection, b: ApiSpecDetection): number 
     return supportDiff;
   }
 
+  const formatDiff = formatRank(a.format) - formatRank(b.format);
+
+  if (formatDiff !== 0) {
+    return formatDiff;
+  }
+
   return a.path.localeCompare(b.path);
 }
 
@@ -238,70 +281,81 @@ function generationSupportRank(
   return generationSupport === "supported" ? 0 : 1;
 }
 
+function formatRank(format: ApiSourceFormat): number {
+  if (format === "openapi-json" || format === "openapi-yaml") {
+    return 0;
+  }
+
+  if (format === "swagger-json" || format === "swagger-yaml") {
+    return 1;
+  }
+
+  return 2;
+}
+
 async function generateCode(args: JsonObject): Promise<unknown> {
   const specPath = readString(args.specPath, "specPath");
   const outputDir = readString(args.outputDir, "outputDir");
   const features = readFeatures(args.features);
   const absoluteSpecPath = resolveFromCwd(specPath);
   const absoluteOutputDir = resolveFromCwd(outputDir);
-  const spec = await loadSpec(absoluteSpecPath);
+  const raw = await fs.readFile(absoluteSpecPath, "utf8");
+  const spec = parseSpecByExtension(absoluteSpecPath, raw);
+  const format = inferApiSourceFormat(absoluteSpecPath, raw, spec);
 
-  if (!isRecord(spec) || typeof spec.openapi !== "string") {
-    throw new Error(
-      "generate_code currently supports OpenAPI 3.x YAML/JSON specs. Other API sources can be detected first, then converted or handled by future adapters.",
+  let bundle: GeneratedBundle;
+
+  if (format === "openapi-json" || format === "openapi-yaml") {
+    bundle = buildOpenApiBundle(asRecord(spec), features, "builtin-openapi");
+  } else if (format === "swagger-json" || format === "swagger-yaml") {
+    bundle = buildOpenApiBundle(
+      convertSwaggerToOpenApi(asRecord(spec)),
+      features,
+      "builtin-swagger2-adapter",
     );
+  } else if (format === "graphql") {
+    bundle = buildGraphqlBundle(raw, features);
+  } else if (format === "postman-collection") {
+    bundle = buildRequestCollectionBundle(
+      collectPostmanRequests(asRecord(spec)),
+      features,
+      "builtin-postman-adapter",
+    );
+  } else if (format === "insomnia-export") {
+    bundle = buildRequestCollectionBundle(
+      collectInsomniaRequests(asRecord(spec)),
+      features,
+      "builtin-insomnia-adapter",
+    );
+  } else if (format === "http-file") {
+    bundle = buildRequestCollectionBundle(
+      collectHttpFileRequests(raw),
+      features,
+      "builtin-http-file-adapter",
+    );
+  } else if (format === "asyncapi-json" || format === "asyncapi-yaml") {
+    bundle = buildAsyncApiBundle(asRecord(spec), features);
+  } else {
+    throw new Error(`Unsupported API source format: ${format}`);
   }
 
   await fs.mkdir(absoluteOutputDir, { recursive: true });
 
   const generatedFiles: string[] = [];
-  const operations = collectOperations(spec);
-
-  if (features.includes("types")) {
+  for (const file of bundle.files) {
     generatedFiles.push(
-      await writeGeneratedFile(
-        absoluteOutputDir,
-        "types.ts",
-        generateTypesFile(spec, operations),
-      ),
+      await writeGeneratedFile(absoluteOutputDir, file.fileName, file.contents),
     );
   }
-
-  if (features.includes("zod")) {
-    generatedFiles.push(
-      await writeGeneratedFile(
-        absoluteOutputDir,
-        "zod.ts",
-        generateZodFile(spec),
-      ),
-    );
-  }
-
-  if (features.includes("tanstack-query")) {
-    generatedFiles.push(
-      await writeGeneratedFile(
-        absoluteOutputDir,
-        "tanstack-query.ts",
-        generateTanstackQueryFile(operations),
-      ),
-    );
-  }
-
-  generatedFiles.push(
-    await writeGeneratedFile(
-      absoluteOutputDir,
-      "index.ts",
-      generateIndexFile(features),
-    ),
-  );
 
   const report = {
     generatedAt: new Date().toISOString(),
-    engine: "builtin-openapi",
+    engine: bundle.engine,
+    sourceFormat: format,
     specPath: absoluteSpecPath,
     outputDir: absoluteOutputDir,
     features,
-    operationCount: operations.length,
+    itemCount: bundle.itemCount,
     files: generatedFiles,
   };
 
@@ -319,6 +373,941 @@ async function generateCode(args: JsonObject): Promise<unknown> {
     ...report,
     files: generatedFiles,
   };
+}
+
+function buildOpenApiBundle(
+  spec: JsonObject,
+  features: Feature[],
+  engine: string,
+): GeneratedBundle {
+  const operations = collectOperations(spec);
+  const files: GeneratedBundle["files"] = [];
+
+  if (features.includes("types")) {
+    files.push({
+      fileName: "types.ts",
+      contents: generateTypesFile(spec, operations),
+    });
+  }
+
+  if (features.includes("zod")) {
+    files.push({
+      fileName: "zod.ts",
+      contents: generateZodFile(spec),
+    });
+  }
+
+  if (features.includes("tanstack-query")) {
+    files.push({
+      fileName: "tanstack-query.ts",
+      contents: generateTanstackQueryFile(operations),
+    });
+  }
+
+  files.push({
+    fileName: "index.ts",
+    contents: generateIndexFile(features),
+  });
+
+  return {
+    engine,
+    itemCount: operations.length,
+    files,
+  };
+}
+
+function buildRequestCollectionBundle(
+  requests: RequestItem[],
+  features: Feature[],
+  engine: string,
+): GeneratedBundle {
+  const files: GeneratedBundle["files"] = [];
+
+  if (features.includes("types")) {
+    files.push({
+      fileName: "types.ts",
+      contents: generateRequestCollectionTypesFile(requests),
+    });
+  }
+
+  if (features.includes("zod")) {
+    files.push({
+      fileName: "zod.ts",
+      contents: generateRequestCollectionZodFile(requests),
+    });
+  }
+
+  if (features.includes("tanstack-query")) {
+    files.push({
+      fileName: "tanstack-query.ts",
+      contents: generateRequestCollectionTanstackFile(requests),
+    });
+  }
+
+  files.push({
+    fileName: "index.ts",
+    contents: generateIndexFile(features),
+  });
+
+  return {
+    engine,
+    itemCount: requests.length,
+    files,
+  };
+}
+
+function buildGraphqlBundle(rawSchema: string, features: Feature[]): GeneratedBundle {
+  const graphqlTypes = parseGraphqlObjectTypes(rawSchema);
+  const graphqlOperations = parseGraphqlOperations(rawSchema, graphqlTypes);
+  const files: GeneratedBundle["files"] = [];
+
+  if (features.includes("types")) {
+    files.push({
+      fileName: "types.ts",
+      contents: generateGraphqlTypesFile(graphqlTypes, graphqlOperations),
+    });
+  }
+
+  if (features.includes("zod")) {
+    files.push({
+      fileName: "zod.ts",
+      contents: generateGraphqlZodFile(graphqlTypes),
+    });
+  }
+
+  if (features.includes("tanstack-query")) {
+    files.push({
+      fileName: "tanstack-query.ts",
+      contents: generateGraphqlTanstackFile(graphqlOperations),
+    });
+  }
+
+  files.push({
+    fileName: "index.ts",
+    contents: generateIndexFile(features),
+  });
+
+  return {
+    engine: "builtin-graphql-adapter",
+    itemCount: graphqlOperations.length,
+    files,
+  };
+}
+
+function buildAsyncApiBundle(spec: JsonObject, features: Feature[]): GeneratedBundle {
+  const schemas = getAsyncApiSchemas(spec);
+  const channels = asRecord(spec.channels);
+  const files: GeneratedBundle["files"] = [];
+
+  if (features.includes("types")) {
+    files.push({
+      fileName: "types.ts",
+      contents: generateAsyncApiTypesFile(schemas, channels),
+    });
+  }
+
+  if (features.includes("zod")) {
+    files.push({
+      fileName: "zod.ts",
+      contents: generateAsyncApiZodFile(schemas),
+    });
+  }
+
+  files.push({
+    fileName: "asyncapi-client.ts",
+    contents: generateAsyncApiClientFile(channels),
+  });
+  files.push({
+    fileName: "index.ts",
+    contents: generateAsyncApiIndexFile(features),
+  });
+
+  return {
+    engine: "builtin-asyncapi-adapter",
+    itemCount: Object.keys(channels).length,
+    files,
+  };
+}
+
+function convertSwaggerToOpenApi(swagger: JsonObject): JsonObject {
+  const convertedPaths: JsonObject = {};
+
+  for (const [pathTemplate, pathValue] of Object.entries(asRecord(swagger.paths))) {
+    const pathItem = asRecord(pathValue);
+    const convertedPathItem: JsonObject = {};
+
+    for (const [key, value] of Object.entries(pathItem)) {
+      if (!HTTP_METHODS.has(key)) {
+        convertedPathItem[key] = value;
+        continue;
+      }
+
+      const operation = asRecord(value);
+      const convertedOperation: JsonObject = {
+        ...operation,
+        responses: convertSwaggerResponses(asRecord(operation.responses)),
+      };
+      const bodyParameter = readSwaggerBodyParameter(operation);
+
+      if (bodyParameter) {
+        convertedOperation.requestBody = {
+          required: bodyParameter.required,
+          content: {
+            "application/json": {
+              schema: bodyParameter.schema,
+            },
+          },
+        };
+      }
+
+      convertedPathItem[key] = convertedOperation;
+    }
+
+    convertedPaths[pathTemplate] = convertedPathItem;
+  }
+
+  return {
+    openapi: "3.0.3",
+    info: asRecord(swagger.info),
+    paths: convertedPaths,
+    components: {
+      schemas: asRecord(swagger.definitions),
+    },
+  };
+}
+
+function convertSwaggerResponses(responses: JsonObject): JsonObject {
+  const converted: JsonObject = {};
+
+  for (const [statusCode, responseValue] of Object.entries(responses)) {
+    const response = asRecord(responseValue);
+    const schema = response.schema;
+
+    converted[statusCode] = schema
+      ? {
+          ...response,
+          content: {
+            "application/json": {
+              schema,
+            },
+          },
+        }
+      : response;
+  }
+
+  return converted;
+}
+
+function readSwaggerBodyParameter(
+  operation: JsonObject,
+): { required: boolean; schema: unknown } | null {
+  const parameters = Array.isArray(operation.parameters)
+    ? operation.parameters
+    : [];
+  const bodyParameter = parameters.map(asRecord).find((parameter) => {
+    return parameter.in === "body" && parameter.schema !== undefined;
+  });
+
+  if (!bodyParameter) {
+    return null;
+  }
+
+  return {
+    required: bodyParameter.required === true,
+    schema: bodyParameter.schema,
+  };
+}
+
+function generateRequestCollectionTypesFile(requests: RequestItem[]): string {
+  const lines = generatedHeader();
+
+  lines.push(`export type ApiRequestParams = Record<string, string | number | boolean>;`);
+  lines.push(`export type ApiRequestBody = unknown;`);
+  lines.push(`export type ApiRequestResponse = unknown;`);
+  lines.push("");
+
+  for (const request of requests) {
+    lines.push(`export type ${request.typePrefix}Params = ApiRequestParams;`);
+    lines.push(`export type ${request.typePrefix}Body = ${request.bodyType ?? "ApiRequestBody"};`);
+    lines.push(`export type ${request.typePrefix}Response = ApiRequestResponse;`);
+    lines.push("");
+  }
+
+  return `${lines.join("\n").trimEnd()}\n`;
+}
+
+function generateRequestCollectionZodFile(requests: RequestItem[]): string {
+  const lines = [
+    ...generatedHeader(),
+    `import { z } from "zod";`,
+    "",
+    `export const ApiRequestParamsSchema = z.record(z.union([z.string(), z.number(), z.boolean()]));`,
+    `export const ApiRequestBodySchema = z.unknown();`,
+    "",
+  ];
+
+  for (const request of requests) {
+    lines.push(`export const ${request.typePrefix}ParamsSchema = ApiRequestParamsSchema;`);
+    lines.push(`export const ${request.typePrefix}BodySchema = ApiRequestBodySchema;`);
+    lines.push("");
+  }
+
+  return `${lines.join("\n").trimEnd()}\n`;
+}
+
+function generateRequestCollectionTanstackFile(requests: RequestItem[]): string {
+  const imports = requests.flatMap((request) => [
+    `${request.typePrefix}Params`,
+    `${request.typePrefix}Body`,
+    `${request.typePrefix}Response`,
+  ]);
+  const lines = [
+    ...generatedHeader(),
+    `import { useMutation, useQuery, type UseMutationOptions, type UseQueryOptions } from "@tanstack/react-query";`,
+    imports.length > 0 ? `import type { ${imports.join(", ")} } from "./types";` : "",
+    "",
+    `const API_BASE_URL = "";`,
+    "",
+    `function getRuntimeOrigin(): string {`,
+    `  return typeof window === "undefined" ? "http://localhost" : window.location.origin;`,
+    `}`,
+    "",
+    `function applyParams(url: string, params?: Record<string, unknown>): string {`,
+    `  let nextUrl = url;`,
+    `  for (const [key, value] of Object.entries(params ?? {})) {`,
+    `    nextUrl = nextUrl.replace(new RegExp(\`{{?\\\\b\${key}\\\\b}}?\`, "g"), encodeURIComponent(String(value)));`,
+    `  }`,
+    `  return nextUrl;`,
+    `}`,
+    "",
+    `async function requestJson<T>(url: string, init: RequestInit): Promise<T> {`,
+    `  const response = await fetch(new URL(API_BASE_URL + url, getRuntimeOrigin()), init);`,
+    `  if (!response.ok) {`,
+    `    throw new Error(\`API request failed: \${response.status} \${response.statusText}\`);`,
+    `  }`,
+    `  return response.status === 204 ? (undefined as T) : (response.json() as Promise<T>);`,
+    `}`,
+    "",
+  ].filter(Boolean);
+
+  for (const request of requests) {
+    const paramsArg = `params?: ${request.typePrefix}Params`;
+    const bodyArg = `body?: ${request.typePrefix}Body`;
+    const isQuery = request.method.toLowerCase() === "get";
+
+    lines.push(
+      `export async function ${request.functionName}(${paramsArg}, ${bodyArg}, init?: RequestInit): Promise<${request.typePrefix}Response> {`,
+    );
+    lines.push(`  const url = applyParams(${JSON.stringify(request.url)}, params);`);
+    lines.push(`  return requestJson<${request.typePrefix}Response>(url, {`);
+    lines.push(`    method: ${JSON.stringify(request.method.toUpperCase())},`);
+    lines.push(`    ${isQuery ? "" : "body: body === undefined ? undefined : JSON.stringify(body),"}`);
+    lines.push(`    headers: { "content-type": "application/json", ...init?.headers },`);
+    lines.push(`    ...init,`);
+    lines.push(`  });`);
+    lines.push(`}`);
+    lines.push("");
+
+    if (isQuery) {
+      lines.push(
+        `export function use${request.typePrefix}Query(${paramsArg}, options?: Omit<UseQueryOptions<${request.typePrefix}Response, Error>, "queryKey" | "queryFn">) {`,
+      );
+      lines.push(`  return useQuery({`);
+      lines.push(`    queryKey: [${JSON.stringify(request.name)}, params],`);
+      lines.push(`    queryFn: () => ${request.functionName}(params),`);
+      lines.push(`    ...options,`);
+      lines.push(`  });`);
+      lines.push(`}`);
+    } else {
+      lines.push(
+        `export function use${request.typePrefix}Mutation(options?: UseMutationOptions<${request.typePrefix}Response, Error, { params?: ${request.typePrefix}Params; body?: ${request.typePrefix}Body }>) {`,
+      );
+      lines.push(`  return useMutation({`);
+      lines.push(`    mutationFn: ({ params, body }) => ${request.functionName}(params, body),`);
+      lines.push(`    ...options,`);
+      lines.push(`  });`);
+      lines.push(`}`);
+    }
+
+    lines.push("");
+  }
+
+  return `${lines.join("\n").trimEnd()}\n`;
+}
+
+function collectPostmanRequests(collection: JsonObject): RequestItem[] {
+  const requests: RequestItem[] = [];
+
+  function walk(items: unknown[]): void {
+    for (const itemValue of items) {
+      const item = asRecord(itemValue);
+
+      if (Array.isArray(item.item)) {
+        walk(item.item);
+        continue;
+      }
+
+      const request = asRecord(item.request);
+      const method = readOptionalString(request.method) ?? "GET";
+      const url = normalizePostmanUrl(request.url);
+      const name = readOptionalString(item.name) ?? `${method} ${url}`;
+
+      requests.push(makeRequestItem(name, method, url));
+    }
+  }
+
+  walk(Array.isArray(collection.item) ? collection.item : []);
+  return requests;
+}
+
+function normalizePostmanUrl(value: unknown): string {
+  if (typeof value === "string") {
+    return stripUrlOrigin(value);
+  }
+
+  const url = asRecord(value);
+  const raw = readOptionalString(url.raw);
+
+  if (raw) {
+    return stripUrlOrigin(raw.replace(/^{{baseUrl}}/, ""));
+  }
+
+  if (Array.isArray(url.path)) {
+    return `/${url.path.map(String).join("/")}`;
+  }
+
+  return "/";
+}
+
+function collectInsomniaRequests(exportFile: JsonObject): RequestItem[] {
+  const resources = Array.isArray(exportFile.resources) ? exportFile.resources : [];
+
+  return resources
+    .map(asRecord)
+    .filter((resource) => resource._type === "request")
+    .map((resource) => {
+      const method = readOptionalString(resource.method) ?? "GET";
+      const url = stripUrlOrigin(readOptionalString(resource.url) ?? "/");
+      const name = readOptionalString(resource.name) ?? `${method} ${url}`;
+      return makeRequestItem(name, method, url);
+    });
+}
+
+function collectHttpFileRequests(raw: string): RequestItem[] {
+  return raw
+    .split(/^###.*$/gm)
+    .map((block) => block.trim())
+    .filter(Boolean)
+    .map((block, index) => {
+      const requestLine = block
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .find((line) => /^(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\s+/i.test(line));
+      const [method = "GET", url = "/"] = requestLine?.split(/\s+/) ?? [];
+      return makeRequestItem(`HttpRequest${index + 1}`, method, stripUrlOrigin(url));
+    });
+}
+
+function makeRequestItem(name: string, method: string, url: string): RequestItem {
+  const typePrefix = toTypeName(name);
+
+  return {
+    name,
+    method: method.toUpperCase(),
+    url: url.startsWith("/") ? url : `/${url}`,
+    functionName: toCamelCase(name),
+    typePrefix,
+  };
+}
+
+function stripUrlOrigin(url: string): string {
+  if (url.startsWith("{{")) {
+    return url.replace(/^{{[^}]+}}/, "") || "/";
+  }
+
+  try {
+    return new URL(url).pathname;
+  } catch {
+    return url.startsWith("/") ? url : `/${url}`;
+  }
+}
+
+function getAsyncApiSchemas(spec: JsonObject): JsonObject {
+  return asRecord(asRecord(spec.components).schemas);
+}
+
+function generateAsyncApiTypesFile(schemas: JsonObject, channels: JsonObject): string {
+  const lines = generatedHeader();
+
+  for (const [schemaName, schema] of Object.entries(schemas)) {
+    const safeName = toTypeName(schemaName);
+    const schemaObject = asRecord(schema);
+    const type = schemaToType(schemaObject);
+
+    if (schemaObject.type === "object" && isRecord(schemaObject.properties)) {
+      lines.push(`export interface ${safeName} ${type}`);
+    } else {
+      lines.push(`export type ${safeName} = ${type};`);
+    }
+
+    lines.push("");
+  }
+
+  lines.push(`export type AsyncApiChannel = ${jsonStringUnion(Object.keys(channels))};`);
+  lines.push(
+    `export type AsyncApiPublish = (channel: AsyncApiChannel, payload: unknown) => Promise<void> | void;`,
+  );
+
+  return `${lines.join("\n").trimEnd()}\n`;
+}
+
+function generateAsyncApiZodFile(schemas: JsonObject): string {
+  const lines = [
+    ...generatedHeader(),
+    `import { z } from "zod";`,
+    "",
+  ];
+
+  for (const [schemaName, schema] of Object.entries(schemas)) {
+    const safeName = toTypeName(schemaName);
+    lines.push(`export const ${safeName}Schema = ${schemaToZod(asRecord(schema))};`);
+    lines.push("");
+  }
+
+  return `${lines.join("\n").trimEnd()}\n`;
+}
+
+function generateAsyncApiClientFile(channels: JsonObject): string {
+  const lines = [
+    ...generatedHeader(),
+    `import type { AsyncApiChannel, AsyncApiPublish } from "./types";`,
+    "",
+    `export function createAsyncApiClient(publish: AsyncApiPublish) {`,
+    `  return {`,
+    `    publish(channel: AsyncApiChannel, payload: unknown) {`,
+    `      return publish(channel, payload);`,
+    `    },`,
+    `  };`,
+    `}`,
+    "",
+  ];
+
+  for (const channelName of Object.keys(channels)) {
+    const functionName = `publish${toTypeName(channelName)}`;
+    lines.push(
+      `export function ${functionName}(publish: AsyncApiPublish, payload: unknown) {`,
+    );
+    lines.push(`  return publish(${JSON.stringify(channelName)} as AsyncApiChannel, payload);`);
+    lines.push(`}`);
+    lines.push("");
+  }
+
+  return `${lines.join("\n").trimEnd()}\n`;
+}
+
+function generateAsyncApiIndexFile(features: Feature[]): string {
+  const lines = generateIndexFile(features).trimEnd().split("\n");
+  lines.push(`export * from "./asyncapi-client";`);
+  return `${lines.join("\n")}\n`;
+}
+
+function jsonStringUnion(values: string[]): string {
+  if (values.length === 0) {
+    return "string";
+  }
+
+  return values.map((value) => JSON.stringify(value)).join(" | ");
+}
+
+function parseGraphqlObjectTypes(rawSchema: string): Record<string, GraphqlObjectType> {
+  const result: Record<string, GraphqlObjectType> = {};
+  const typeRegex = /\b(type|input|interface)\s+([A-Za-z_][A-Za-z0-9_]*)[^{]*\{([\s\S]*?)\}/g;
+  let match: RegExpExecArray | null;
+
+  while ((match = typeRegex.exec(rawSchema)) !== null) {
+    const [, kind, typeName, body] = match;
+
+    result[typeName] = {
+      kind: kind as GraphqlObjectType["kind"],
+      fields: parseGraphqlFieldLines(body).map((field) => ({
+        name: field.name,
+        rawType: field.rawType,
+        type: graphqlTypeToTs(field.rawType),
+        required: field.rawType.trim().endsWith("!"),
+      })),
+    };
+  }
+
+  return result;
+}
+
+function parseGraphqlOperations(
+  rawSchema: string,
+  graphqlTypes: Record<string, GraphqlObjectType>,
+): GraphqlField[] {
+  return [
+    ...parseGraphqlOperationFields(rawSchema, graphqlTypes, "Query", "query"),
+    ...parseGraphqlOperationFields(rawSchema, graphqlTypes, "Mutation", "mutation"),
+  ];
+}
+
+function parseGraphqlOperationFields(
+  rawSchema: string,
+  graphqlTypes: Record<string, GraphqlObjectType>,
+  typeName: string,
+  operationType: GraphqlField["operationType"],
+): GraphqlField[] {
+  const match = new RegExp(`\\btype\\s+${typeName}\\s*\\{([\\s\\S]*?)\\}`, "m").exec(
+    rawSchema,
+  );
+
+  if (!match) {
+    return [];
+  }
+
+  return parseGraphqlFieldLines(match[1]).map((field) => ({
+    name: field.name,
+    operationType,
+    args: field.args.map((arg) => ({
+      name: arg.name,
+      in: "query",
+      required: arg.rawType.trim().endsWith("!"),
+      type: graphqlTypeToTs(arg.rawType),
+    })),
+    responseType: graphqlTypeToTs(field.rawType),
+    selection: graphqlSelectionFor(field.rawType, graphqlTypes),
+  }));
+}
+
+function parseGraphqlFieldLines(body: string): Array<{
+  name: string;
+  args: Array<{ name: string; rawType: string }>;
+  rawType: string;
+}> {
+  return body
+    .split(/\r?\n/)
+    .map((line) => line.replace(/#.*/, "").trim())
+    .filter(Boolean)
+    .map((line) => {
+      const match = /^([A-Za-z_][A-Za-z0-9_]*)(?:\(([^)]*)\))?\s*:\s*([^=]+)$/.exec(
+        line.replace(/,$/, ""),
+      );
+
+      if (!match) {
+        return null;
+      }
+
+      return {
+        name: match[1],
+        args: parseGraphqlArgs(match[2] ?? ""),
+        rawType: match[3].trim(),
+      };
+    })
+    .filter((field): field is {
+      name: string;
+      args: Array<{ name: string; rawType: string }>;
+      rawType: string;
+    } => field !== null);
+}
+
+function parseGraphqlArgs(rawArgs: string): Array<{ name: string; rawType: string }> {
+  if (!rawArgs.trim()) {
+    return [];
+  }
+
+  return rawArgs
+    .split(",")
+    .map((arg) => arg.trim())
+    .map((arg) => /^([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.+)$/.exec(arg))
+    .filter((match): match is RegExpExecArray => match !== null)
+    .map((match) => ({
+      name: match[1],
+      rawType: match[2].trim(),
+    }));
+}
+
+function graphqlTypeToTs(rawType: string): string {
+  const type = rawType.trim().replace(/!$/, "");
+
+  if (type.startsWith("[") && type.endsWith("]")) {
+    return `${graphqlTypeToTs(type.slice(1, -1))}[]`;
+  }
+
+  switch (type) {
+    case "ID":
+    case "String":
+      return "string";
+    case "Int":
+    case "Float":
+      return "number";
+    case "Boolean":
+      return "boolean";
+    default:
+      return toTypeName(type);
+  }
+}
+
+function graphqlTypeToZod(rawType: string): string {
+  const required = rawType.trim().endsWith("!");
+  const type = rawType.trim().replace(/!$/, "");
+  let expression: string;
+
+  if (type.startsWith("[") && type.endsWith("]")) {
+    expression = `z.array(${graphqlTypeToZod(type.slice(1, -1))})`;
+  } else if (type === "ID" || type === "String") {
+    expression = "z.string()";
+  } else if (type === "Int") {
+    expression = "z.number().int()";
+  } else if (type === "Float") {
+    expression = "z.number()";
+  } else if (type === "Boolean") {
+    expression = "z.boolean()";
+  } else {
+    expression = "z.unknown()";
+  }
+
+  return required ? expression : `${expression}.optional()`;
+}
+
+function graphqlSelectionFor(
+  rawType: string,
+  graphqlTypes: Record<string, GraphqlObjectType>,
+): string {
+  const typeName = rawType.replace(/[![\]]/g, "").trim();
+  const type = graphqlTypes[typeName];
+
+  if (!type || type.fields.length === 0 || isGraphqlScalar(typeName)) {
+    return "";
+  }
+
+  const scalarFields = type.fields
+    .filter((field) => isGraphqlScalar(field.type))
+    .map((field) => field.name);
+
+  return scalarFields.length > 0 ? `{ ${scalarFields.join(" ")} }` : "{ __typename }";
+}
+
+function isGraphqlScalar(typeName: string): boolean {
+  return ["string", "number", "boolean", "ID", "String", "Int", "Float", "Boolean"].includes(
+    typeName,
+  );
+}
+
+function generateGraphqlTypesFile(
+  graphqlTypes: Record<string, GraphqlObjectType>,
+  operations: GraphqlField[],
+): string {
+  const lines = generatedHeader();
+
+  for (const [typeName, type] of Object.entries(graphqlTypes)) {
+    if (typeName === "Query" || typeName === "Mutation" || typeName === "Subscription") {
+      continue;
+    }
+
+    lines.push(`export interface ${toTypeName(typeName)} {`);
+    for (const field of type.fields) {
+      lines.push(`  ${JSON.stringify(field.name)}${field.required ? "" : "?"}: ${field.type};`);
+    }
+    lines.push(`}`);
+    lines.push("");
+  }
+
+  for (const operation of operations) {
+    const typePrefix = toTypeName(operation.name);
+    lines.push(`export type ${typePrefix}Variables = ${parametersToType(operation.args)};`);
+    lines.push(`export type ${typePrefix}Response = ${operation.responseType};`);
+    lines.push("");
+  }
+
+  return `${lines.join("\n").trimEnd()}\n`;
+}
+
+function generateGraphqlZodFile(graphqlTypes: Record<string, GraphqlObjectType>): string {
+  const lines = [
+    ...generatedHeader(),
+    `import { z } from "zod";`,
+    "",
+  ];
+
+  for (const [typeName, type] of Object.entries(graphqlTypes)) {
+    if (typeName === "Query" || typeName === "Mutation" || typeName === "Subscription") {
+      continue;
+    }
+
+    lines.push(`export const ${toTypeName(typeName)}Schema = z.object({`);
+    for (const field of type.fields) {
+      lines.push(`  ${JSON.stringify(field.name)}: ${graphqlTypeToZod(field.rawType)},`);
+    }
+    lines.push(`}).passthrough();`);
+    lines.push("");
+  }
+
+  return `${lines.join("\n").trimEnd()}\n`;
+}
+
+function generateGraphqlTanstackFile(operations: GraphqlField[]): string {
+  const imports = operations.flatMap((operation) => [
+    `${toTypeName(operation.name)}Variables`,
+    `${toTypeName(operation.name)}Response`,
+  ]);
+  const lines = [
+    ...generatedHeader(),
+    `import { useMutation, useQuery, type UseMutationOptions, type UseQueryOptions } from "@tanstack/react-query";`,
+    imports.length > 0 ? `import type { ${imports.join(", ")} } from "./types";` : "",
+    "",
+    `const GRAPHQL_ENDPOINT = "/graphql";`,
+    "",
+    `async function fetchGraphql<T>(query: string, variables?: Record<string, unknown>): Promise<T> {`,
+    `  const response = await fetch(GRAPHQL_ENDPOINT, {`,
+    `    method: "POST",`,
+    `    headers: { "content-type": "application/json" },`,
+    `    body: JSON.stringify({ query, variables }),`,
+    `  });`,
+    `  if (!response.ok) {`,
+    `    throw new Error(\`GraphQL request failed: \${response.status} \${response.statusText}\`);`,
+    `  }`,
+    `  const payload = (await response.json()) as { data?: Record<string, T>; errors?: unknown[] };`,
+    `  if (payload.errors?.length) {`,
+    `    throw new Error("GraphQL response contained errors.");`,
+    `  }`,
+    `  return Object.values(payload.data ?? {})[0] as T;`,
+    `}`,
+    "",
+  ].filter(Boolean);
+
+  for (const operation of operations) {
+    const typePrefix = toTypeName(operation.name);
+    const variablesType = `${typePrefix}Variables`;
+    const responseType = `${typePrefix}Response`;
+    const operationDocument = buildGraphqlOperationDocument(operation);
+
+    lines.push(`export const ${operation.name}Document = ${JSON.stringify(operationDocument)};`);
+    lines.push("");
+    lines.push(
+      `export function ${toCamelCase(operation.name)}(variables?: ${variablesType}): Promise<${responseType}> {`,
+    );
+    lines.push(`  return fetchGraphql<${responseType}>(${operation.name}Document, variables);`);
+    lines.push(`}`);
+    lines.push("");
+
+    if (operation.operationType === "query") {
+      lines.push(
+        `export function use${typePrefix}Query(variables?: ${variablesType}, options?: Omit<UseQueryOptions<${responseType}, Error>, "queryKey" | "queryFn">) {`,
+      );
+      lines.push(`  return useQuery({`);
+      lines.push(`    queryKey: [${JSON.stringify(operation.name)}, variables],`);
+      lines.push(`    queryFn: () => ${toCamelCase(operation.name)}(variables),`);
+      lines.push(`    ...options,`);
+      lines.push(`  });`);
+      lines.push(`}`);
+    } else {
+      lines.push(
+        `export function use${typePrefix}Mutation(options?: UseMutationOptions<${responseType}, Error, ${variablesType} | undefined>) {`,
+      );
+      lines.push(`  return useMutation({`);
+      lines.push(`    mutationFn: (variables) => ${toCamelCase(operation.name)}(variables),`);
+      lines.push(`    ...options,`);
+      lines.push(`  });`);
+      lines.push(`}`);
+    }
+
+    lines.push("");
+  }
+
+  return `${lines.join("\n").trimEnd()}\n`;
+}
+
+function buildGraphqlOperationDocument(operation: GraphqlField): string {
+  const variables = operation.args
+    .map((arg) => `$${arg.name}: ${tsTypeToGraphqlVariableType(arg.type, arg.required)}`)
+    .join(", ");
+  const args = operation.args.map((arg) => `${arg.name}: $${arg.name}`).join(", ");
+  const variablePart = variables ? `(${variables})` : "";
+  const argsPart = args ? `(${args})` : "";
+  const selection = operation.selection ? ` ${operation.selection}` : "";
+
+  return `${operation.operationType} ${operation.name}${variablePart} { ${operation.name}${argsPart}${selection} }`;
+}
+
+function tsTypeToGraphqlVariableType(type: string, required: boolean): string {
+  const base = type.endsWith("[]")
+    ? `[${tsTypeToGraphqlVariableType(type.slice(0, -2), false)}]`
+    : type === "string"
+      ? "String"
+      : type === "number"
+        ? "Float"
+        : type === "boolean"
+          ? "Boolean"
+          : type;
+
+  return required ? `${base}!` : base;
+}
+
+function parseSpecByExtension(specPath: string, raw: string): unknown {
+  const extension = path.extname(specPath).toLowerCase();
+
+  if (extension === ".json") {
+    return JSON.parse(raw) as unknown;
+  }
+
+  if (extension === ".yaml" || extension === ".yml") {
+    return parseYaml(raw) as unknown;
+  }
+
+  return raw;
+}
+
+function inferApiSourceFormat(
+  specPath: string,
+  raw: string,
+  parsed: unknown,
+): ApiSourceFormat {
+  const extension = path.extname(specPath).toLowerCase();
+  const lowerName = path.basename(specPath).toLowerCase();
+
+  if (extension === ".graphql" || extension === ".gql") {
+    return "graphql";
+  }
+
+  if (extension === ".http" || extension === ".rest") {
+    return "http-file";
+  }
+
+  if (!isRecord(parsed)) {
+    throw new Error(`Could not parse API source: ${specPath}`);
+  }
+
+  if (typeof parsed.openapi === "string") {
+    return extension === ".json" ? "openapi-json" : "openapi-yaml";
+  }
+
+  if (typeof parsed.swagger === "string") {
+    return extension === ".json" ? "swagger-json" : "swagger-yaml";
+  }
+
+  if (typeof parsed.asyncapi === "string") {
+    return extension === ".json" ? "asyncapi-json" : "asyncapi-yaml";
+  }
+
+  const postmanInfo = asRecord(parsed.info);
+
+  if (
+    typeof postmanInfo.schema === "string" &&
+    postmanInfo.schema.includes("schema.getpostman.com")
+  ) {
+    return "postman-collection";
+  }
+
+  if (
+    (parsed._type === "export" && Array.isArray(parsed.resources)) ||
+    lowerName.endsWith(".insomnia.json")
+  ) {
+    return "insomnia-export";
+  }
+
+  throw new Error(
+    `Unsupported API source. The file may be valid, but no adapter recognized it: ${specPath}. First bytes: ${raw.slice(0, 80)}`,
+  );
 }
 
 async function findCandidateSpecs(root: string): Promise<string[]> {
@@ -373,9 +1362,9 @@ async function diagnoseSpecFile(
       diagnosis: raw.includes("type Query")
         ? "GraphQL schema with Query type detected."
         : "GraphQL schema file detected.",
-      generationSupport: "detected-only",
+      generationSupport: "supported",
       recommendedAction:
-        "Add a GraphQL adapter that generates typed operations from schema and .graphql documents.",
+        "Use generate_code to create TypeScript, Zod, and GraphQL TanStack Query helpers.",
     };
   }
 
@@ -385,9 +1374,9 @@ async function diagnoseSpecFile(
       absolutePath: filePath,
       format: "http-file",
       diagnosis: "HTTP request collection file detected.",
-      generationSupport: "detected-only",
+      generationSupport: "supported",
       recommendedAction:
-        "Use this as request examples, or convert stable endpoints to OpenAPI for generation.",
+        "Use generate_code to create request clients and TanStack Query wrappers from HTTP examples.",
     };
   }
 
@@ -424,9 +1413,9 @@ async function diagnoseSpecFile(
       diagnosis: `Swagger/OpenAPI ${parsed.swagger} detected${
         typeof info.title === "string" ? `: ${info.title}` : ""
       }.`,
-      generationSupport: "detected-only",
+      generationSupport: "supported",
       recommendedAction:
-        "Convert Swagger 2.0 to OpenAPI 3.x before running generate_code.",
+        "Use generate_code directly. The Swagger 2.0 adapter converts it internally.",
     };
   }
 
@@ -440,9 +1429,9 @@ async function diagnoseSpecFile(
       diagnosis: `AsyncAPI ${parsed.asyncapi} detected${
         typeof info.title === "string" ? `: ${info.title}` : ""
       }.`,
-      generationSupport: "detected-only",
+      generationSupport: "supported",
       recommendedAction:
-        "Add an AsyncAPI adapter for event/message client generation.",
+        "Use generate_code to create message types, Zod schemas, and an AsyncAPI publish client.",
     };
   }
 
@@ -459,9 +1448,9 @@ async function diagnoseSpecFile(
       diagnosis: `Postman collection detected${
         typeof postmanInfo.name === "string" ? `: ${postmanInfo.name}` : ""
       }.`,
-      generationSupport: "detected-only",
+      generationSupport: "supported",
       recommendedAction:
-        "Convert the Postman collection to OpenAPI, or add a Postman adapter that infers endpoints from collection items.",
+        "Use generate_code to create request clients and TanStack Query wrappers from collection items.",
     };
   }
 
@@ -471,9 +1460,9 @@ async function diagnoseSpecFile(
       absolutePath: filePath,
       format: "insomnia-export",
       diagnosis: "Insomnia export detected.",
-      generationSupport: "detected-only",
+      generationSupport: "supported",
       recommendedAction:
-        "Convert the Insomnia export to OpenAPI, or add an Insomnia adapter.",
+        "Use generate_code to create request clients and TanStack Query wrappers from exported requests.",
     };
   }
 
@@ -934,6 +1923,9 @@ function isCandidateSpecName(fileName: string): boolean {
     lowerName.endsWith(".openapi.json") ||
     lowerName.endsWith(".openapi.yaml") ||
     lowerName.endsWith(".openapi.yml") ||
+    lowerName === "asyncapi.json" ||
+    lowerName === "asyncapi.yaml" ||
+    lowerName === "asyncapi.yml" ||
     lowerName.endsWith(".asyncapi.json") ||
     lowerName.endsWith(".asyncapi.yaml") ||
     lowerName.endsWith(".asyncapi.yml") ||

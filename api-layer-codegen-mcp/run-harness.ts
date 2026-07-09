@@ -32,7 +32,7 @@ type DetectApiSpecResult = {
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const serverPath = path.resolve(__dirname, "./mcp-server/dist/server.js");
 const testProjectRoot = path.resolve(__dirname, "./test-project-a");
-const outputDir = path.resolve(testProjectRoot, "./src/api/generated");
+const generatedRoot = path.resolve(testProjectRoot, "./src/api");
 
 let nextId = 1;
 let stdoutBuffer = "";
@@ -93,7 +93,7 @@ mcpServer.on("exit", (code) => {
 });
 
 async function main(): Promise<void> {
-  await fs.rm(outputDir, { recursive: true, force: true });
+  await fs.rm(generatedRoot, { recursive: true, force: true });
 
   console.log("[Harness] MCP 서버 초기화 요청을 전송합니다.");
   await request("initialize", {
@@ -118,42 +118,104 @@ async function main(): Promise<void> {
   const detectionResult = parseToolJson<DetectApiSpecResult>(detectionResponse);
 
   assertDetectedFormat(detectionResult, "openapi-yaml", "supported");
-  assertDetectedFormat(detectionResult, "graphql", "detected-only");
-  assertDetectedFormat(detectionResult, "postman-collection", "detected-only");
-  assertDetectedFormat(detectionResult, "http-file", "detected-only");
+  assertDetectedFormat(detectionResult, "swagger-json", "supported");
+  assertDetectedFormat(detectionResult, "graphql", "supported");
+  assertDetectedFormat(detectionResult, "postman-collection", "supported");
+  assertDetectedFormat(detectionResult, "insomnia-export", "supported");
+  assertDetectedFormat(detectionResult, "asyncapi-yaml", "supported");
+  assertDetectedFormat(detectionResult, "http-file", "supported");
 
   console.log("[Harness] MCP 서버에 코드 생성 명령을 전송합니다.");
-  await request("tools/call", {
-    name: "generate_code",
-    arguments: {
-      specPath: "./openapi.yaml",
-      outputDir: "./src/api/generated",
-      features: ["types", "zod", "tanstack-query"],
-    },
-  });
+  await generateCodeFor("./openapi.yaml", "./src/api/generated-openapi");
 
   await assertGeneratedFile(
+    "generated-openapi",
     "types.ts",
     "export interface Pet",
     "TypeScript schema type was not generated.",
   );
   await assertGeneratedFile(
+    "generated-openapi",
     "zod.ts",
     "export const PetSchema",
     "Zod schema was not generated.",
   );
   await assertGeneratedFile(
+    "generated-openapi",
     "tanstack-query.ts",
     "useListPetsQuery",
     "TanStack Query hook was not generated.",
   );
   await assertGeneratedFile(
+    "generated-openapi",
     "codegen-report.json",
     "\"engine\": \"builtin-openapi\"",
     "Codegen report was not generated.",
   );
 
+  await generateCodeFor("./swagger.json", "./src/api/generated-swagger");
+  await assertGeneratedFile(
+    "generated-swagger",
+    "tanstack-query.ts",
+    "useListSwaggerPetsQuery",
+    "Swagger TanStack Query hook was not generated.",
+  );
+
+  await generateCodeFor("./schema.graphql", "./src/api/generated-graphql");
+  await assertGeneratedFile(
+    "generated-graphql",
+    "tanstack-query.ts",
+    "usePetsQuery",
+    "GraphQL TanStack Query hook was not generated.",
+  );
+
+  await generateCodeFor(
+    "./petstore.postman_collection.json",
+    "./src/api/generated-postman",
+  );
+  await assertGeneratedFile(
+    "generated-postman",
+    "tanstack-query.ts",
+    "useListPetsQuery",
+    "Postman TanStack Query hook was not generated.",
+  );
+
+  await generateCodeFor("./insomnia.json", "./src/api/generated-insomnia");
+  await assertGeneratedFile(
+    "generated-insomnia",
+    "tanstack-query.ts",
+    "useListInsomniaPetsQuery",
+    "Insomnia TanStack Query hook was not generated.",
+  );
+
+  await generateCodeFor("./api.http", "./src/api/generated-http");
+  await assertGeneratedFile(
+    "generated-http",
+    "tanstack-query.ts",
+    "useHttpRequest1Query",
+    "HTTP file TanStack Query hook was not generated.",
+  );
+
+  await generateCodeFor("./asyncapi.yaml", "./src/api/generated-asyncapi");
+  await assertGeneratedFile(
+    "generated-asyncapi",
+    "asyncapi-client.ts",
+    "createAsyncApiClient",
+    "AsyncAPI client was not generated.",
+  );
+
   console.log("[Harness] 생성 파일 검증이 완료되었습니다.");
+}
+
+async function generateCodeFor(specPath: string, outputDir: string): Promise<void> {
+  await request("tools/call", {
+    name: "generate_code",
+    arguments: {
+      specPath,
+      outputDir,
+      features: ["types", "zod", "tanstack-query"],
+    },
+  });
 }
 
 function request(method: string, params: unknown): Promise<JsonRpcResponse> {
@@ -184,11 +246,12 @@ function notify(method: string, params: unknown): Promise<void> {
 }
 
 async function assertGeneratedFile(
+  outputName: string,
   fileName: string,
   expected: string,
   failureMessage: string,
 ): Promise<void> {
-  const filePath = path.join(outputDir, fileName);
+  const filePath = path.join(generatedRoot, outputName, fileName);
   const contents = await fs.readFile(filePath, "utf8");
 
   if (!contents.includes(expected)) {

@@ -1,0 +1,22 @@
+asyncapi: 2.6.0
+info:
+  title: Petstore Events
+  version: 1.0.0
+channels:
+  pet/created:
+    publish:
+      message:
+        payload:
+          $ref: "#/components/schemas/PetCreatedEvent"
+components:
+  schemas:
+    PetCreatedEvent:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+        name:
+          type: string
