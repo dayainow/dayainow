@@ -1,0 +1,19 @@
+{
+  "info": {
+    "name": "Petstore Harness Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "List pets",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/pets",
+          "host": ["{{baseUrl}}"],
+          "path": ["pets"]
+        }
+      }
+    }
+  ]
+}

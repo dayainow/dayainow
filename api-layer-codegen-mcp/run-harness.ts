@@ -13,6 +13,22 @@ type JsonRpcResponse = {
   };
 };
 
+type ToolContent = {
+  type: string;
+  text: string;
+};
+
+type ToolResult = {
+  content?: ToolContent[];
+};
+
+type DetectApiSpecResult = {
+  found?: Array<{
+    format?: string;
+    generationSupport?: string;
+  }>;
+};
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const serverPath = path.resolve(__dirname, "./mcp-server/dist/server.js");
 const testProjectRoot = path.resolve(__dirname, "./test-project-a");
@@ -95,10 +111,16 @@ async function main(): Promise<void> {
   await request("tools/list", {});
 
   console.log("[Harness] 테스트 프로젝트에서 API 스펙을 탐지합니다.");
-  await request("tools/call", {
+  const detectionResponse = await request("tools/call", {
     name: "detect_api_spec",
     arguments: {},
   });
+  const detectionResult = parseToolJson<DetectApiSpecResult>(detectionResponse);
+
+  assertDetectedFormat(detectionResult, "openapi-yaml", "supported");
+  assertDetectedFormat(detectionResult, "graphql", "detected-only");
+  assertDetectedFormat(detectionResult, "postman-collection", "detected-only");
+  assertDetectedFormat(detectionResult, "http-file", "detected-only");
 
   console.log("[Harness] MCP 서버에 코드 생성 명령을 전송합니다.");
   await request("tools/call", {
@@ -171,6 +193,34 @@ async function assertGeneratedFile(
 
   if (!contents.includes(expected)) {
     throw new Error(`${failureMessage} File: ${filePath}`);
+  }
+}
+
+function parseToolJson<T>(response: JsonRpcResponse): T {
+  const result = response.result as ToolResult;
+  const text = result.content?.find((item) => item.type === "text")?.text;
+
+  if (!text) {
+    throw new Error("MCP tool response did not include text content.");
+  }
+
+  return JSON.parse(text) as T;
+}
+
+function assertDetectedFormat(
+  result: DetectApiSpecResult,
+  format: string,
+  generationSupport: string,
+): void {
+  const matched = result.found?.some(
+    (item) =>
+      item.format === format && item.generationSupport === generationSupport,
+  );
+
+  if (!matched) {
+    throw new Error(
+      `Expected detect_api_spec to find ${format} with ${generationSupport} support.`,
+    );
   }
 }
 

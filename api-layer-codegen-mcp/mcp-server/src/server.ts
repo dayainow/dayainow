@@ -19,8 +19,20 @@ type JsonRpcRequest = {
 type ApiSpecDetection = {
   path: string;
   absolutePath: string;
-  format: "openapi-json" | "openapi-yaml" | "graphql";
+  format:
+    | "openapi-json"
+    | "openapi-yaml"
+    | "swagger-json"
+    | "swagger-yaml"
+    | "graphql"
+    | "postman-collection"
+    | "insomnia-export"
+    | "asyncapi-json"
+    | "asyncapi-yaml"
+    | "http-file";
   diagnosis: string;
+  generationSupport: "supported" | "detected-only";
+  recommendedAction: string;
 };
 
 type Operation = {
@@ -45,7 +57,7 @@ const MCP_TOOLS = [
   {
     name: "detect_api_spec",
     description:
-      "현재 프로젝트 디렉토리에서 OpenAPI(swagger.json/yaml) 또는 GraphQL Schema 파일을 탐색하고 형식을 진단합니다.",
+      "현재 프로젝트 디렉토리에서 OpenAPI/Swagger, GraphQL, Postman, Insomnia, AsyncAPI, HTTP 파일을 탐색하고 형식을 진단합니다.",
     inputSchema: {
       type: "object",
       properties: {
@@ -60,7 +72,7 @@ const MCP_TOOLS = [
   {
     name: "generate_code",
     description:
-      "OpenAPI/GraphQL 스펙 파일을 읽어 TypeScript 타입, Zod 스키마, TanStack Query 훅을 자동 생성합니다.",
+      "API 스펙 파일을 읽어 TypeScript 타입, Zod 스키마, TanStack Query 훅을 자동 생성합니다. 현재 생성 엔진은 OpenAPI 3.x를 지원합니다.",
     inputSchema: {
       type: "object",
       properties: {
@@ -195,15 +207,35 @@ async function detectApiSpec(args: JsonObject): Promise<unknown> {
     }
   }
 
+  detected.sort(compareDetectedSpecs);
+
   return {
     projectRoot,
     found: detected,
     primarySpec: detected[0]?.path ?? null,
     message:
       detected.length > 0
-        ? `${detected.length} API spec file(s) detected.`
-        : "No OpenAPI or GraphQL schema file was detected.",
+        ? `${detected.length} API spec/source file(s) detected.`
+        : "No supported API spec/source file was detected.",
   };
+}
+
+function compareDetectedSpecs(a: ApiSpecDetection, b: ApiSpecDetection): number {
+  const supportDiff =
+    generationSupportRank(a.generationSupport) -
+    generationSupportRank(b.generationSupport);
+
+  if (supportDiff !== 0) {
+    return supportDiff;
+  }
+
+  return a.path.localeCompare(b.path);
+}
+
+function generationSupportRank(
+  generationSupport: ApiSpecDetection["generationSupport"],
+): number {
+  return generationSupport === "supported" ? 0 : 1;
 }
 
 async function generateCode(args: JsonObject): Promise<unknown> {
@@ -216,7 +248,7 @@ async function generateCode(args: JsonObject): Promise<unknown> {
 
   if (!isRecord(spec) || typeof spec.openapi !== "string") {
     throw new Error(
-      "generate_code currently supports OpenAPI 3.x YAML/JSON specs. GraphQL detection is available, but GraphQL codegen is not implemented yet.",
+      "generate_code currently supports OpenAPI 3.x YAML/JSON specs. Other API sources can be detected first, then converted or handled by future adapters.",
     );
   }
 
@@ -341,6 +373,21 @@ async function diagnoseSpecFile(
       diagnosis: raw.includes("type Query")
         ? "GraphQL schema with Query type detected."
         : "GraphQL schema file detected.",
+      generationSupport: "detected-only",
+      recommendedAction:
+        "Add a GraphQL adapter that generates typed operations from schema and .graphql documents.",
+    };
+  }
+
+  if (extension === ".http" || extension === ".rest") {
+    return {
+      path: relativePath,
+      absolutePath: filePath,
+      format: "http-file",
+      diagnosis: "HTTP request collection file detected.",
+      generationSupport: "detected-only",
+      recommendedAction:
+        "Use this as request examples, or convert stable endpoints to OpenAPI for generation.",
     };
   }
 
@@ -361,6 +408,9 @@ async function diagnoseSpecFile(
       diagnosis: `OpenAPI ${parsed.openapi} detected${
         typeof info.title === "string" ? `: ${info.title}` : ""
       }.`,
+      generationSupport: "supported",
+      recommendedAction:
+        "Use generate_code directly to create TypeScript, Zod, and TanStack Query files.",
     };
   }
 
@@ -370,10 +420,60 @@ async function diagnoseSpecFile(
     return {
       path: relativePath,
       absolutePath: filePath,
-      format: extension === ".json" ? "openapi-json" : "openapi-yaml",
+      format: extension === ".json" ? "swagger-json" : "swagger-yaml",
       diagnosis: `Swagger/OpenAPI ${parsed.swagger} detected${
         typeof info.title === "string" ? `: ${info.title}` : ""
       }.`,
+      generationSupport: "detected-only",
+      recommendedAction:
+        "Convert Swagger 2.0 to OpenAPI 3.x before running generate_code.",
+    };
+  }
+
+  if (typeof parsed.asyncapi === "string") {
+    const info = asRecord(parsed.info);
+
+    return {
+      path: relativePath,
+      absolutePath: filePath,
+      format: extension === ".json" ? "asyncapi-json" : "asyncapi-yaml",
+      diagnosis: `AsyncAPI ${parsed.asyncapi} detected${
+        typeof info.title === "string" ? `: ${info.title}` : ""
+      }.`,
+      generationSupport: "detected-only",
+      recommendedAction:
+        "Add an AsyncAPI adapter for event/message client generation.",
+    };
+  }
+
+  const postmanInfo = asRecord(parsed.info);
+
+  if (
+    typeof postmanInfo.schema === "string" &&
+    postmanInfo.schema.includes("schema.getpostman.com")
+  ) {
+    return {
+      path: relativePath,
+      absolutePath: filePath,
+      format: "postman-collection",
+      diagnosis: `Postman collection detected${
+        typeof postmanInfo.name === "string" ? `: ${postmanInfo.name}` : ""
+      }.`,
+      generationSupport: "detected-only",
+      recommendedAction:
+        "Convert the Postman collection to OpenAPI, or add a Postman adapter that infers endpoints from collection items.",
+    };
+  }
+
+  if (parsed._type === "export" && Array.isArray(parsed.resources)) {
+    return {
+      path: relativePath,
+      absolutePath: filePath,
+      format: "insomnia-export",
+      diagnosis: "Insomnia export detected.",
+      generationSupport: "detected-only",
+      recommendedAction:
+        "Convert the Insomnia export to OpenAPI, or add an Insomnia adapter.",
     };
   }
 
@@ -834,10 +934,19 @@ function isCandidateSpecName(fileName: string): boolean {
     lowerName.endsWith(".openapi.json") ||
     lowerName.endsWith(".openapi.yaml") ||
     lowerName.endsWith(".openapi.yml") ||
+    lowerName.endsWith(".asyncapi.json") ||
+    lowerName.endsWith(".asyncapi.yaml") ||
+    lowerName.endsWith(".asyncapi.yml") ||
+    lowerName.endsWith(".postman_collection.json") ||
+    lowerName === "postman_collection.json" ||
+    lowerName.endsWith(".insomnia.json") ||
+    lowerName === "insomnia.json" ||
     lowerName === "schema.graphql" ||
     lowerName === "schema.gql" ||
     lowerName.endsWith(".graphql") ||
-    lowerName.endsWith(".gql")
+    lowerName.endsWith(".gql") ||
+    lowerName.endsWith(".http") ||
+    lowerName.endsWith(".rest")
   );
 }
 
