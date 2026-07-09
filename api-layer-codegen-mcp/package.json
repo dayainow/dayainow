@@ -1,13 +1,13 @@
 {
-  "name": "mcp-codegen-harness",
+  "name": "api-layer-codegen-mcp",
   "version": "0.1.0",
   "private": true,
-  "description": "Local harness for the mcp-codegen-agent MCP server.",
+  "description": "Local harness for the API Layer Codegen MCP server.",
   "workspaces": [
     "mcp-server"
   ],
   "scripts": {
-    "build": "npm --workspace mcp-codegen-agent run build",
+    "build": "npm --workspace mcp-api-layer-codegen run build",
     "harness": "tsx run-harness.ts",
     "test": "npm run build && npm run harness"
   },

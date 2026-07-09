@@ -84,7 +84,7 @@ async function main(): Promise<void> {
     protocolVersion: "2025-06-18",
     capabilities: {},
     clientInfo: {
-      name: "mcp-codegen-harness",
+      name: "api-layer-codegen-mcp-harness",
       version: "0.1.0",
     },
   });

@@ -1,10 +1,10 @@
 {
-  "name": "mcp-codegen-agent",
+  "name": "mcp-api-layer-codegen",
   "version": "0.1.0",
-  "description": "MCP server that detects API specs and generates TypeScript API layers.",
+  "description": "MCP server that detects API specs and generates frontend API layers.",
   "type": "commonjs",
   "bin": {
-    "mcp-codegen": "./dist/server.js"
+    "api-layer-codegen-mcp": "./dist/server.js"
   },
   "main": "./dist/server.js",
   "files": [

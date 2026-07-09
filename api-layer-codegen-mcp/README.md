@@ -1,6 +1,8 @@
-# MCP Codegen Agent Harness
+# API Layer Codegen MCP
 
-`mcp-codegen-agent`는 프로젝트 안의 OpenAPI/GraphQL 스펙을 찾고, OpenAPI 스펙에서 프론트엔드 API 레이어를 생성하는 MCP 서버입니다.
+OpenAPI 스펙을 찾아 TypeScript 타입, Zod 스키마, TanStack Query hook으로 된 프론트엔드 API 레이어를 생성하는 MCP 서버입니다.
+
+AI 클라이언트 없이도 stdio 하네스로 MCP 호출과 파일 생성을 검증할 수 있게 구성되어 있습니다.
 
 현재 생성 대상:
 
@@ -12,7 +14,7 @@
 
 프론트엔드에서 API를 붙일 때 자주 생기는 반복 작업을 줄입니다. 백엔드가 OpenAPI 스펙을 제공해도, 프론트엔드에서는 보통 타입 정의, 런타임 검증 스키마, fetcher, TanStack Query hook을 다시 손으로 만들게 됩니다. 이 과정에서 필드 이름이 틀리거나, API 응답 타입과 화면 코드가 어긋나거나, 엔드포인트가 바뀌었는데 일부 hook만 갱신되지 않는 문제가 자주 생깁니다.
 
-`mcp-codegen-agent`는 AI 클라이언트가 현재 프로젝트의 API 스펙을 직접 찾고, 사용자가 요청한 코드 레이어를 같은 규칙으로 생성하도록 돕습니다. 즉, "스펙은 있는데 프론트엔드 API 레이어를 매번 사람이 정리해야 하는 문제"를 MCP 도구로 자동화합니다.
+`API Layer Codegen MCP`는 AI 클라이언트가 현재 프로젝트의 API 스펙을 직접 찾고, 사용자가 요청한 코드 레이어를 같은 규칙으로 생성하도록 돕습니다. 즉, "스펙은 있는데 프론트엔드 API 레이어를 매번 사람이 정리해야 하는 문제"를 MCP 도구로 자동화합니다.
 
 ## 언제 쓰면 좋나요?
 
@@ -48,7 +50,7 @@ openapi.yaml이 업데이트됐어. 기존 src/api/generated 폴더를 기준으
 
 ### 3. 여러 서비스에서 같은 코드 생성 규칙을 쓰고 싶을 때
 
-`mcp-codegen`을 전역 CLI로 등록하면 프로젝트마다 별도 설정을 복사하지 않아도 됩니다. Cursor나 Claude Desktop이 열려 있는 프로젝트 루트 기준으로 상대경로를 해석하므로, A 프로젝트에서는 `./openapi.yaml`, B 프로젝트에서는 `./swagger.json`처럼 각각의 스펙을 읽어 생성할 수 있습니다.
+`api-layer-codegen-mcp`를 전역 CLI로 등록하면 프로젝트마다 별도 설정을 복사하지 않아도 됩니다. Cursor나 Claude Desktop이 열려 있는 프로젝트 루트 기준으로 상대경로를 해석하므로, A 프로젝트에서는 `./openapi.yaml`, B 프로젝트에서는 `./swagger.json`처럼 각각의 스펙을 읽어 생성할 수 있습니다.
 
 ## 무엇이 생성되나요?
 
@@ -65,7 +67,7 @@ openapi.yaml이 업데이트됐어. 기존 src/api/generated 폴더를 기준으
 ## 구조
 
 ```text
-mcp-codegen-harness/
+api-layer-codegen-mcp/
 ├── mcp-server/           # MCP 서버 코드(TypeScript)
 │   ├── src/server.ts
 │   └── package.json
@@ -118,7 +120,7 @@ OpenAPI 스펙을 읽어 지정된 출력 디렉토리에 코드를 생성합니
 ## 전역 CLI로 등록
 
 ```bash
-cd mcp-codegen-harness/mcp-server
+cd api-layer-codegen-mcp/mcp-server
 npm install
 npm run build
 npm link
@@ -127,22 +129,22 @@ npm link
 이후 어느 디렉토리에서든 다음 명령으로 MCP 서버를 실행할 수 있습니다.
 
 ```bash
-mcp-codegen
+api-layer-codegen-mcp
 ```
 
 ## Cursor 등록 예시
 
-- Name: `CodegenAgent`
+- Name: `ApiLayerCodegen`
 - Type: `command`
-- Command: `mcp-codegen`
+- Command: `api-layer-codegen-mcp`
 
 ## Claude Desktop 등록 예시
 
 ```json
 {
   "mcpServers": {
-    "mcp-codegen-agent": {
-      "command": "mcp-codegen"
+    "mcp-api-layer-codegen": {
+      "command": "api-layer-codegen-mcp"
     }
   }
 }
