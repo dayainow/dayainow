@@ -1,8 +1,8 @@
 # Personal Projects
 
 아이디어가 생기면 웹·모바일로 직접 만들어 보는 개인 GitHub입니다.  
-프론트엔드 중심 풀스택으로 기획 → 구현 → 배포까지 해보고,  
-AI 협업·CI/CD·자동화 도구 같은 워크플로우도 함께 시도합니다.
+프론트엔드 중심 풀스택으로 기획 → 디자인 → 개발 → QA → 배포까지 직접 만들고,<br>
+그 과정에서 검증한 AI 협업·CI/CD·Phase Gate를 재사용 가능한 개발 시스템으로 추출합니다.
 
 https://github.com/dayainow
 
@@ -13,18 +13,26 @@ https://github.com/dayainow
 | | |
 | --- | --- |
 | **주요 영역** | 프론트엔드 · 풀스택 · 프로덕트 (웹/앱, 어드민·커머스 UI) |
-| **제품** | 모바일 앱 2종 배포 · 웹 서비스 MVP~운영 · 3D 인터랙션 프로토타입 |
-| **오픈소스** | CI/CD 자동화, Figma↔코드 동기화, 모바일 검증, 컴포넌트 격리 개발 등 14+ 재사용 패키지 |
-| **관심사** | TypeScript/React, 복잡한 UI·상태 설계, AI를 검증 가능한 워크플로로 쓰는 것 |
+| **제품** | 모바일 앱 2종 배포 · 웹 서비스 MVP~운영 · 3D 인터랙션 프로토타입 · Process Control Plane(Goodz) |
+| **오픈소스** | CI/CD 자동화, Figma↔코드 동기화, GA4 태깅 검증, 모바일 검증, 컴포넌트 격리 개발 등 15+ 재사용 패키지 |
+| **관심사** | TypeScript/React, 복잡한 UI·상태 설계, 프로세스 자동화, AI를 검증 가능한 워크플로로 쓰는 것 |
 
 ---
 
 ## 대표 프로젝트
 
+### MCP 서버
+
+| 프로젝트 | 한 줄 소개 | 기술 |
+| --- | --- | --- |
+| 마음길잡이 | 카카오 PlayMCP 등록 - 카카오톡 한 마디로 정신건강복지센터·복지제도 연결, 위기 연락처 안내 | Python · FastMCP · 공공데이터 · Render |
+| API Layer Codegen MCP | OpenAPI 탐지 → TypeScript/Zod/TanStack Query API 레이어 생성까지 stdio 하네스로 검증 | TypeScript · MCP · OpenAPI · Zod |
+
 ### 웹 서비스
 
 | 프로젝트 | 한 줄 소개 | 기술 |
 | --- | --- | --- |
+| Goodz | Template·Project Run·Stage·Task·GO/HOLD/KILL Gate·증거·감사 이력으로 기획→배포를 관리하는 Process Control Plane | TypeScript · Turborepo · React · Express · SQLite · GHA CI |
 | CorpBrain | RBAC 기반 로컬 RAG 사내 문서 챗봇 — 문서 트리 탐색·Slack 연동·품질 게이트(Hit@3 80%)·옵션형 Cross-encoder 리랭킹 | Next.js · Ollama · AI SDK · PgVector · Redis |
 | OlaLab | 100+ AI 도구 큐레이션·커뮤니티 플랫폼 | Next.js · NestJS · Prisma · Supabase |
 | HarnessHub | AI 에이전트·하네스 발견·평가·설치 카탈로그 (3D UI, CLI) | Next.js · NestJS · R3F · Redis |
@@ -50,13 +58,13 @@ https://github.com/dayainow
 
 **Delivery** — GitHub Actions(CI/CD) · Vercel 배포 · SEO/OG · Rate Limiting
 
-**AI Workflow** — Cursor · MCP · Figma MCP · 역할 분리 에이전트 · Skill/Rule 표준화 · RAG 품질 게이트(Hit@K)
+**AI Workflow** — Cursor · MCP 서버 개발 · Figma MCP · 역할 분리 에이전트 · Skill/Rule 표준화 · RAG 품질 게이트(Hit@K)
 
 | 영역 | 실무에서 하는 일 |
 | --- | --- |
 | 프론트엔드 | B2C/B2B UI 구현, 디자인 시스템 연동, 성능·접근성 개선 |
 | 풀스택 | API 설계·연동, DB 스키마, 인증·권한, 배포 파이프라인 |
-| AI 활용 | 코드 생성기가 아닌 검증 가능한 워크플로로 운영 (역할·게이트·재현) |
+| AI 활용 | 코드 생성기가 아닌 검증 가능한 워크플로로 운영 (역할·게이트·재현) · MCP 서버 직접 개발·배포 |
 | 도구화 | 반복 작업을 npm 패키지·GHA 워크플로·Cursor Skill로 추출 |
 
 ---
@@ -68,6 +76,7 @@ https://github.com/dayainow
 ### 배포 · 품질
 
 - **CI/CD Harness** — build → test → deploy 표준화, GHA Summary·HTML 리포트·Slack/Discord 알림
+- **Frontend Agent Orchestrator Kit** — 기획/디자인 → 구현 → Mocking → 테스트 → 배포 검증을 묶는 AI 에이전트 하네스
 - **Frontend Collab Kit** — 팀 단위 ESLint/Prettier/Husky + 컴포넌트 스캐폴딩 CLI
 
 ### AI 협업 · 디자인 연동
@@ -79,7 +88,10 @@ https://github.com/dayainow
 
 ### 프론트엔드 개발 · 검증
 
+- **Frontend Security Suite** — XSS·CSP·API Header·Storage 통합 검증
 - **Component Harness** — UI 격리 샌드박스, spec 기반 deterministic 검증
+- **Form Validation Harness** — Zod Chaos 주입·조건부 의존성·스냅샷 검증
+- **GA Analytics Harness** — GA4 명세 → 코드·MSW 캡처·compliance·GHA 게이트
 - **Auth Permission Harness** — 모노레포 권한·기관 Mock
 - **Audio Player Harness** — 전역 플레이어 상태 주입·MP3/HLS/에러 시나리오
 - **WebView Bridge Harness** — Flutter WebView 브릿지 브라우저 Mock
@@ -103,7 +115,7 @@ https://github.com/dayainow
 
 ## 기술 스택
 
-- **Language** — TypeScript (주력), JavaScript
+- **Language** — TypeScript (주력), JavaScript, Python
 - **Frontend** — React, Next.js App Router, Tailwind CSS, Zustand, TanStack Query
 - **Mobile** — Expo, React Native, EAS Build
 - **Backend** — NestJS, Node.js, Prisma, Supabase, Vercel Serverless
@@ -118,11 +130,9 @@ https://github.com/dayainow
 
 아이디어 → MVP → 실사용 검증 → 패턴 추출 → 오픈소스·다음 제품에 재사용
 
-- **End-to-end** — 기획·UI·API·배포·출시 준비까지 직접 수행
+- **End-to-end** — 기획·디자인·UI·API·QA·배포까지 직접 수행하고 Goodz에서 Template·Task·Gate·감사 이력으로 시스템화
 - **프로토타입 우선** — 동작하는 제품 루프를 먼저 만들고 구조를 다듬음
 - **품질 게이트** — 린트·테스트·CI를 코드와 함께 유지
 - **UX** — 정보는 충실하되 화면은 과하지 않게
 
 ---
-
-

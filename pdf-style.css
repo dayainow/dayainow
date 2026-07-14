@@ -21,12 +21,16 @@ h2 {
   padding-top: 2px;
   border-left: 4px solid #334155;
   padding-left: 8px;
+  break-after: avoid;
+  page-break-after: avoid;
 }
 
 h3 {
   font-size: 14px;
   font-weight: 700;
   margin: 14px 0 8px;
+  break-after: avoid;
+  page-break-after: avoid;
 }
 
 p {
@@ -76,7 +80,13 @@ td {
   padding: 7px 9px;
   vertical-align: top;
   text-align: left;
-  word-break: break-word;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+th:first-child,
+td:first-child {
+  min-width: 72px;
 }
 
 th {
