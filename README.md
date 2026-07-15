@@ -45,11 +45,13 @@
 
 | 프로젝트 | 한 줄 소개 | 역할·기술 | 링크 |
 | --- | --- | --- | --- |
-| [**Beacon**](https://github.com/dayainow/beacon-project-os) | 프로젝트 폴더의 파일·Git을 자동 관찰해 부족한 근거, P0–P4 Gate, 산출물·변경 이력을 보여주고 Project Book으로 남기는 **로컬 우선 Project Navigation OS** | TypeScript · Node.js · SQLite · esbuild · pnpm | [GitHub](https://github.com/dayainow/beacon-project-os) · [v0.2.0](https://github.com/dayainow/beacon-project-os/releases/tag/v0.2.0) |
 | [**CorpBrain**](https://github.com/dayainow/corp-brain) | RBAC 기반 로컬 RAG 사내 문서 챗봇 — 문서 트리 탐색·Slack 연동·품질 게이트(Hit@3 80%)·옵션형 Cross-encoder 리랭킹 | Next.js · Ollama · AI SDK · PgVector · Redis | [GitHub](https://github.com/dayainow/corp-brain) |
-| [**Goodz**](https://github.com/dayainow/goodz) | 기획→배포를 Template·Project Run·Stage·Task·GO/HOLD/KILL Gate·증거·감사 이력으로 관리하는 **Process Control Plane**. Commerce와 Internal Service는 이식성 Reference | TypeScript · Turborepo · React · Express · SQLite · GHA CI | [GitHub](https://github.com/dayainow/goodz) |
 | [**OlaLab**](https://github.com/dayainow/ola) | 100+ AI 도구 큐레이션·커뮤니티 플랫폼 | Next.js · NestJS · Prisma · Supabase | [GitHub](https://github.com/dayainow/ola) |
 | [**HarnessHub**](https://github.com/dayainow/harness-hub) | AI 에이전트·하네스 **발견·평가·설치** 카탈로그 (3D UI, CLI) | Next.js · NestJS · R3F · Redis | [GitHub](https://github.com/dayainow/harness-hub) |
+| [Zarami](https://zarami-iota.vercel.app/) | 실제 채용 데이터 기반 AI 커리어 로드맵 및 퀘스트 가이드 플랫폼 (개인화 스킬 트리·GitHub 잔디 연동 인증) | Next.js · TypeScript · Supabase · React Flow · Gemini & Groq | [GitHub](https://github.com/dayainow/zarami) · [v1.0](https://zarami-iota.vercel.app/) |
+| [**Goodz**](https://github.com/dayainow/goodz) | 기획→배포를 Template·Project Run·Stage·Task·GO/HOLD/KILL Gate·증거·감사 이력으로 관리하는 **Process Control Plane**. Commerce와 Internal Service는 이식성 Reference | TypeScript · Turborepo · React · Express · SQLite · GHA CI | [GitHub](https://github.com/dayainow/goodz) |
+| [**Beacon**](https://github.com/dayainow/beacon-project-os) | 프로젝트 폴더의 파일·Git을 자동 관찰해 부족한 근거, P0–P4 Gate, 산출물·변경 이력을 보여주고 Project Book으로 남기는 **로컬 우선 Project Navigation OS** | TypeScript · Node.js · SQLite · esbuild · pnpm | [GitHub](https://github.com/dayainow/beacon-project-os) · [v0.2.0](https://github.com/dayainow/beacon-project-os/releases/tag/v0.2.0) |
+
 
 ### 모바일 · 인터랙션
 
