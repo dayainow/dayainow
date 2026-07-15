@@ -7,6 +7,7 @@
 그 과정에서 검증한 AI 협업·CI/CD·Phase Gate를 **재사용 가능한 개발 시스템**으로 추출합니다.
 
 [![GitHub](https://img.shields.io/badge/GitHub-Profile-181717?style=flat-square&logo=github)](https://github.com/dayainow)
+[![Beacon](https://img.shields.io/badge/Beacon-v0.1.0-6D4AFF?style=flat-square&logo=github&logoColor=white)](https://github.com/dayainow/beacon-project-os/releases/tag/v0.1.0)
 [![TypeScript](https://img.shields.io/badge/TypeScript-주력-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-App%20Router-000000?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![Expo](https://img.shields.io/badge/Expo-React%20Native-000020?style=flat-square&logo=expo)](https://expo.dev/)
@@ -23,7 +24,7 @@
 | | |
 | --- | --- |
 | **주요 영역** | 프론트엔드 · 풀스택 · 프로덕트 (웹/앱, 어드민·커머스 UI) |
-| **제품** | 모바일 앱 2종 배포 · 웹 서비스 MVP~운영 · 3D 인터랙션 프로토타입 · **Process Control Plane** ([Goodz](https://github.com/dayainow/goodz)) |
+| **제품** | 모바일 앱 2종 배포 · 웹 서비스 MVP~운영 · 3D 인터랙션 프로토타입 · **Project Navigation OS** ([Beacon](https://github.com/dayainow/beacon-project-os)) · **Process Control Plane** ([Goodz](https://github.com/dayainow/goodz)) |
 | **오픈소스** | CI/CD 자동화, Figma↔코드 동기화, GA4 태깅 검증, 모바일 검증, 컴포넌트 격리 개발 등 **15+ 재사용 패키지** |
 | **관심사** | TypeScript/React, 복잡한 UI·상태 설계, 프로세스 자동화, AI를 검증 가능한 워크플로로 쓰는 것 |
 
@@ -44,6 +45,7 @@
 
 | 프로젝트 | 한 줄 소개 | 역할·기술 | 링크 |
 | --- | --- | --- | --- |
+| [**Beacon**](https://github.com/dayainow/beacon-project-os) | 프로젝트 폴더의 파일·Git을 자동 관찰해 부족한 근거, P0–P4 Gate, 산출물·변경 이력을 보여주고 Project Book으로 남기는 **로컬 우선 Project Navigation OS** | TypeScript · Node.js · SQLite · esbuild · pnpm | [GitHub](https://github.com/dayainow/beacon-project-os) · [v0.1.0](https://github.com/dayainow/beacon-project-os/releases/tag/v0.1.0) |
 | [**CorpBrain**](https://github.com/dayainow/corp-brain) | RBAC 기반 로컬 RAG 사내 문서 챗봇 — 문서 트리 탐색·Slack 연동·품질 게이트(Hit@3 80%)·옵션형 Cross-encoder 리랭킹 | Next.js · Ollama · AI SDK · PgVector · Redis | [GitHub](https://github.com/dayainow/corp-brain) |
 | [**Goodz**](https://github.com/dayainow/goodz) | 기획→배포를 Template·Project Run·Stage·Task·GO/HOLD/KILL Gate·증거·감사 이력으로 관리하는 **Process Control Plane**. Commerce와 Internal Service는 이식성 Reference | TypeScript · Turborepo · React · Express · SQLite · GHA CI | [GitHub](https://github.com/dayainow/goodz) |
 | [**OlaLab**](https://github.com/dayainow/ola) | 100+ AI 도구 큐레이션·커뮤니티 플랫폼 | Next.js · NestJS · Prisma · Supabase | [GitHub](https://github.com/dayainow/ola) |
