@@ -32,25 +32,6 @@
 
 ---
 
-## 🏢 Skill Step Labs (엔터프라이즈 실무 아키텍처 랩 시리즈)
-
-대규모 엔터프라이즈 서비스 개발 중 도달하는 기술적 한계와 아키텍처를 독립된 공식 깃허브 조직 **[Skill Step Labs (github.com/skill-step-labs)](https://github.com/skill-step-labs)**에 10대 실습 스튜디오 레포지토리로 구축하여 100% 공개 배포했습니다.
-
-| 도메인 카테고리 | 랩 레포지토리 (Public) | 핵심 다루는 주제 |
-| --- | --- | --- |
-| **🎨 Frontend & Web** | [**b2b-mes-admin-lab**](https://github.com/skill-step-labs/b2b-mes-admin-lab) | FSD Next.js 16, AG-Grid/Handsontable 60fps 대용량 그리드, Module Federation, BFF 게이트웨이, Zustand & TanStack Query |
-| | [**frontend-performance-lab**](https://github.com/skill-step-labs/frontend-performance-lab) | Vite vs Webpack 빌드 최적화, Canvas(Chart.js) 대 SVG(D3), RN WebView 비동기 RPC 브릿지, PWA, App Store 파이프라인 |
-| | [**frontend-coding-interview-lab**](https://github.com/skill-step-labs/frontend-coding-interview-lab) | IT 대기업 프론트엔드 코딩 테스트 & 자료구조/알고리즘 및 바닐라 JS/React 하드코딩 유닛 테스트 |
-| | [**frontend-security-lab**](https://github.com/skill-step-labs/frontend-security-lab) | XSS DOMPurify 방어, CSRF & HTTP-Only SameSite Cookie 이중 토큰, CSP 헤더, CORS Preflight |
-| **⚡ Fullstack & Backend** | [**fullstack-reliability-lab**](https://github.com/skill-step-labs/fullstack-reliability-lab) | HTTP Idempotency Key 멱등성 보장, Exponential Backoff + Jitter 재시도, 낙관적 락(Optimistic Lock), SWR 캐싱 |
-| | [**backend-performance-lab**](https://github.com/skill-step-labs/backend-performance-lab) | Python FastAPI 비동기 서빙, PostgreSQL 커넥션 풀링, N+1 쿼리 차단, Redis 캐시 및 Stampede 방지 |
-| **🐳 Infra & DevOps** | [**docker-infra-lab**](https://github.com/skill-step-labs/docker-infra-lab) | Multi-stage Dockerfile (이미지 용량 90% 절감), Docker Compose 오케스트레이션, Nginx Reverse Proxy |
-| **🧠 AI & Data Platform** | [**llm-rag-data-platform-lab**](https://github.com/skill-step-labs/llm-rag-data-platform-lab) | RAG(검색 증강 생성), ChromaDB/FAISS 벡터 스토어, 코사인 유사도 검색, AWS Bedrock Claude 3.5 파이프라인 |
-| | [**ai-product-patterns-lab**](https://github.com/skill-step-labs/ai-product-patterns-lab) | SSE(Server-Sent Events) 실시간 토큰 스트리밍, AI Provider Fallback 서킷 브레이커, Token Rate Limiter |
-| **📱 Mobile Native** | [**android-architecture-lab**](https://github.com/skill-step-labs/android-architecture-lab) | Android Clean Architecture 3계층, MVI (Model-View-Intent), Jetpack Compose, Kotlin Coroutines / StateFlow |
-
----
-
 ## 대표 프로젝트
 
 배포·데모 링크가 있는 프로젝트를 우선 정리했습니다.
@@ -199,7 +180,26 @@ Dev / AI   Cursor, Claude, MCP, Figma MCP, Lighthouse, web-vitals
 ---
 
 
+## 🏢 Skill Step Labs (엔터프라이즈 실무 아키텍처 랩 시리즈)
 
+대규모 엔터프라이즈 서비스 개발 중 도달하는 기술적 한계와 아키텍처를 독립된 공식 깃허브 조직 **[Skill Step Labs (github.com/skill-step-labs)](https://github.com/skill-step-labs)**에 10대 실습 스튜디오 레포지토리로 구축하여 100% 공개 배포했습니다.
+
+| 도메인 카테고리 | 랩 레포지토리 (Public) | 핵심 다루는 주제 |
+| --- | --- | --- |
+| **🎨 Frontend & Web** | [**b2b-mes-admin-lab**](https://github.com/skill-step-labs/b2b-mes-admin-lab) | FSD Next.js 16, AG-Grid/Handsontable 60fps 대용량 그리드, Module Federation, BFF 게이트웨이, Zustand & TanStack Query |
+| | [**frontend-performance-lab**](https://github.com/skill-step-labs/frontend-performance-lab) | Vite vs Webpack 빌드 최적화, Canvas(Chart.js) 대 SVG(D3), RN WebView 비동기 RPC 브릿지, PWA, App Store 파이프라인 |
+| | [**frontend-coding-interview-lab**](https://github.com/skill-step-labs/frontend-coding-interview-lab) | IT 대기업 프론트엔드 코딩 테스트 & 자료구조/알고리즘 및 바닐라 JS/React 하드코딩 유닛 테스트 |
+| | [**frontend-security-lab**](https://github.com/skill-step-labs/frontend-security-lab) | XSS DOMPurify 방어, CSRF & HTTP-Only SameSite Cookie 이중 토큰, CSP 헤더, CORS Preflight |
+| **⚡ Fullstack & Backend** | [**fullstack-reliability-lab**](https://github.com/skill-step-labs/fullstack-reliability-lab) | HTTP Idempotency Key 멱등성 보장, Exponential Backoff + Jitter 재시도, 낙관적 락(Optimistic Lock), SWR 캐싱 |
+| | [**backend-performance-lab**](https://github.com/skill-step-labs/backend-performance-lab) | Python FastAPI 비동기 서빙, PostgreSQL 커넥션 풀링, N+1 쿼리 차단, Redis 캐시 및 Stampede 방지 |
+| **🐳 Infra & DevOps** | [**docker-infra-lab**](https://github.com/skill-step-labs/docker-infra-lab) | Multi-stage Dockerfile (이미지 용량 90% 절감), Docker Compose 오케스트레이션, Nginx Reverse Proxy |
+| **🧠 AI & Data Platform** | [**llm-rag-data-platform-lab**](https://github.com/skill-step-labs/llm-rag-data-platform-lab) | RAG(검색 증강 생성), ChromaDB/FAISS 벡터 스토어, 코사인 유사도 검색, AWS Bedrock Claude 3.5 파이프라인 |
+| | [**ai-product-patterns-lab**](https://github.com/skill-step-labs/ai-product-patterns-lab) | SSE(Server-Sent Events) 실시간 토큰 스트리밍, AI Provider Fallback 서킷 브레이커, Token Rate Limiter |
+| **📱 Mobile Native** | [**android-architecture-lab**](https://github.com/skill-step-labs/android-architecture-lab) | Android Clean Architecture 3계층, MVI (Model-View-Intent), Jetpack Compose, Kotlin Coroutines / StateFlow |
+
+---
+
+---
 
 <div align="center">
 
