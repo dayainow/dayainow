@@ -26,7 +26,7 @@
 | --- | --- |
 | **주요 영역** | 프론트엔드 · 풀스택 · 프로덕트 (웹/앱, 어드민·커머스 UI) |
 | **조직 랩** | **[Skill Step Labs (공식 조직)](https://github.com/skill-step-labs)** — 대규모 B2B 어드민, FSD, MFE, BFF, 성능 튜닝, RAG AI, 안드로이드 10대 아키텍처 랩 |
-| **제품** | 모바일 앱 2종 배포 · 웹 서비스 MVP~운영 · 3D 인터랙션 프로토타입 · **Project Navigation OS** ([Beacon](https://github.com/dayainow/beacon-project-os)) · **Process Control Plane** ([Goodz](https://github.com/dayainow/goodz)) |
+| **제품** | 모바일 앱 2종 배포 · 웹 서비스 MVP~운영 · 3D 인터랙션 프로토타입 · **AI Validation Crew Platform** ([Critter](https://github.com/dayainow/critter)) · **Project Navigation OS** ([Beacon](https://github.com/dayainow/beacon-project-os)) · **Process Control Plane** ([Goodz](https://github.com/dayainow/goodz)) |
 | **오픈소스** | CI/CD 자동화, Figma↔코드 동기화, GA4 태깅 검증, 모바일 검증, 컴포넌트 격리 개발 등 **15+ 재사용 패키지** |
 | **관심사** | TypeScript/React, 복잡한 UI·상태 설계, 프로세스 자동화, AI를 검증 가능한 워크플로로 쓰는 것 |
 
@@ -47,6 +47,7 @@
 
 | 프로젝트 | 한 줄 소개 | 역할·기술 | 링크 |
 | --- | --- | --- | --- |
+| [**Critter**](https://github.com/dayainow/critter) | AI 행동 에이전트 크루가 웹 랜딩페이지와 온보딩을 출시 전에 점검하고 행동 근거를 Mission Report로 정리하는 사전 검증 플랫폼 | Product Planning · UX Research · AI Agent Design | [GitHub](https://github.com/dayainow/critter) |
 | [**CorpBrain**](https://github.com/dayainow/corp-brain) | RBAC 기반 로컬 RAG 사내 문서 챗봇 — 문서 트리 탐색·Slack 연동·품질 게이트(Hit@3 80%)·옵션형 Cross-encoder 리랭킹 | Next.js · Ollama · AI SDK · PgVector · Redis | [GitHub](https://github.com/dayainow/corp-brain) |
 | [**OlaLab**](https://github.com/dayainow/ola) | 100+ AI 도구 큐레이션·커뮤니티 플랫폼 | Next.js · NestJS · Prisma · Supabase | [GitHub](https://github.com/dayainow/ola) |
 | [**HarnessHub**](https://github.com/dayainow/harness-hub) | AI 에이전트·하네스 **발견·평가·설치** 카탈로그 (3D UI, CLI) | Next.js · NestJS · R3F · Redis | [GitHub](https://github.com/dayainow/harness-hub) |
