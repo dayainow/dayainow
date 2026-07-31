@@ -107,7 +107,7 @@ AI Workflow  Cursor · MCP · Figma MCP · 역할 분리 에이전트 · Skill/R
 
 | 프로젝트 | 소개 |
 | --- | --- |
-| [**Figma-to-Code Harness**](https://github.com/dayainow/figma-to-code-harness) | Figma REST API Node → TypeScript React AST 파이프라인 & 4대 업계 엔진(Figma Code Connect, Visual Copilot, Locofy, MCP AST) 샌드박스 |
+| [**Figma-to-Code Harness**](https://github.com/dayainow/figma-to-code-harness) | Figma REST API Node → TypeScript React AST 파이프라인 & Webhook 자동 PR & 4대 업계 엔진(Figma Code Connect, Visual Copilot, Locofy, MCP AST) 샌드박스 |
 | [**Figma Publish Harness**](https://github.com/dayainow/figma-publish) | Figma ↔ Next.js **양방향** 퍼블·동기화 (Skill · Rule · MCP 순서 표준화) |
 | [**Role-Based AI Harness**](https://github.com/dayainow/ai-agent-harness-methodology) | planner → 설계 → 구현 → QA **역할·핸드오프** 방법론 |
 | [**3-Layer Harness**](https://github.com/dayainow/3-layer-harness) | Hooks · 공유 지침 · 전문 에이전트 템플릿 |
