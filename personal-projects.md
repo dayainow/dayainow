@@ -32,10 +32,14 @@ https://github.com/dayainow
 
 | 프로젝트 | 한 줄 소개 | 기술 |
 | --- | --- | --- |
-| Goodz | Template·Project Run·Stage·Task·GO/HOLD/KILL Gate·증거·감사 이력으로 기획→배포를 관리하는 Process Control Plane | TypeScript · Turborepo · React · Express · SQLite · GHA CI |
 | CorpBrain | RBAC 기반 로컬 RAG 사내 문서 챗봇 — 문서 트리 탐색·Slack 연동·품질 게이트(Hit@3 80%)·옵션형 Cross-encoder 리랭킹 | Next.js · Ollama · AI SDK · PgVector · Redis |
 | OlaLab | 100+ AI 도구 큐레이션·커뮤니티 플랫폼 | Next.js · NestJS · Prisma · Supabase |
 | HarnessHub | AI 에이전트·하네스 발견·평가·설치 카탈로그 (3D UI, CLI) | Next.js · NestJS · R3F · Redis |
+| Folio | 일지·문서·칸반·프로세스를 한 화면에서 연결하는 local-first 개발자 워크스페이스 | Next.js · React · TypeScript · Supabase · MCP |
+| Zarami | 실제 채용 데이터 기반 AI 커리어 로드맵 및 퀘스트 가이드 플랫폼 | Next.js · TypeScript · Supabase · React Flow |
+| Beacon | 로컬 우선 Project Navigation OS — Gate·산출물·변경 이력·Project Book | TypeScript · Node.js · SQLite · esbuild · pnpm |
+| Critter | AI 행동 에이전트 크루가 출시 전 랜딩·온보딩을 점검하고 Mission Report로 정리하는 사전 검증 플랫폼 | Product Planning · UX Research · AI Agent Design |
+| Goodz | Template·Project Run·Stage·Task·GO/HOLD/KILL Gate·증거·감사 이력으로 기획→배포를 관리하는 Process Control Plane | TypeScript · Turborepo · React · Express · SQLite · GHA CI |
 
 ### 모바일 · 인터랙션
 
