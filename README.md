@@ -117,6 +117,7 @@ AI Workflow  Cursor · MCP · Figma MCP · 역할 분리 에이전트 · Skill/R
 
 | 프로젝트 | 소개 |
 | --- | --- |
+| [**AI Test Guard**](https://github.com/dayainow/ai-test-guard) | 프론트엔드 테스트 **3층**(Vitest Unit · Storybook Visual · Playwright E2E + Stagehand AI E2E) 하이브리드 하네스 |
 | [**Frontend Security Suite**](https://github.com/dayainow/frontend-security-harness) | 프론트엔드 **4대 보안(XSS, CSP, API Header, Storage)** 통합 검증 하네스 |
 | [**Component Harness**](https://github.com/dayainow/component-harness) | UI **격리 샌드박스** — spec 기반 deterministic 검증 |
 | [**Form Validation Harness**](https://github.com/dayainow/form-validation-harness) | 복잡한 폼 **Zod Chaos 주입** · 조건부 의존성 스위칭 · 타임머신 스냅샷 |
@@ -142,7 +143,7 @@ AI Workflow  Cursor · MCP · Figma MCP · 역할 분리 에이전트 · Skill/R
 ```text
 ① AI 규칙      Cursor Skill · Rule · Prompt  (협업 순서·품질 게이트)
 ② 로컬 품질    Husky · ESLint · Prettier     (커밋 시)
-③ UI 검증      Component Harness · Storybook (개발 중)
+③ UI 검증      Component Harness · Storybook · AI Test Guard (개발 중)
 ④ CI/CD        GitHub Actions · CI/CD Harness (push 후 build/test/deploy)
 ```
 

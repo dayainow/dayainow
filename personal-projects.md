@@ -93,6 +93,7 @@ https://github.com/dayainow
 
 ### 프론트엔드 개발 · 검증
 
+- **AI Test Guard** — Vitest Unit · Storybook Visual · Playwright E2E + Stagehand AI E2E 3층 하이브리드 테스트 하네스
 - **Frontend Security Suite** — XSS·CSP·API Header·Storage 통합 검증
 - **Component Harness** — UI 격리 샌드박스, spec 기반 deterministic 검증
 - **Form Validation Harness** — Zod Chaos 주입·조건부 의존성·스냅샷 검증
@@ -113,7 +114,7 @@ https://github.com/dayainow
 
 1. AI 규칙 — Cursor Skill · Rule · Prompt (협업 순서·품질 게이트)
 2. 로컬 품질 — Husky · ESLint · Prettier (커밋 시)
-3. UI 검증 — Component Harness · Storybook (개발 중)
+3. UI 검증 — Component Harness · Storybook · AI Test Guard (개발 중)
 4. CI/CD — GitHub Actions · CI/CD Harness (push 후 build/test/deploy)
 
 ---
