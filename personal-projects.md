@@ -85,6 +85,7 @@ https://github.com/dayainow
 
 ### AI 협업 · 디자인 연동
 
+- **Figma-to-Code Harness** — Figma REST API Node → TypeScript React AST 파이프라인 & 4대 업계 엔진(Figma Code Connect, Visual Copilot, Locofy, MCP AST) 샌드박스
 - **Figma Publish Harness** — Figma ↔ Next.js 양방향 퍼블·동기화
 - **Role-Based AI Harness** — planner → 설계 → 구현 → QA 역할·핸드오프 방법론
 - **3-Layer Harness** — Hooks · 공유 지침 · 전문 에이전트 템플릿
