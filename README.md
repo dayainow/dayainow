@@ -14,7 +14,7 @@
 [![Expo](https://img.shields.io/badge/Expo-React%20Native-000020?style=flat-square&logo=expo)](https://expo.dev/)
 [![GitHub Actions](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white)](https://github.com/dayainow/ci-cd-harness)
 
-[📄 프로젝트 상세 PDF](./personal-projects.pdf)
+[🌐 이력 사이트](https://candid-blini-c6f102.netlify.app/) · [📄 프로젝트 상세 PDF](./personal-projects.pdf)
 
 </div>
 
