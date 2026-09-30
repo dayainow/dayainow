@@ -137,6 +137,12 @@ AI Workflow  Cursor · MCP · Figma MCP · 역할 분리 에이전트 · Skill/R
 | [**Deep Link Harness**](https://github.com/dayainow/deep-link-harness) | 앱 딥링크·Universal Link·App Link 라우팅 검증 |
 | [**Offline Sync Harness**](https://github.com/dayainow/offline-sync-harness) | 오프라인 저장·재시도 큐·네트워크 복구 시 동기화 시나리오 검증 |
 
+### 🎮 미니 게임 & 프로토타입
+
+| 프로젝트 | 소개 |
+| --- | --- |
+| [**5x5 Minichess**](./minichess-prototype) | 1~3분 안에 끝나는 빠르고 캐주얼한 모바일 웹 체스. HTML/JS 및 PWA 지원. <br> <img src="./assets/minichess-app.jpg" width="150" alt="Minichess Screenshot" /> |
+
 ### 자동화 구성 방식 (요약)
 
 업계 표준에 맞춰, 프로젝트마다 아래 층을 조합합니다.

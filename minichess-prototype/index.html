@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5x5 스피드 체스</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <header>
+            <h1>5x5 스피드 체스</h1>
+            <div id="status" class="status-msg">백(White)의 턴입니다.</div>
+        </header>
+        
+        <main>
+            <div id="board" class="chess-board"></div>
+        </main>
+        
+        <footer>
+            <button id="reset-btn">게임 재시작</button>
+        </footer>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
