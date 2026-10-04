@@ -1,0 +1,29 @@
+# 의존성
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# 네이티브 프로젝트 (CNG: 빌드할 때 expo prebuild로 생성되므로 저장소에 넣지 않음)
+/ios
+/android
+
+# 서명 키·인증서 (EAS가 원격으로 관리)
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# 기타
+*.log
+npm-debug.*
+.DS_Store
+.env*.local
+*.orig.*
+
+# 로컬 도구 설정
+.claude/

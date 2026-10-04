@@ -1,0 +1,2 @@
+# 모든 텍스트 파일은 LF 줄바꿈으로 통일 (Windows에서 작업해도 EAS 빌드 서버·다른 OS와 차이 없게)
+* text=auto eol=lf

@@ -1,0 +1,8 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "캡슐체스"
+  },
+  "android": {
+    "app_name": "캡슐체스"
+  }
+}
