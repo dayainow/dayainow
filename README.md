@@ -38,7 +38,10 @@ node scripts/build-icons.mjs        # 앱 아이콘·스플래시 (로컬 Edge/C
 node scripts/build-sounds.mjs       # 효과음 합성
 node --no-warnings --import ./scripts/register-ts.mjs scripts/generate-puzzles.ts 400 150   # 데일리 퍼즐 뱅크
 node --no-warnings --import ./scripts/register-ts.mjs scripts/campaign-balance.ts 40        # 단계 난이도 시뮬레이션
+node scripts/store-screenshots.mjs  # 스토어 스크린샷 (npm run web을 켠 상태에서)
 ```
+
+스토어 등록 절차와 입력할 내용: [docs/store/google-play.md](docs/store/google-play.md)
 
 ## 빌드 (EAS)
 

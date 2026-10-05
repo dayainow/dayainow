@@ -1,6 +1,6 @@
 import { type Href, router, useFocusEffect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MAX_STARS } from '../src/campaign/stages';
 import { WelcomeModal } from '../src/components/WelcomeModal';
@@ -59,24 +59,27 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.hero}>
-        <Image source={require('../assets/splash-icon.png')} style={styles.logo} />
-        <Text style={styles.title}>{strings.appTitle}</Text>
-        <Text style={styles.subtitle}>{strings.subtitle}</Text>
-      </View>
+      {/* 화면이 넉넉하면 가운데, 작은 휴대폰에서는 스크롤 (로고·메뉴가 잘리지 않게) */}
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <View style={styles.hero}>
+          <Image source={require('../assets/splash-icon.png')} style={styles.logo} />
+          <Text style={styles.title}>{strings.appTitle}</Text>
+          <Text style={styles.subtitle}>{strings.subtitle}</Text>
+        </View>
 
-      <View style={styles.menu}>
-        {items.map(item => (
-          <TouchableOpacity
-            key={item.label}
-            style={[styles.menuButton, item.primary && styles.menuButtonPrimary]}
-            onPress={() => router.push(item.href)}
-          >
-            <Text style={styles.menuLabel}>{item.label}</Text>
-            {item.info ? <Text style={styles.menuInfo}>{item.info}</Text> : null}
-          </TouchableOpacity>
-        ))}
-      </View>
+        <View style={styles.menu}>
+          {items.map(item => (
+            <TouchableOpacity
+              key={item.label}
+              style={[styles.menuButton, item.primary && styles.menuButtonPrimary]}
+              onPress={() => router.push(item.href)}
+            >
+              <Text style={styles.menuLabel}>{item.label}</Text>
+              {item.info ? <Text style={styles.menuInfo}>{item.info}</Text> : null}
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
 
       <WelcomeModal
         visible={loaded && !progress.onboarded}
@@ -89,8 +92,9 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: palette.mintMist, justifyContent: 'center', paddingHorizontal: 24 },
-  hero: { alignItems: 'center', marginBottom: 32 },
+  container: { flex: 1, backgroundColor: palette.mintMist },
+  scroll: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 24, paddingVertical: 24 },
+  hero: { alignItems: 'center', marginBottom: 28 },
   logo: { width: 120, height: 120 },
   title: { fontSize: 34, fontWeight: '900', color: palette.ink, marginTop: 8 },
   subtitle: { fontSize: 15, color: palette.inkSoft, marginTop: 4 },
