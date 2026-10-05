@@ -54,7 +54,14 @@
           "enableBackgroundPlayback": false
         }
       ],
-      "expo-asset"
+      "expo-asset",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#6FDDB7"
+        }
+      ]
     ]
   }
 }

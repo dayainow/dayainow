@@ -15,8 +15,8 @@ describe('settings storage', () => {
   it('updates one field without touching the others', async () => {
     await updateSettings({ soundEnabled: false });
     await updateSettings({ difficulty: 'hard' });
-    expect(await loadSettings()).toEqual({ difficulty: 'hard', soundEnabled: false, hapticsEnabled: true });
-    expect(getCachedSettings()).toEqual({ difficulty: 'hard', soundEnabled: false, hapticsEnabled: true });
+    expect(await loadSettings()).toEqual({ ...DEFAULT_SETTINGS, difficulty: 'hard', soundEnabled: false });
+    expect(getCachedSettings()).toEqual({ ...DEFAULT_SETTINGS, difficulty: 'hard', soundEnabled: false });
   });
 
   it('fills new fields with defaults for older saves', async () => {

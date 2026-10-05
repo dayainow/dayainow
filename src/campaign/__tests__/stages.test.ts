@@ -1,5 +1,5 @@
 import { INITIAL_BOARD, getGameStatus } from '../../engine/chessEngine';
-import { MAX_STARS, STAGES, buildStageBoard, getStage, isStageUnlocked, starsFor } from '../stages';
+import { MAX_STARS, STAGES, buildStageBoard, clearedStageCount, getStage, isStageUnlocked, nextStageId, starsFor } from '../stages';
 
 describe('campaign stages', () => {
   it('has 20 stages numbered 1..20 with stronger AI in later capsules', () => {
@@ -40,6 +40,15 @@ describe('campaign stages', () => {
     expect(starsFor(stage, stage.par + 1)).toBe(2);
     expect(starsFor(stage, stage.par + 6)).toBe(2);
     expect(starsFor(stage, stage.par + 7)).toBe(1);
+  });
+
+  it('points "continue" at the first unlocked stage not yet cleared', () => {
+    expect(nextStageId({})).toBe(1);
+    expect(nextStageId({ 1: 3, 2: 1 })).toBe(3);
+    expect(clearedStageCount({ 1: 3, 2: 1 })).toBe(2);
+    const all = Object.fromEntries(STAGES.map(s => [s.id, 1]));
+    expect(nextStageId(all)).toBeNull();
+    expect(clearedStageCount(all)).toBe(20);
   });
 
   it('unlocks a stage after the previous one is cleared', () => {

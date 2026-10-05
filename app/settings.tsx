@@ -4,6 +4,7 @@ import { StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { strings } from '../src/i18n';
 import { feedback } from '../src/feedback/feedback';
+import { disableDailyReminder, enableDailyReminder, isReminderSupported } from '../src/notifications';
 import { resetProgress } from '../src/storage/progress';
 import { DEFAULT_SETTINGS, type Settings, loadSettings, updateSettings } from '../src/storage/settings';
 import { palette } from '../src/theme';
@@ -23,6 +24,17 @@ export default function SettingsScreen() {
     if (value) feedback.select();
   };
 
+  // 알림은 켤 때 권한을 묻고, 거절하면 꺼진 상태로 둠
+  const toggleReminder = async (value: boolean) => {
+    if (value) {
+      const enabled = await enableDailyReminder();
+      setSettings(await updateSettings({ reminderEnabled: enabled }));
+    } else {
+      await disableDailyReminder();
+      setSettings(await updateSettings({ reminderEnabled: false }));
+    }
+  };
+
   const handleReset = async () => {
     if (resetState !== 'confirming') {
       setResetState('confirming');
@@ -35,6 +47,17 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView edges={['bottom']} style={styles.container}>
       <View style={styles.card}>
+        {isReminderSupported && (
+          <View style={styles.row}>
+            <Text style={styles.label}>{strings.settings.reminder}</Text>
+            <Switch
+              value={settings.reminderEnabled}
+              onValueChange={toggleReminder}
+              trackColor={{ true: palette.mint, false: palette.line }}
+              thumbColor={palette.white}
+            />
+          </View>
+        )}
         <View style={styles.row}>
           <Text style={styles.label}>{strings.settings.sound}</Text>
           <Switch

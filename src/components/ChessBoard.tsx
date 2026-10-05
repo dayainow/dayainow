@@ -5,7 +5,7 @@ import { feedback } from '../feedback/feedback';
 import { moveFeedbackKind } from '../feedback/moveKind';
 import { palette, sideColors } from '../theme';
 
-const MAX_BOARD_SIZE = 340;
+const MAX_BOARD_SIZE = 400;
 const BORDER = 4;
 const SLIDE_MS = 180;
 const LAND_MS = 140;
@@ -22,6 +22,7 @@ type Props = {
   checkedKing: Square | null;
   onMove: (move: Move) => void;
   markers?: Square[]; // 튜토리얼 ★ 표시
+  hint?: Square | null; // 퍼즐 힌트: 움직일 기물을 빛나게
 };
 
 // 이동 연출에 필요한 정보: 움직인 기물(승급 전 모습), 잡힌 기물
@@ -29,8 +30,8 @@ type Slide = { move: Move; mover: string; captured: string | null };
 
 const pieceColor = (piece: string) => sideColors[piece.charAt(0) as 'w' | 'b'];
 
-// 탭으로 기물 선택 → 이동. 남는 공간에 맞춰 크기가 정해짐 (최대 340)
-export function ChessBoard({ board, sideToMove, interactive, lastMove, checkedKing, onMove, markers = [] }: Props) {
+// 탭으로 기물 선택 → 이동. 남는 공간에 맞춰 크기가 정해짐 (최대 400)
+export function ChessBoard({ board, sideToMove, interactive, lastMove, checkedKing, onMove, markers = [], hint = null }: Props) {
   const [selected, setSelected] = useState<Square | null>(null);
   const [targets, setTargets] = useState<Square[]>([]);
   const [size, setSize] = useState(MAX_BOARD_SIZE);
@@ -56,8 +57,9 @@ export function ChessBoard({ board, sideToMove, interactive, lastMove, checkedKi
   // 새 수가 들어오면 이전 판 기준으로 미끄러지는 연출 시작 (그리기 전에 처리해서 깜빡임 없음)
   useLayoutEffect(() => {
     if (lastMove && lastMove !== prevMove.current) {
-      const mover = prevBoard.current[lastMove.fromR][lastMove.fromC] ?? board[lastMove.toR][lastMove.toC];
-      if (mover) {
+      const mover = prevBoard.current[lastMove.fromR][lastMove.fromC];
+      // 출발 칸에 있던 기물이 실제로 떠났을 때만 새 수로 봄 (무르기로 예전 판이 돌아올 때는 연출 없이 바로 표시)
+      if (mover && !board[lastMove.fromR][lastMove.fromC] && board[lastMove.toR][lastMove.toC]) {
         const captured = prevBoard.current[lastMove.toR][lastMove.toC];
         setSlide({ move: lastMove, mover, captured });
         feedback.move(moveFeedbackKind({ captured: !!captured, givesCheck: !!checkedKing }));
@@ -119,6 +121,7 @@ export function ChessBoard({ board, sideToMove, interactive, lastMove, checkedKi
               // 연출 중에는 도착 칸의 기물을 숨기고 위에 떠 있는 기물로 보여 줌
               const hiddenBySlide = !!slide && slide.move.toR === r && slide.move.toC === c;
               const hasMarker = at({ r, c }, markers);
+              const isHint = hint?.r === r && hint?.c === c;
 
               return (
                 <TouchableOpacity
@@ -131,6 +134,7 @@ export function ChessBoard({ board, sideToMove, interactive, lastMove, checkedKi
                     isLastMove && styles.lastMoveCell,
                     isCheckedKing && styles.checkCell,
                     isSelected && styles.selectedCell,
+                    isHint && styles.hintCell,
                   ]}
                 >
                   {hasMarker &&
@@ -218,6 +222,7 @@ const styles = StyleSheet.create({
   lastMoveCell: { backgroundColor: palette.butterLight },
   checkCell: { backgroundColor: palette.coralLight },
   selectedCell: { backgroundColor: palette.butter },
+  hintCell: { borderWidth: 4, borderColor: palette.star, backgroundColor: palette.butterLight },
   targetDot: { position: 'absolute', width: 16, height: 16, backgroundColor: 'rgba(58, 52, 69, 0.22)', borderRadius: 8, zIndex: 1 },
   marker: { position: 'absolute', color: palette.star },
   markerBadge: { position: 'absolute', top: 2, right: 4, color: palette.star, zIndex: 3 },

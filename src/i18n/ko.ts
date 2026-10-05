@@ -14,6 +14,23 @@ export const ko = {
     freePlay: '자유 대전',
     freePlayInfo: 'AI 또는 친구와 한 판',
     settings: '설정',
+    play: '풀기',
+    done: '완료!',
+    nextPuzzleIn: (time: string) => `다음 퍼즐까지 ${time}`,
+    continueLabel: '이어하기',
+    continueStage: (n: number) => `${n}단계 도전`,
+    allCleared: '모든 단계 클리어! ★ 모으기에 도전해 보세요',
+    stagesProgress: (cleared: number, total: number) => `${cleared} / ${total} 단계`,
+    allStages: '전체 단계',
+    keepStreak: (streak: number) => `오늘 풀면 🔥 ${streak + 1}일 연속!`,
+    startStreak: '오늘부터 연속 기록을 시작해 봐요',
+  },
+  game: {
+    yourTurn: '내 차례',
+    aiThinking: 'AI가 생각 중…',
+    sideTurn: (side: string) => `${side} 차례`,
+    undo: '↶ 무르기',
+    restart: '↻ 처음부터',
   },
   screens: {
     learn: '체스 배우기',
@@ -76,9 +93,22 @@ export const ko = {
     alreadySolved: '오늘 퍼즐을 풀었어요. 내일 또 만나요!',
     share: '결과 공유',
     copied: '결과를 복사했어요',
+    hint: '💡 힌트',
+    hintShown: '빛나는 기물을 움직여 보세요',
+    nextPuzzleIn: (time: string) => `다음 퍼즐까지 ${time}`,
+    continueCampaign: '단계별 도전 이어하기',
+    reminderTitle: '🔔 매일 아침 새 퍼즐 알림',
+    reminderBody: '아침 9시에 오늘의 퍼즐이 열렸다고 알려 드릴게요',
+    reminderOn: '알림 켜기',
+    reminderLater: '괜찮아요',
+    reminderEnabled: '내일 아침 9시에 알려 드릴게요!',
+    reminderDenied: '알림 권한이 꺼져 있어요. 휴대폰 설정에서 켤 수 있어요',
     home: '홈으로',
-    shareText: (number: number, mateIn: number, attempts: number, streak: number) =>
-      `캡슐체스 데일리 #${number} · ${mateIn}수 메이트\n${'🟥'.repeat(attempts - 1)}🟩\n🔥 ${streak}일 연속`,
+    close: '닫기',
+    shareText: (number: number, mateIn: number, attempts: number, streak: number, hints: number) =>
+      `캡슐체스 데일리 #${number} · ${mateIn}수 메이트
+${'🟥'.repeat(attempts - 1)}🟩${'💡'.repeat(hints)}
+🔥 ${streak}일 연속`,
   },
   onboarding: {
     title: '캡슐체스에 온 걸 환영해요!',
@@ -119,7 +149,13 @@ export const ko = {
       mate: { title: '체크메이트', body: '킹이 어디로도 피할 수 없게 공격하면 체크메이트, 승리예요! 한 수로 끝내 보세요.' },
     },
   },
+  notification: {
+    channel: '오늘의 퍼즐',
+    title: '🧩 오늘의 퍼즐이 열렸어요!',
+    body: '3분이면 충분해요. 연속 기록을 이어 가세요 🔥',
+  },
   settings: {
+    reminder: '퍼즐 알림 (매일 아침 9시)',
     sound: '효과음',
     haptics: '진동',
     language: '언어',

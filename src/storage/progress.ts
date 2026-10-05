@@ -4,6 +4,7 @@ import { previousDateKey } from '../utils/date';
 export type DailyRecord = {
   solved: boolean;
   attempts: number; // 성공까지 시도한 횟수 (성공한 시도 포함)
+  hints?: number; // 사용한 힌트 수
 };
 
 export type Progress = {
@@ -73,7 +74,7 @@ export const applyStageResult = (progress: Progress, stageId: number, stars: num
     : progress;
 
 // 어제 풀었으면 연속 +1, 아니면 1부터. 같은 날 두 번 풀어도 한 번만 인정
-export const applyDailySolve = (progress: Progress, dateKey: string, attempts: number): Progress => {
+export const applyDailySolve = (progress: Progress, dateKey: string, attempts: number, hints = 0): Progress => {
   if (progress.daily.records[dateKey]?.solved) return progress;
   const streak = progress.daily.lastSolved === previousDateKey(dateKey) ? progress.daily.streak + 1 : 1;
   return {
@@ -82,7 +83,7 @@ export const applyDailySolve = (progress: Progress, dateKey: string, attempts: n
       streak,
       bestStreak: Math.max(progress.daily.bestStreak, streak),
       lastSolved: dateKey,
-      records: { ...progress.daily.records, [dateKey]: { solved: true, attempts } },
+      records: { ...progress.daily.records, [dateKey]: { solved: true, attempts, hints } },
     },
   };
 };
@@ -114,8 +115,8 @@ export const recordStageResult = async (stageId: number, stars: number): Promise
   return next;
 };
 
-export const recordDailySolve = async (dateKey: string, attempts: number): Promise<Progress> => {
-  const next = applyDailySolve(await loadProgress(), dateKey, attempts);
+export const recordDailySolve = async (dateKey: string, attempts: number, hints = 0): Promise<Progress> => {
+  const next = applyDailySolve(await loadProgress(), dateKey, attempts, hints);
   await saveProgress(next);
   return next;
 };

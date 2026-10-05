@@ -15,6 +15,23 @@ export const en: Strings = {
     freePlay: 'Free Play',
     freePlayInfo: 'vs AI or a friend',
     settings: 'Settings',
+    play: 'Play',
+    done: 'Done!',
+    nextPuzzleIn: (time: string) => `Next puzzle in ${time}`,
+    continueLabel: 'Continue',
+    continueStage: (n: number) => `Stage ${n}`,
+    allCleared: 'All stages cleared! Go for every ★',
+    stagesProgress: (cleared: number, total: number) => `${cleared} / ${total} stages`,
+    allStages: 'All stages',
+    keepStreak: (streak: number) => `Today makes it 🔥 ${streak + 1} days!`,
+    startStreak: 'Start your streak today',
+  },
+  game: {
+    yourTurn: 'Your turn',
+    aiThinking: 'AI is thinking…',
+    sideTurn: (side: string) => `${side}'s turn`,
+    undo: '↶ Undo',
+    restart: '↻ Restart',
   },
   screens: {
     learn: 'Learn to Play',
@@ -77,9 +94,22 @@ export const en: Strings = {
     alreadySolved: "You solved today's puzzle. See you tomorrow!",
     share: 'Share result',
     copied: 'Result copied',
+    hint: '💡 Hint',
+    hintShown: 'Move the glowing piece',
+    nextPuzzleIn: (time: string) => `Next puzzle in ${time}`,
+    continueCampaign: 'Continue the challenge',
+    reminderTitle: '🔔 Daily puzzle reminder',
+    reminderBody: "We'll let you know at 9 AM when a new puzzle is ready",
+    reminderOn: 'Turn on',
+    reminderLater: 'No thanks',
+    reminderEnabled: "We'll remind you tomorrow at 9 AM!",
+    reminderDenied: 'Notifications are off. You can turn them on in your phone settings',
     home: 'Home',
-    shareText: (number: number, mateIn: number, attempts: number, streak: number) =>
-      `Capsule Chess Daily #${number} · Mate in ${mateIn}\n${'🟥'.repeat(attempts - 1)}🟩\n🔥 ${streak}-day streak`,
+    close: 'Close',
+    shareText: (number: number, mateIn: number, attempts: number, streak: number, hints: number) =>
+      `Capsule Chess Daily #${number} · Mate in ${mateIn}
+${'🟥'.repeat(attempts - 1)}🟩${'💡'.repeat(hints)}
+🔥 ${streak}-day streak`,
   },
   onboarding: {
     title: 'Welcome to Capsule Chess!',
@@ -120,7 +150,13 @@ export const en: Strings = {
       mate: { title: 'Checkmate', body: "Attack the king so it can't escape: that's checkmate and you win! Finish it in one move." },
     },
   },
+  notification: {
+    channel: 'Daily puzzle',
+    title: '🧩 A new daily puzzle is ready!',
+    body: 'It only takes 3 minutes. Keep your streak going 🔥',
+  },
   settings: {
+    reminder: 'Puzzle reminder (9 AM daily)',
     sound: 'Sound effects',
     haptics: 'Haptics',
     language: 'Language',

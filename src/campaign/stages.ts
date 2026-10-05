@@ -59,3 +59,10 @@ export const starsFor = (stage: Stage, blueMoves: number): number =>
 
 export const isStageUnlocked = (campaign: Record<string, number>, id: number): boolean =>
   id === 1 || (campaign[id - 1] ?? 0) > 0;
+
+// 홈의 "이어하기": 열려 있으면서 아직 못 깬 첫 단계. 다 깼으면 null
+export const nextStageId = (campaign: Record<string, number>): number | null =>
+  STAGES.find(s => isStageUnlocked(campaign, s.id) && !(campaign[s.id] > 0))?.id ?? null;
+
+export const clearedStageCount = (campaign: Record<string, number>): number =>
+  STAGES.filter(s => (campaign[s.id] ?? 0) > 0).length;

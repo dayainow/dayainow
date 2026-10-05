@@ -52,6 +52,16 @@ ${background ? `<rect width="180" height="180" fill="${background}"/>` : ''}
 </svg>
 `;
 
+// Android 알림 아이콘: 흰색 실루엣만 (안드로이드가 알파 채널만 써서 색을 입힘). 캡슐 + 폰 머리 모양 구멍
+const NOTIFICATION_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="96" height="96">
+<defs><mask id="cut"><rect width="180" height="180" fill="#fff"/><circle cx="90" cy="70" r="30" fill="#000"/><rect x="62" y="96" width="56" height="16" rx="8" fill="#000"/></mask></defs>
+<g mask="url(#cut)" transform="translate(90 90) scale(0.95) translate(-90 -99)">
+  <circle cx="90" cy="99" r="80" fill="#fff"/>
+</g>
+<circle cx="90" cy="68" r="20" fill="#fff"/>
+</svg>
+`;
+
 // Play 스토어 대표 이미지 (1024x500): 왼쪽 캡슐, 오른쪽 제목·한 줄 소개·특징 칩
 const FEATURE_TEXT = {
   ko: { titleLines: ['캡슐체스'], titleSize: 104, tagline: '3분이면 끝나는 귀여운 미니 체스', chips: ['오늘의 퍼즐', '20단계 도전', '튜토리얼'], chipSize: 24 },
@@ -104,6 +114,8 @@ const TARGETS = [
   { name: 'adaptive-icon', out: 'assets/adaptive-icon.png', width: 1024, height: 1024, svg: buildIconSvg({ background: null, scale: 0.63, size: 1024 }) },
   // 스플래시 가운데 이미지 (배경색은 app.json에서 지정)
   { name: 'splash-icon', out: 'assets/splash-icon.png', width: 1024, height: 1024, svg: buildIconSvg({ background: null, scale: 0.95, size: 1024 }) },
+  // Android 알림 작은 아이콘 96x96 (흰색 실루엣)
+  { name: 'notification-icon', out: 'assets/notification-icon.png', width: 96, height: 96, svg: NOTIFICATION_SVG },
   // Google Play 스토어 아이콘 512x512 (꽉 찬 정사각형, 모서리는 스토어가 둥글게 처리)
   { name: 'play-icon', out: 'assets/store/play-icon.png', width: 512, height: 512, svg: buildIconSvg({ background: BRAND.mintLight, scale: 0.9, size: 512 }) },
   // Google Play 대표 이미지 1024x500

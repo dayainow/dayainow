@@ -4,6 +4,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { type Stage, buildStageBoard, getStage, starsFor } from '../../src/campaign/stages';
 import { ChessBoard } from '../../src/components/ChessBoard';
+import { GameControls } from '../../src/components/GameControls';
 import { ResultModal } from '../../src/components/ResultModal';
 import { TurnBadge } from '../../src/components/TurnBadge';
 import { useChessGame } from '../../src/game/useChessGame';
@@ -47,7 +48,7 @@ function StagePlay({ stage }: { stage: Stage }) {
         <Text style={styles.goal}>{strings.campaign.goal(stage.par)}</Text>
         <Text style={styles.moves}>{strings.campaign.movesUsed(game.blueMoves)}</Text>
         <View style={styles.turn}>
-          <TurnBadge turn={game.turn} status={game.status} />
+          <TurnBadge turn={game.turn} status={game.status} vsAi />
         </View>
       </View>
 
@@ -60,9 +61,7 @@ function StagePlay({ stage }: { stage: Stage }) {
         onMove={game.move}
       />
 
-      <TouchableOpacity style={styles.button} onPress={() => game.reset()}>
-        <Text style={styles.buttonText}>{strings.restart}</Text>
-      </TouchableOpacity>
+      <GameControls canUndo={game.canUndo} onUndo={game.undo} onRestart={() => game.reset()} />
 
       <ResultModal
         visible={game.isGameOver}
@@ -94,6 +93,4 @@ const styles = StyleSheet.create({
   goal: { fontSize: 15, fontWeight: '700', color: palette.ink },
   moves: { fontSize: 13, color: palette.inkSoft, marginTop: 2 },
   turn: { marginTop: 10 },
-  button: { backgroundColor: palette.ink, paddingHorizontal: 30, paddingVertical: 12, borderRadius: 30 },
-  buttonText: { color: palette.white, fontSize: 16, fontWeight: 'bold' },
 });

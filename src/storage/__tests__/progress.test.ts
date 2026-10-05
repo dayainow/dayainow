@@ -70,7 +70,12 @@ describe('daily streak', () => {
     p = applyDailySolve(p, '2026-10-04', 1);
     expect(p.daily.streak).toBe(1);
     expect(p.daily.bestStreak).toBe(2);
-    expect(p.daily.records['2026-10-02']).toEqual({ solved: true, attempts: 3 });
+    expect(p.daily.records['2026-10-02']).toEqual({ solved: true, attempts: 3, hints: 0 });
+  });
+
+  it('records how many hints were used', () => {
+    const p = applyDailySolve(emptyProgress(), '2026-10-01', 2, 1);
+    expect(p.daily.records['2026-10-01']).toEqual({ solved: true, attempts: 2, hints: 1 });
   });
 
   it('counts the same day only once', () => {

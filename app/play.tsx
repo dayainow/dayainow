@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChessBoard } from '../src/components/ChessBoard';
+import { GameControls } from '../src/components/GameControls';
 import { ResultModal } from '../src/components/ResultModal';
 import { TurnBadge } from '../src/components/TurnBadge';
 import { DIFFICULTY_DEPTH, type Difficulty } from '../src/engine/chessAI';
@@ -67,7 +68,7 @@ export default function FreePlayScreen() {
         )}
 
         <View style={styles.turn}>
-          <TurnBadge turn={game.turn} status={game.status} />
+          <TurnBadge turn={game.turn} status={game.status} vsAi={gameMode === 'pve'} />
         </View>
       </View>
 
@@ -80,9 +81,7 @@ export default function FreePlayScreen() {
         onMove={game.move}
       />
 
-      <TouchableOpacity style={styles.button} onPress={() => game.reset()}>
-        <Text style={styles.buttonText}>{strings.restart}</Text>
-      </TouchableOpacity>
+      <GameControls canUndo={game.canUndo} onUndo={game.undo} onRestart={() => game.reset()} />
 
       <ResultModal
         visible={game.isGameOver}
@@ -118,6 +117,4 @@ const styles = StyleSheet.create({
   difficultyText: { fontSize: 13, color: palette.inkSoft, fontWeight: '600' },
   difficultyTextActive: { color: palette.mintDark },
   turn: { marginTop: 12 },
-  button: { backgroundColor: palette.ink, paddingHorizontal: 30, paddingVertical: 12, borderRadius: 30 },
-  buttonText: { color: palette.white, fontSize: 16, fontWeight: 'bold' },
 });
