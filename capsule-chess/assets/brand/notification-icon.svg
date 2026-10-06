@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="96" height="96">
+<defs><mask id="cut"><rect width="180" height="180" fill="#fff"/><circle cx="90" cy="70" r="30" fill="#000"/><rect x="62" y="96" width="56" height="16" rx="8" fill="#000"/></mask></defs>
+<g mask="url(#cut)" transform="translate(90 90) scale(0.95) translate(-90 -99)">
+  <circle cx="90" cy="99" r="80" fill="#fff"/>
+</g>
+<circle cx="90" cy="68" r="20" fill="#fff"/>
+</svg>
