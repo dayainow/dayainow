@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { strings } from '../src/i18n';
+import { track } from '../src/analytics';
 import { feedback } from '../src/feedback/feedback';
 import { disableDailyReminder, enableDailyReminder, isReminderSupported } from '../src/notifications';
 import { resetProgress } from '../src/storage/progress';
@@ -20,12 +21,14 @@ export default function SettingsScreen() {
 
   const toggle = async (key: 'soundEnabled' | 'hapticsEnabled', value: boolean) => {
     setSettings(await updateSettings({ [key]: value }));
+    track('setting_change', { key, value });
     // 켜는 순간 바로 들리고 느껴지도록 미리 보기
     if (value) feedback.select();
   };
 
   // 알림은 켤 때 권한을 묻고, 거절하면 꺼진 상태로 둠
   const toggleReminder = async (value: boolean) => {
+    track('setting_change', { key: 'reminderEnabled', value });
     if (value) {
       const enabled = await enableDailyReminder();
       setSettings(await updateSettings({ reminderEnabled: enabled }));

@@ -4,10 +4,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChessBoard } from '../src/components/ChessBoard';
 import { GameControls } from '../src/components/GameControls';
 import { ResultModal } from '../src/components/ResultModal';
-import { TurnBadge } from '../src/components/TurnBadge';
+import { MascotBubble } from '../src/components/MascotBubble';
 import { DIFFICULTY_DEPTH, type Difficulty } from '../src/engine/chessAI';
 import { useChessGame } from '../src/game/useChessGame';
 import { strings } from '../src/i18n';
+import { track } from '../src/analytics';
 import { feedback } from '../src/feedback/feedback';
 import { DEFAULT_SETTINGS, loadSettings, updateSettings } from '../src/storage/settings';
 import { palette, sideColors } from '../src/theme';
@@ -31,6 +32,7 @@ export default function FreePlayScreen() {
   const playerLost = gameMode === 'pve' && result?.winner === 'b';
   useEffect(() => {
     if (!game.isGameOver) return;
+    track('free_play_end', { mode: gameMode, difficulty, result: !result?.winner ? 'draw' : playerLost ? 'lose' : 'win' });
     if (!result?.winner) feedback.clear();
     else if (playerLost) feedback.lose();
     else feedback.win();
@@ -68,7 +70,16 @@ export default function FreePlayScreen() {
         )}
 
         <View style={styles.turn}>
-          <TurnBadge turn={game.turn} status={game.status} vsAi={gameMode === 'pve'} />
+          <MascotBubble
+            vsAi={gameMode === 'pve'}
+            turn={game.turn}
+            status={game.status}
+            lastMove={game.lastMove}
+            lastCaptured={game.lastCaptured}
+            winner={game.isGameOver ? game.result?.winner ?? null : null}
+            isGameOver={game.isGameOver}
+            moveCount={game.blueMoves * 2 + (game.turn === 'b' ? 1 : 0)}
+          />
         </View>
       </View>
 
@@ -81,7 +92,14 @@ export default function FreePlayScreen() {
         onMove={game.move}
       />
 
-      <GameControls canUndo={game.canUndo} onUndo={game.undo} onRestart={() => game.reset()} />
+      <GameControls
+        canUndo={game.canUndo}
+        onUndo={() => {
+          game.undo();
+          track('undo', { screen: 'play' });
+        }}
+        onRestart={() => game.reset()}
+      />
 
       <ResultModal
         visible={game.isGameOver}

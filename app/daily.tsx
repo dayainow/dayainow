@@ -1,10 +1,12 @@
 import { router } from 'expo-router';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Platform, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { track } from '../src/analytics';
 import { nextStageId } from '../src/campaign/stages';
 import { ChessBoard } from '../src/components/ChessBoard';
 import { ResultModal } from '../src/components/ResultModal';
+import { ShareCardModal } from '../src/components/ShareCard';
 import { type Move, findKing, isInCheck, simulateMove } from '../src/engine/chessEngine';
 import { findMatingMoves, forcesMate, isCheckmated, pickStubbornReply } from '../src/engine/mateSolver';
 import { feedback } from '../src/feedback/feedback';
@@ -28,6 +30,7 @@ export default function DailyScreen() {
   const [message, setMessage] = useState<string | null>(null);
   const [solved, setSolved] = useState(false);
   const [showResult, setShowResult] = useState(false);
+  const [showShare, setShowShare] = useState(false);
   const [progress, setProgress] = useState<Progress | null>(null);
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [countdown, setCountdown] = useState(() => formatCountdown(msUntilNextDay(new Date())));
@@ -41,6 +44,7 @@ export default function DailyScreen() {
     loadProgress().then(saved => {
       setProgress(saved);
       const record = saved.daily.records[puzzle.dateKey];
+      track('daily_open', { number: puzzle.number, solved: !!record?.solved });
       if (record?.solved) {
         setSolved(true);
         setAttempts(record.attempts);
@@ -73,6 +77,7 @@ export default function DailyScreen() {
     if (!key) return;
     setHintSquare({ r: key.fromR, c: key.fromC });
     setHints(n => n + 1);
+    track('daily_hint', { number: puzzle.number });
     setMessage(strings.daily.hintShown);
   };
 
@@ -87,6 +92,7 @@ export default function DailyScreen() {
     if (!forcesMate(after, 'w', movesLeft)) {
       setMessage(strings.daily.wrong);
       later(feedback.wrong, 250);
+      track('daily_wrong', { number: puzzle.number, attempt: attempts });
       later(() => {
         setAttempts(n => n + 1);
         restart();
@@ -97,6 +103,7 @@ export default function DailyScreen() {
     setMessage(null);
     if (isCheckmated('b', after)) {
       later(feedback.win, 250);
+      track('daily_solved', { number: puzzle.number, attempts, hints });
       recordDailySolve(puzzle.dateKey, attempts, hints).then(saved => {
         setProgress(saved);
         setSolved(true);
@@ -118,30 +125,22 @@ export default function DailyScreen() {
 
   const streak = progress ? currentStreak(progress, puzzle.dateKey) : 0;
 
-  const share = async () => {
-    const text = strings.daily.shareText(puzzle.number, puzzle.mateIn, attempts, Math.max(streak, 1), hints);
-    try {
-      if (Platform.OS === 'web') {
-        if (navigator.share) await navigator.share({ text });
-        else {
-          await navigator.clipboard.writeText(text);
-          setMessage(strings.daily.copied);
-        }
-      } else {
-        await Share.share({ message: text });
-      }
-    } catch {
-      // 사용자가 공유를 취소한 경우 등
-    }
+  // 결과 카드 미리보기를 열어 이미지나 텍스트로 공유
+  const share = () => {
+    setShowResult(false);
+    setShowShare(true);
   };
+  const shareData = { number: puzzle.number, mateIn: puzzle.mateIn, attempts, hints, streak: Math.max(streak, 1) };
 
   const turnOnReminder = async () => {
     const enabled = await enableDailyReminder();
+    track('reminder_prompt', { action: enabled ? 'enabled' : 'denied' });
     setSettings(await updateSettings(enabled ? { reminderEnabled: true } : { reminderPromptDismissed: true }));
     setMessage(enabled ? strings.daily.reminderEnabled : strings.daily.reminderDenied);
   };
 
   const dismissReminder = async () => {
+    track('reminder_prompt', { action: 'dismissed' });
     setSettings(await updateSettings({ reminderPromptDismissed: true }));
   };
 
@@ -152,6 +151,10 @@ export default function DailyScreen() {
 
   const checkedKing = isInCheck(turn, board) ? findKing(turn, board) : null;
   const askReminder = solved && isReminderSupported && !settings.reminderEnabled && !settings.reminderPromptDismissed;
+
+  useEffect(() => {
+    if (askReminder) track('reminder_prompt', { action: 'shown' });
+  }, [askReminder]);
 
   return (
     <SafeAreaView edges={['bottom']} style={styles.container}>
@@ -205,6 +208,17 @@ export default function DailyScreen() {
           <Text style={styles.outlineText}>{strings.daily.hint}</Text>
         </TouchableOpacity>
       )}
+
+      <ShareCardModal
+        visible={showShare}
+        onClose={() => setShowShare(false)}
+        data={shareData}
+        text={strings.daily.shareText(shareData.number, shareData.mateIn, shareData.attempts, shareData.streak, shareData.hints)}
+        onCopied={() => {
+          setShowShare(false);
+          setMessage(strings.daily.copied);
+        }}
+      />
 
       <ResultModal
         visible={showResult}

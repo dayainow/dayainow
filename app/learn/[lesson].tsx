@@ -6,6 +6,7 @@ import { ChessBoard } from '../../src/components/ChessBoard';
 import { ResultModal } from '../../src/components/ResultModal';
 import { type Move, findKing, isInCheck, simulateMove } from '../../src/engine/chessEngine';
 import { isCheckmated } from '../../src/engine/mateSolver';
+import { track } from '../../src/analytics';
 import { feedback } from '../../src/feedback/feedback';
 import { strings } from '../../src/i18n';
 import { recordLessonDone } from '../../src/storage/progress';
@@ -46,6 +47,8 @@ function LessonPlay({ lesson }: { lesson: Lesson }) {
   const complete = () => {
     setDone(true);
     recordLessonDone(lesson.id);
+    track('lesson_complete', { lesson: lesson.id });
+    if (!next) track('tutorial_complete', {});
     // 마지막 레슨이면 졸업 축하, 아니면 짧은 통과음
     timer.current = setTimeout(() => {
       if (next) feedback.clear();

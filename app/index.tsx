@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MAX_STARS, STAGES, clearedStageCount, nextStageId } from '../src/campaign/stages';
+import { track } from '../src/analytics';
 import { WelcomeModal } from '../src/components/WelcomeModal';
 import { strings } from '../src/i18n';
 import { getDailyPuzzle } from '../src/puzzles/daily';
@@ -45,9 +46,10 @@ export default function HomeScreen() {
   }, [solvedToday]);
 
   // 환영 안내는 한 번만: 고르면 바로 기록하고 해당 화면으로 이동
-  const finishOnboarding = (href?: Href) => {
+  const finishOnboarding = (choice: 'new' | 'knows' | 'later', href?: Href) => {
     setProgress(p => ({ ...p, onboarded: true }));
     recordOnboarded();
+    track('onboarding_choice', { choice });
     if (href) router.push(href);
   };
 
@@ -133,9 +135,9 @@ export default function HomeScreen() {
 
       <WelcomeModal
         visible={loaded && !progress.onboarded}
-        onNewPlayer={() => finishOnboarding('/learn/king')}
-        onKnowsChess={() => finishOnboarding('/campaign/1')}
-        onLater={() => finishOnboarding()}
+        onNewPlayer={() => finishOnboarding('new', '/learn/king')}
+        onKnowsChess={() => finishOnboarding('knows', '/campaign/1')}
+        onLater={() => finishOnboarding('later')}
       />
     </SafeAreaView>
   );

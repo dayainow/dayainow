@@ -1,13 +1,16 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
+import { track } from '../src/analytics';
 import { initFeedback } from '../src/feedback/feedback';
+import { loadProgress } from '../src/storage/progress';
 import { strings } from '../src/i18n';
 import { palette } from '../src/theme';
 
 export default function RootLayout() {
   useEffect(() => {
     initFeedback();
+    loadProgress().then(progress => track('app_open', { first_open: !progress.onboarded }));
   }, []);
 
   return (

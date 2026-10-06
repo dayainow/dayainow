@@ -19,36 +19,71 @@ export const BRAND = {
   ink: '#3A3445',
 };
 
-// 동글한 폰 마스코트. 머리 중심이 (0, 0)
-const PAWN = `
-  <path d="M-11,22 Q-14,38 -24,44 L24,44 Q14,38 11,22 Z" fill="${BRAND.mint}" stroke="${BRAND.ink}" stroke-width="3.6" stroke-linejoin="round"/>
-  <rect x="-16" y="15" width="32" height="8" rx="4" fill="${BRAND.mint}" stroke="${BRAND.ink}" stroke-width="3.6"/>
-  <circle cx="0" cy="0" r="18" fill="${BRAND.mint}" stroke="${BRAND.ink}" stroke-width="3.6"/>
-  <ellipse cx="-7" cy="-9" rx="4.5" ry="2.8" fill="#FFFFFF"/>
-  <ellipse cx="-7" cy="1" rx="3" ry="3.6" fill="${BRAND.ink}"/>
-  <ellipse cx="7" cy="1" rx="3" ry="3.6" fill="${BRAND.ink}"/>
+// 동글한 폰 마스코트. 머리 중심이 (0, 0). 얼굴(눈·입)만 표정별로 바꿈
+const INK = BRAND.ink;
+const FACES = {
+  normal: `
+  <ellipse cx="-7" cy="1" rx="3" ry="3.6" fill="${INK}"/>
+  <ellipse cx="7" cy="1" rx="3" ry="3.6" fill="${INK}"/>
   <circle cx="-6" cy="-0.4" r="1.1" fill="#FFFFFF"/>
   <circle cx="8" cy="-0.4" r="1.1" fill="#FFFFFF"/>
+  <path d="M-3.5,7.5 Q0,11 3.5,7.5" fill="none" stroke="${INK}" stroke-width="2" stroke-linecap="round"/>`,
+  // 눈웃음 ^^ + 활짝 웃는 입
+  happy: `
+  <path d="M-10,2.5 Q-7,-2.5 -4,2.5" fill="none" stroke="${INK}" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M4,2.5 Q7,-2.5 10,2.5" fill="none" stroke="${INK}" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M-5,6.5 Q0,14 5,6.5 Z" fill="${INK}" stroke="${INK}" stroke-width="1" stroke-linejoin="round"/>
+  <ellipse cx="0" cy="10.2" rx="2" ry="1.2" fill="${BRAND.coral}"/>`,
+  // 동그란 눈 + 오 모양 입
+  surprised: `
+  <circle cx="-7" cy="0.5" r="3.6" fill="${INK}"/>
+  <circle cx="7" cy="0.5" r="3.6" fill="${INK}"/>
+  <circle cx="-5.8" cy="-0.8" r="1.3" fill="#FFFFFF"/>
+  <circle cx="8.2" cy="-0.8" r="1.3" fill="#FFFFFF"/>
+  <ellipse cx="0" cy="9" rx="2.6" ry="3.2" fill="${INK}"/>`,
+  // 위를 올려다보며 고민
+  thinking: `
+  <ellipse cx="-6" cy="-0.5" rx="2.6" ry="3.2" fill="${INK}"/>
+  <ellipse cx="8" cy="-0.5" rx="2.6" ry="3.2" fill="${INK}"/>
+  <circle cx="-5" cy="-2" r="1" fill="#FFFFFF"/>
+  <circle cx="9" cy="-2" r="1" fill="#FFFFFF"/>
+  <path d="M-2.5,8.6 L3.5,7.6" fill="none" stroke="${INK}" stroke-width="2" stroke-linecap="round"/>`,
+  // 처진 눈썹 + 시무룩한 입 + 땀방울
+  sad: `
+  <path d="M-11,-2 L-4,-4.5" fill="none" stroke="${INK}" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M4,-4.5 L11,-2" fill="none" stroke="${INK}" stroke-width="1.8" stroke-linecap="round"/>
+  <ellipse cx="-7" cy="2" rx="2.8" ry="3" fill="${INK}"/>
+  <ellipse cx="7" cy="2" rx="2.8" ry="3" fill="${INK}"/>
+  <circle cx="-6.2" cy="1" r="0.9" fill="#FFFFFF"/>
+  <circle cx="7.8" cy="1" r="0.9" fill="#FFFFFF"/>
+  <path d="M-3.5,10 Q0,7 3.5,10" fill="none" stroke="${INK}" stroke-width="2" stroke-linecap="round"/>
+  <path d="M15,-11 Q18,-6 15,-4 Q12,-6 15,-11 Z" fill="#8EC5FF" stroke="${INK}" stroke-width="1.2"/>`,
+};
+
+const pawn = (face = 'normal') => `
+  <path d="M-11,22 Q-14,38 -24,44 L24,44 Q14,38 11,22 Z" fill="${BRAND.mint}" stroke="${INK}" stroke-width="3.6" stroke-linejoin="round"/>
+  <rect x="-16" y="15" width="32" height="8" rx="4" fill="${BRAND.mint}" stroke="${INK}" stroke-width="3.6"/>
+  <circle cx="0" cy="0" r="18" fill="${BRAND.mint}" stroke="${INK}" stroke-width="3.6"/>
+  <ellipse cx="-7" cy="-9" rx="4.5" ry="2.8" fill="#FFFFFF"/>
   <ellipse cx="-12.5" cy="8" rx="4.5" ry="2.6" fill="${BRAND.blush}"/>
-  <ellipse cx="12.5" cy="8" rx="4.5" ry="2.6" fill="${BRAND.blush}"/>
-  <path d="M-3.5,7.5 Q0,11 3.5,7.5" fill="none" stroke="${BRAND.ink}" stroke-width="2" stroke-linecap="round"/>`;
+  <ellipse cx="12.5" cy="8" rx="4.5" ry="2.6" fill="${BRAND.blush}"/>${FACES[face]}`;
 
 // 180x180 좌표계의 캡슐. 원 중심 (90, 99), 반지름 78
 // 다른 유명 디자인(반반 나뉜 공 + 가운데 띠 + 버튼)과 겹치지 않도록:
 // 경계를 중심보다 아래(y=110)에 두고, 가운데 잠금쇠 없이, 아래 반쪽 테두리(립)가 원 밖으로 살짝 튀어나오게 함
-const CAPSULE = `
+const capsule = (face = 'normal') => `
   <defs><clipPath id="dome"><path d="M12.8,110 A78,78 0 1 1 167.2,110 Z"/></clipPath></defs>
   <path d="M12.8,110 A78,78 0 1 1 167.2,110 Z" fill="${BRAND.clear}"/>
-  <g clip-path="url(#dome)"><g transform="translate(90,62) scale(1.85)">${PAWN}</g></g>
+  <g clip-path="url(#dome)"><g transform="translate(90,62) scale(1.85)">${pawn(face)}</g></g>
   <path d="M26,86 A66,66 0 0 1 48,46" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"/>
   <path d="M12.8,110 A78,78 0 1 1 167.2,110" fill="none" stroke="${BRAND.ink}" stroke-width="6" stroke-linejoin="round"/>
   <path d="M12.8,110 A78,78 0 0 0 167.2,110 Z" fill="${BRAND.butter}" stroke="${BRAND.ink}" stroke-width="6" stroke-linejoin="round"/>
   <rect x="6.8" y="103" width="166.4" height="13" rx="6.5" fill="${BRAND.butter}" stroke="${BRAND.ink}" stroke-width="5"/>`;
 
 // scale: 캡슐이 캔버스에서 차지하는 비율을 조절 (1이면 테두리 립 포함 폭이 약 97%)
-const buildIconSvg = ({ background, scale, size }) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="${size}" height="${size}">
+const buildIconSvg = ({ background, scale, size, face = 'normal' }) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="${size}" height="${size}">
 ${background ? `<rect width="180" height="180" fill="${background}"/>` : ''}
-<g transform="translate(90 90) scale(${scale}) translate(-90 -99)">${CAPSULE}</g>
+<g transform="translate(90 90) scale(${scale}) translate(-90 -99)">${capsule(face)}</g>
 </svg>
 `;
 
@@ -99,7 +134,7 @@ const buildFeatureSvg = ({ titleLines, titleSize, tagline, chips, chipSize }) =>
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 500" width="1024" height="500">
 <rect width="1024" height="500" fill="${BRAND.mintLight}"/>
 ${confetti}
-<g transform="translate(240 250) scale(2.05) translate(-90 -99)">${CAPSULE}</g>
+<g transform="translate(240 250) scale(2.05) translate(-90 -99)">${capsule()}</g>
 ${titles}
 <text x="${textX}" y="${taglineY}" font-family="${FONT}" font-size="32" font-weight="700" fill="${BRAND.ink}">${tagline}</text>
 ${chipSvg}
@@ -116,6 +151,14 @@ const TARGETS = [
   { name: 'splash-icon', out: 'assets/splash-icon.png', width: 1024, height: 1024, svg: buildIconSvg({ background: null, scale: 0.95, size: 1024 }) },
   // Android 알림 작은 아이콘 96x96 (흰색 실루엣)
   { name: 'notification-icon', out: 'assets/notification-icon.png', width: 96, height: 96, svg: NOTIFICATION_SVG },
+  // 게임 화면 마스코트 표정 5종 (말풍선 옆 아바타)
+  ...Object.keys(FACES).map(face => ({
+    name: `mascot-${face}`,
+    out: `assets/mascot/${face}.png`,
+    width: 192,
+    height: 192,
+    svg: buildIconSvg({ background: null, scale: 0.95, size: 192, face }),
+  })),
   // Google Play 스토어 아이콘 512x512 (꽉 찬 정사각형, 모서리는 스토어가 둥글게 처리)
   { name: 'play-icon', out: 'assets/store/play-icon.png', width: 512, height: 512, svg: buildIconSvg({ background: BRAND.mintLight, scale: 0.9, size: 512 }) },
   // Google Play 대표 이미지 1024x500
@@ -144,6 +187,7 @@ const main = () => {
   const brandDir = join(ROOT, 'assets', 'brand');
   mkdirSync(brandDir, { recursive: true });
   mkdirSync(join(ROOT, 'assets', 'store'), { recursive: true });
+  mkdirSync(join(ROOT, 'assets', 'mascot'), { recursive: true });
   const workDir = mkdtempSync(join(tmpdir(), 'capsule-icons-'));
   try {
     for (const target of TARGETS) {

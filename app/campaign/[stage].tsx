@@ -6,9 +6,10 @@ import { type Stage, buildStageBoard, getStage, starsFor } from '../../src/campa
 import { ChessBoard } from '../../src/components/ChessBoard';
 import { GameControls } from '../../src/components/GameControls';
 import { ResultModal } from '../../src/components/ResultModal';
-import { TurnBadge } from '../../src/components/TurnBadge';
+import { MascotBubble } from '../../src/components/MascotBubble';
 import { useChessGame } from '../../src/game/useChessGame';
 import { strings } from '../../src/i18n';
+import { track } from '../../src/analytics';
 import { feedback } from '../../src/feedback/feedback';
 import { recordStageResult } from '../../src/storage/progress';
 import { palette } from '../../src/theme';
@@ -25,18 +26,25 @@ function StagePlay({ stage }: { stage: Stage }) {
   const initialBoard = useMemo(() => buildStageBoard(stage), [stage]);
   const game = useChessGame({ initialBoard, ai: stage.ai });
   const [earnedStars, setEarnedStars] = useState(0);
+  const [undos, setUndos] = useState(0);
   const nextStage = getStage(stage.id + 1);
   const won = game.result?.winner === 'w';
 
+  useEffect(() => {
+    track('stage_start', { stage: stage.id });
+  }, []);
+
   // 이기면 별 계산 후 저장 (최고 기록만 남음)
   useEffect(() => {
-    if (!game.isGameOver) return;
-    if (game.result?.winner !== 'w') {
+    if (!game.isGameOver || !game.result) return;
+    const outcome = game.result.winner === 'w' ? 'win' : game.result.winner ? 'lose' : 'draw';
+    const stars = outcome === 'win' ? starsFor(stage, game.result.blueMoves) : 0;
+    track('stage_end', { stage: stage.id, result: outcome, moves: game.result.blueMoves, stars, undos });
+    if (outcome !== 'win') {
       feedback.lose();
       return;
     }
     feedback.win();
-    const stars = starsFor(stage, game.result.blueMoves);
     setEarnedStars(stars);
     recordStageResult(stage.id, stars);
   }, [game.isGameOver]);
@@ -48,7 +56,16 @@ function StagePlay({ stage }: { stage: Stage }) {
         <Text style={styles.goal}>{strings.campaign.goal(stage.par)}</Text>
         <Text style={styles.moves}>{strings.campaign.movesUsed(game.blueMoves)}</Text>
         <View style={styles.turn}>
-          <TurnBadge turn={game.turn} status={game.status} vsAi />
+          <MascotBubble
+            vsAi={true}
+            turn={game.turn}
+            status={game.status}
+            lastMove={game.lastMove}
+            lastCaptured={game.lastCaptured}
+            winner={game.isGameOver ? game.result?.winner ?? null : null}
+            isGameOver={game.isGameOver}
+            moveCount={game.blueMoves * 2 + (game.turn === 'b' ? 1 : 0)}
+          />
         </View>
       </View>
 
@@ -61,7 +78,15 @@ function StagePlay({ stage }: { stage: Stage }) {
         onMove={game.move}
       />
 
-      <GameControls canUndo={game.canUndo} onUndo={game.undo} onRestart={() => game.reset()} />
+      <GameControls
+        canUndo={game.canUndo}
+        onUndo={() => {
+          game.undo();
+          setUndos(n => n + 1);
+          track('undo', { screen: 'stage' });
+        }}
+        onRestart={() => game.reset()}
+      />
 
       <ResultModal
         visible={game.isGameOver}

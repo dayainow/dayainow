@@ -1,7 +1,7 @@
 import { INITIAL_BOARD } from '../../engine/chessEngine';
 import { type Snapshot, undoTargetIndex } from '../useChessGame';
 
-const snap = (turn: 'w' | 'b'): Snapshot => ({ board: INITIAL_BOARD, turn, status: 'playing', lastMove: null, blueMoves: 0 });
+const snap = (turn: 'w' | 'b'): Snapshot => ({ board: INITIAL_BOARD, turn, status: 'playing', lastMove: null, lastCaptured: null, blueMoves: 0 });
 
 describe('undoTargetIndex', () => {
   it('has nothing to undo at the start', () => {
