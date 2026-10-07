@@ -4,6 +4,7 @@ import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'rea
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MAX_STARS, STAGES, clearedStageCount, nextStageId } from '../src/campaign/stages';
 import { track } from '../src/analytics';
+import { RulesButton } from '../src/components/RulesButton';
 import { WelcomeModal } from '../src/components/WelcomeModal';
 import { strings } from '../src/i18n';
 import { getDailyPuzzle } from '../src/puzzles/daily';
@@ -58,7 +59,7 @@ export default function HomeScreen() {
       {/* 화면이 넉넉하면 가운데, 작은 휴대폰에서는 스크롤 (로고·메뉴가 잘리지 않게) */}
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.column}>
-          {/* 상단: 연속 기록·별 + 설정 */}
+          {/* 상단: 연속 기록·별 + 규칙·설정 */}
           <View style={styles.topBar}>
             <View style={styles.chips}>
               <View style={[styles.chip, streak === 0 && styles.chipMuted]}>
@@ -68,9 +69,12 @@ export default function HomeScreen() {
                 <Text style={styles.chipText}>★ {stars}</Text>
               </View>
             </View>
-            <TouchableOpacity style={styles.gear} onPress={() => router.push('/settings')} accessibilityLabel={strings.home.settings}>
-              <Text style={styles.gearText}>⚙️</Text>
-            </TouchableOpacity>
+            <View style={styles.actions}>
+              <RulesButton source="home" labeled />
+              <TouchableOpacity style={styles.gear} onPress={() => router.push('/settings')} accessibilityLabel={strings.home.settings}>
+                <Text style={styles.gearText}>⚙️</Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           <View style={styles.hero}>
@@ -149,6 +153,7 @@ const styles = StyleSheet.create({
   column: { alignSelf: 'center', width: '100%', maxWidth: 440, gap: 14 },
   topBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   chips: { flexDirection: 'row', gap: 8 },
+  actions: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   chip: { backgroundColor: palette.white, borderWidth: 2, borderColor: palette.ink, borderRadius: 16, paddingHorizontal: 12, paddingVertical: 4 },
   chipMuted: { borderColor: palette.line },
   chipText: { fontSize: 15, fontWeight: '800', color: palette.ink },

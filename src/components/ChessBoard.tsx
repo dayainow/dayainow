@@ -164,7 +164,6 @@ export function ChessBoard({ board, sideToMove, interactive, lastMove, checkedKi
           <>
             {slide.captured && (
               <Animated.View
-                pointerEvents="none"
                 style={[
                   styles.floating,
                   {
@@ -183,7 +182,6 @@ export function ChessBoard({ board, sideToMove, interactive, lastMove, checkedKi
               </Animated.View>
             )}
             <Animated.View
-              pointerEvents="none"
               style={[
                 styles.floating,
                 {
@@ -230,5 +228,5 @@ const styles = StyleSheet.create({
   // 고른 기물은 살짝 들려 보이게
   lifted: { transform: [{ scale: 1.15 }, { translateY: -2 }] },
   hidden: { opacity: 0 },
-  floating: { position: 'absolute', justifyContent: 'center', alignItems: 'center', zIndex: 10 },
+  floating: { position: 'absolute', justifyContent: 'center', alignItems: 'center', zIndex: 10, pointerEvents: 'none' },
 });

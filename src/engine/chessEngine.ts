@@ -8,10 +8,15 @@ export const INITIAL_BOARD: (string | null)[][] = [
   ['wR', 'wN', 'wB', 'wQ', 'wK'],
 ];
 
-export const PIECE_SYMBOLS: Record<string, string> = {
-  'wR': '♖', 'wN': '♘', 'wB': '♗', 'wQ': '♕', 'wK': '♔', 'wP': '♙',
-  'bR': '♜', 'bN': '♞', 'bB': '♝', 'bQ': '♛', 'bK': '♚', 'bP': '♟'
-};
+// 글자 모양으로 그리라는 표시(VS15). 안드로이드·iOS가 ♟를 색을 바꿀 수 없는 이모지로 그리는 것을 막음
+const TEXT_STYLE = '\uFE0E';
+
+export const PIECE_SYMBOLS: Record<string, string> = Object.fromEntries(
+  Object.entries({
+    'wR': '♖', 'wN': '♘', 'wB': '♗', 'wQ': '♕', 'wK': '♔', 'wP': '♙',
+    'bR': '♜', 'bN': '♞', 'bB': '♝', 'bQ': '♛', 'bK': '♚', 'bP': '♟'
+  }).map(([piece, symbol]) => [piece, symbol + TEXT_STYLE])
+);
 
 export type Move = {
   fromR: number;

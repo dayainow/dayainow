@@ -17,6 +17,7 @@ export type AnalyticsEvents = {
   free_play_end: { mode: 'pve' | 'pvp'; difficulty: string; result: 'win' | 'lose' | 'draw' };
   undo: { screen: 'play' | 'stage' };
   setting_change: { key: string; value: boolean | string };
+  rules_open: { source: 'home' | 'header' | 'learn' };
 };
 
 export type AnalyticsSink = (event: string, props: Record<string, unknown>) => void;
