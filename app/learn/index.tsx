@@ -1,13 +1,16 @@
 import { router, useFocusEffect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RuleList } from '../../src/components/RuleList';
 import { strings } from '../../src/i18n';
 import { useOpenRules } from '../../src/rules/RulesProvider';
 import { type Progress, emptyProgress, loadProgress } from '../../src/storage/progress';
 import { palette } from '../../src/theme';
-import { LESSONS } from '../../src/tutorial/lessons';
+import { LESSONS, LESSON_PIECE } from '../../src/tutorial/lessons';
+import { Panel } from '../../src/ui/Panel';
+import { PieceImage } from '../../src/ui/PieceImage';
+import { Text } from '../../src/ui/Text';
 
 type LessonId = keyof typeof strings.tutorial.lessons;
 
@@ -24,22 +27,25 @@ export default function LearnScreen() {
   return (
     <SafeAreaView edges={['bottom']} style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.rulesCard}>
+        <Panel style={styles.rulesCard}>
           <Text style={styles.rulesTitle}>{strings.onboarding.rulesTitle}</Text>
           <RuleList items={strings.rules.diffs} compact />
-          <TouchableOpacity style={styles.rulesLink} onPress={() => openRules('learn')}>
+          <Pressable style={styles.rulesLink} onPress={() => openRules('learn')}>
             <Text style={styles.rulesLinkText}>{strings.rules.viewAll} ›</Text>
-          </TouchableOpacity>
-        </View>
+          </Pressable>
+        </Panel>
 
         {LESSONS.map((lesson, i) => {
           const done = !!progress.tutorial[lesson.id];
           return (
-            <TouchableOpacity key={lesson.id} style={[styles.lesson, done && styles.lessonDone]} onPress={() => router.push(`/learn/${lesson.id}`)}>
-              <Text style={styles.lessonNumber}>{i + 1}</Text>
-              <Text style={styles.lessonTitle}>{strings.tutorial.lessons[lesson.id as LessonId].title}</Text>
-              <Text style={styles.lessonCheck}>{done ? '✓' : ''}</Text>
-            </TouchableOpacity>
+            <Pressable key={lesson.id} onPress={() => router.push(`/learn/${lesson.id}`)}>
+              <Panel color={done ? palette.mintLight : palette.white} style={styles.lesson}>
+                <Text style={styles.lessonNumber}>{i + 1}</Text>
+                <PieceImage piece={LESSON_PIECE[lesson.id] ?? 'wK'} size={38} />
+                <Text style={styles.lessonTitle}>{strings.tutorial.lessons[lesson.id as LessonId].title}</Text>
+                <Text style={styles.lessonCheck}>{done ? '✓' : '›'}</Text>
+              </Panel>
+            </Pressable>
           );
         })}
       </ScrollView>
@@ -48,15 +54,14 @@ export default function LearnScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: palette.mintMist },
-  content: { padding: 20, gap: 10, alignItems: 'stretch', maxWidth: 460, width: '100%', alignSelf: 'center' },
-  rulesCard: { backgroundColor: palette.white, borderRadius: 18, borderWidth: 2, borderColor: palette.ink, padding: 16, marginBottom: 6 },
-  rulesTitle: { fontSize: 16, fontWeight: '800', color: palette.ink, marginBottom: 12 },
-  rulesLink: { alignSelf: 'flex-end', marginTop: 10 },
-  rulesLinkText: { fontSize: 14, fontWeight: '800', color: palette.mintDark },
-  lesson: { flexDirection: 'row', alignItems: 'center', backgroundColor: palette.white, borderRadius: 16, borderWidth: 2, borderColor: palette.ink, paddingVertical: 12, paddingHorizontal: 16 },
-  lessonDone: { backgroundColor: palette.mintLight },
-  lessonNumber: { width: 28, fontSize: 16, fontWeight: '900', color: palette.inkSoft },
-  lessonTitle: { flex: 1, fontSize: 16, fontWeight: '800', color: palette.ink },
-  lessonCheck: { fontSize: 18, fontWeight: '900', color: palette.mintDark },
+  container: { flex: 1, backgroundColor: palette.bg },
+  content: { padding: 16, gap: 10, alignSelf: 'center', width: '100%', maxWidth: 480 },
+  rulesCard: { padding: 14, marginBottom: 6 },
+  rulesTitle: { fontSize: 18, marginBottom: 10 },
+  rulesLink: { alignSelf: 'flex-end', marginTop: 8 },
+  rulesLinkText: { fontSize: 15, color: palette.blueDark },
+  lesson: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 6, paddingHorizontal: 14 },
+  lessonNumber: { width: 20, fontSize: 17, color: palette.inkSoft },
+  lessonTitle: { flex: 1, fontSize: 18 },
+  lessonCheck: { fontSize: 20, color: palette.mintDark },
 });

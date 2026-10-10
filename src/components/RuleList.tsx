@@ -1,6 +1,7 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { palette } from '../theme';
+import { Text } from '../ui/Text';
 
 export type RuleItem = { icon: string; title: string; body: string };
 

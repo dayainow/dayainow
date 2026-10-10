@@ -62,7 +62,8 @@
           "color": "#6FDDB7"
         }
       ],
-      "expo-sharing"
+      "expo-sharing",
+      "expo-font"
     ]
   }
 }

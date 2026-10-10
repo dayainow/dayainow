@@ -1,7 +1,7 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { PIECE_SYMBOLS } from '../engine/chessEngine';
+import { StyleSheet, View } from 'react-native';
 import { palette, sideColors } from '../theme';
+import { PieceImage } from '../ui/PieceImage';
 
 type Square = { r: number; c: number };
 
@@ -28,11 +28,7 @@ export function MiniBoard({ board, size, moves = [], captures = [], focus }: Pro
             <View key={c} style={[styles.cell, (r + c) % 2 === 0 ? styles.light : styles.dark, focus?.r === r && focus?.c === c && styles.focus]}>
               {has(captures, r, c) && <View style={[styles.capture, { borderRadius: cell / 2, borderWidth: Math.max(2, cell / 14) }]} />}
               {has(moves, r, c) && <View style={[styles.dot, { width: cell * 0.3, height: cell * 0.3, borderRadius: cell * 0.15 }]} />}
-              {piece && (
-                <Text style={[styles.piece, { fontSize: cell * 0.74, lineHeight: cell * 0.95, color: sideColors[piece.charAt(0) as 'w' | 'b'] }]}>
-                  {PIECE_SYMBOLS[piece]}
-                </Text>
-              )}
+              {piece && <PieceImage piece={piece} size={cell * 0.94} />}
             </View>
           ))}
         </View>
@@ -50,5 +46,4 @@ const styles = StyleSheet.create({
   focus: { backgroundColor: palette.butter },
   dot: { position: 'absolute', backgroundColor: palette.mintDark, opacity: 0.55 },
   capture: { position: 'absolute', top: '8%', left: '8%', right: '8%', bottom: '8%', borderColor: sideColors.b },
-  piece: { textAlign: 'center' },
 });

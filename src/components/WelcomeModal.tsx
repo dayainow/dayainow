@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
-import { Image, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import { strings } from '../i18n';
 import { palette } from '../theme';
+import { GameButton } from '../ui/GameButton';
+import { MascotFace } from '../ui/MascotFace';
+import { Panel } from '../ui/Panel';
+import { Text } from '../ui/Text';
 import { RuleList } from './RuleList';
 
 type Props = {
@@ -18,21 +22,19 @@ export function WelcomeModal({ visible, onNewPlayer, onKnowsChess, onLater }: Pr
   return (
     <Modal visible={visible} transparent animationType="fade">
       <View style={styles.overlay}>
-        <View style={styles.card}>
-          <Image source={require('../../assets/splash-icon.png')} style={styles.logo} />
+        <Panel style={styles.card}>
+          <MascotFace mood="happy" size={88} />
           {step === 'ask' ? (
             <>
               <Text style={styles.title}>{strings.onboarding.title}</Text>
               <Text style={styles.question}>{strings.onboarding.question}</Text>
-              <TouchableOpacity style={styles.primaryButton} onPress={onNewPlayer}>
-                <Text style={styles.primaryText}>{strings.onboarding.newPlayer}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.outlineButton} onPress={() => setStep('rules')}>
-                <Text style={styles.outlineText}>{strings.onboarding.knowsChess}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.textButton} onPress={onLater}>
+              <View style={styles.actions}>
+                <GameButton label={strings.onboarding.newPlayer} onPress={onNewPlayer} />
+                <GameButton label={strings.onboarding.knowsChess} onPress={() => setStep('rules')} variant="white" />
+              </View>
+              <Pressable style={styles.textButton} onPress={onLater}>
                 <Text style={styles.textButtonLabel}>{strings.onboarding.later}</Text>
-              </TouchableOpacity>
+              </Pressable>
             </>
           ) : (
             <>
@@ -42,32 +44,28 @@ export function WelcomeModal({ visible, onNewPlayer, onKnowsChess, onLater }: Pr
                 <RuleList items={strings.rules.diffs} compact />
               </View>
               <Text style={styles.anywhere}>{strings.rules.anywhere}</Text>
-              <TouchableOpacity style={styles.primaryButton} onPress={onKnowsChess}>
-                <Text style={styles.primaryText}>{strings.onboarding.startChallenge}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.textButton} onPress={onNewPlayer}>
+              <View style={styles.actions}>
+                <GameButton label={strings.onboarding.startChallenge} onPress={onKnowsChess} />
+              </View>
+              <Pressable style={styles.textButton} onPress={onNewPlayer}>
                 <Text style={styles.textButtonLabel}>{strings.home.learn}</Text>
-              </TouchableOpacity>
+              </Pressable>
             </>
           )}
-        </View>
+        </Panel>
       </View>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  overlay: { flex: 1, backgroundColor: 'rgba(58, 52, 69, 0.45)', justifyContent: 'center', alignItems: 'center', padding: 20 },
-  card: { backgroundColor: palette.white, borderRadius: 24, borderWidth: 3, borderColor: palette.ink, alignItems: 'center', padding: 24, width: '100%', maxWidth: 340 },
-  logo: { width: 84, height: 84, marginBottom: 6 },
-  title: { fontSize: 21, fontWeight: '900', color: palette.ink, textAlign: 'center' },
-  question: { fontSize: 15, color: palette.inkSoft, textAlign: 'center', marginTop: 6, marginBottom: 16 },
-  rules: { alignSelf: 'stretch', backgroundColor: palette.mintMist, borderRadius: 16, padding: 14 },
-  anywhere: { fontSize: 12, color: palette.inkSoft, textAlign: 'center', marginTop: 10, marginBottom: 16 },
-  primaryButton: { alignSelf: 'stretch', alignItems: 'center', backgroundColor: palette.butter, borderWidth: 2, borderColor: palette.ink, paddingVertical: 13, borderRadius: 20 },
-  primaryText: { color: palette.ink, fontSize: 16, fontWeight: 'bold' },
-  outlineButton: { alignSelf: 'stretch', alignItems: 'center', backgroundColor: palette.white, borderWidth: 2, borderColor: palette.ink, paddingVertical: 13, borderRadius: 20, marginTop: 10 },
-  outlineText: { color: palette.ink, fontSize: 16, fontWeight: 'bold' },
+  overlay: { flex: 1, backgroundColor: 'rgba(46, 42, 58, 0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 },
+  card: { alignItems: 'center', padding: 22, width: '100%', maxWidth: 360 },
+  title: { fontSize: 23, textAlign: 'center', marginTop: 4 },
+  question: { fontSize: 16, color: palette.inkSoft, textAlign: 'center', marginTop: 4, marginBottom: 16 },
+  rules: { alignSelf: 'stretch', backgroundColor: palette.bg, borderRadius: 16, padding: 14 },
+  anywhere: { fontSize: 13, color: palette.inkSoft, textAlign: 'center', marginTop: 10, marginBottom: 14 },
+  actions: { alignSelf: 'stretch', gap: 10 },
   textButton: { paddingVertical: 12, marginTop: 4 },
-  textButtonLabel: { color: palette.inkSoft, fontSize: 14, fontWeight: '600' },
+  textButtonLabel: { color: palette.inkSoft, fontSize: 15 },
 });

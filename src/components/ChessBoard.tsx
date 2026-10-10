@@ -1,12 +1,15 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Animated, Easing, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { type Move, BOARD_SIZE, PIECE_SYMBOLS, getLegalMovesForPiece } from '../engine/chessEngine';
+import { Animated, Easing, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { type Move, BOARD_SIZE, getLegalMovesForPiece } from '../engine/chessEngine';
 import { feedback } from '../feedback/feedback';
 import { moveFeedbackKind } from '../feedback/moveKind';
-import { palette, sideColors } from '../theme';
+import { palette } from '../theme';
+import { Text } from '../ui/Text';
+import { PieceImage } from '../ui/PieceImage';
 
 const MAX_BOARD_SIZE = 400;
 const BORDER = 4;
+const LIFT = 5; // 아래 테두리를 더 두껍게 해서 판이 살짝 떠 보이게
 const SLIDE_MS = 180;
 const LAND_MS = 140;
 const USE_NATIVE_DRIVER = Platform.OS !== 'web';
@@ -28,13 +31,13 @@ type Props = {
 // 이동 연출에 필요한 정보: 움직인 기물(승급 전 모습), 잡힌 기물
 type Slide = { move: Move; mover: string; captured: string | null };
 
-const pieceColor = (piece: string) => sideColors[piece.charAt(0) as 'w' | 'b'];
-
 // 탭으로 기물 선택 → 이동. 남는 공간에 맞춰 크기가 정해짐 (최대 400)
 export function ChessBoard({ board, sideToMove, interactive, lastMove, checkedKing, onMove, markers = [], hint = null }: Props) {
   const [selected, setSelected] = useState<Square | null>(null);
   const [targets, setTargets] = useState<Square[]>([]);
   const [size, setSize] = useState(MAX_BOARD_SIZE);
+  // 판 영역이 판보다 쓸데없이 커지지 않게 (남는 공간은 화면 위아래로 고르게 나눔)
+  const [maxArea, setMaxArea] = useState<number | undefined>(undefined);
   const [slide, setSlide] = useState<Slide | null>(null);
   const progress = useRef(new Animated.Value(1)).current;
   const landing = useRef(new Animated.Value(0)).current;
@@ -43,7 +46,7 @@ export function ChessBoard({ board, sideToMove, interactive, lastMove, checkedKi
   const slideTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const cellSize = (size - BORDER * 2) / BOARD_SIZE;
-  const pieceSize = Math.round(cellSize * 0.63);
+  const pieceSize = Math.round(cellSize * 0.92);
 
   const clearSelection = () => {
     setSelected(null);
@@ -102,13 +105,15 @@ export function ChessBoard({ board, sideToMove, interactive, lastMove, checkedKi
 
   return (
     <View
-      style={styles.area}
+      style={[styles.area, { maxHeight: maxArea }]}
       onLayout={e => {
         const { width, height } = e.nativeEvent.layout;
-        setSize(Math.floor(Math.min(MAX_BOARD_SIZE, width - 32, height)));
+        const widest = Math.min(MAX_BOARD_SIZE, width - 32);
+        setMaxArea(widest + LIFT);
+        setSize(Math.floor(Math.min(widest, height - LIFT)));
       }}
     >
-      <View style={[styles.board, { width: size, height: size }]}>
+      <View style={[styles.board, { width: size, height: size + LIFT }]}>
         {board.map((row, r) => (
           <View key={`row-${r}`} style={styles.row}>
             {row.map((piece, c) => {
@@ -143,17 +148,9 @@ export function ChessBoard({ board, sideToMove, interactive, lastMove, checkedKi
                     ) : (
                       <Text style={[styles.marker, { fontSize: cellSize * 0.5 }]}>★</Text>
                     ))}
-                  {at({ r, c }, targets) && <View style={styles.targetDot} />}
-                  <Text
-                    style={[
-                      styles.piece,
-                      { fontSize: pieceSize, color: piece ? pieceColor(piece) : undefined },
-                      isSelected && styles.lifted,
-                      hiddenBySlide && styles.hidden,
-                    ]}
-                  >
-                    {piece ? PIECE_SYMBOLS[piece] : ''}
-                  </Text>
+                  {/* 갈 수 있는 칸은 점, 잡을 수 있는 칸은 빨간 고리 */}
+                  {at({ r, c }, targets) && <View style={piece ? styles.targetRing : styles.targetDot} />}
+                  {piece && <PieceImage piece={piece} size={pieceSize} style={[styles.piece, isSelected && styles.lifted, hiddenBySlide && styles.hidden]} />}
                 </TouchableOpacity>
               );
             })}
@@ -176,9 +173,7 @@ export function ChessBoard({ board, sideToMove, interactive, lastMove, checkedKi
                   },
                 ]}
               >
-                <Text style={[styles.piece, { fontSize: pieceSize, color: pieceColor(slide.captured) }]}>
-                  {PIECE_SYMBOLS[slide.captured]}
-                </Text>
+                <PieceImage piece={slide.captured} size={pieceSize} />
               </Animated.View>
             )}
             <Animated.View
@@ -198,9 +193,7 @@ export function ChessBoard({ board, sideToMove, interactive, lastMove, checkedKi
                 },
               ]}
             >
-              <Text style={[styles.piece, { fontSize: pieceSize, color: pieceColor(slide.mover) }]}>
-                {PIECE_SYMBOLS[slide.mover]}
-              </Text>
+              <PieceImage piece={slide.mover} size={pieceSize} />
             </Animated.View>
           </>
         )}
@@ -211,22 +204,23 @@ export function ChessBoard({ board, sideToMove, interactive, lastMove, checkedKi
 
 const styles = StyleSheet.create({
   area: { flex: 1, alignSelf: 'stretch', alignItems: 'center', justifyContent: 'center', marginVertical: 12 },
-  // 아이콘처럼 잉크색 굵은 외곽선
-  board: { borderWidth: BORDER, borderColor: palette.ink, borderRadius: 14, overflow: 'hidden', backgroundColor: palette.white },
+  // 잉크색 굵은 외곽선 + 두꺼운 아래 테두리 (장난감 판처럼)
+  board: { borderWidth: BORDER, borderBottomWidth: BORDER + LIFT, borderColor: palette.ink, borderRadius: 18, overflow: 'hidden', backgroundColor: palette.white },
   row: { flex: 1, flexDirection: 'row' },
   cell: { flex: 1, justifyContent: 'center', alignItems: 'center', position: 'relative' },
   lightCell: { backgroundColor: palette.cream },
   darkCell: { backgroundColor: palette.mintLight },
-  lastMoveCell: { backgroundColor: palette.butterLight },
+  lastMoveCell: { backgroundColor: palette.sunLight },
   checkCell: { backgroundColor: palette.coralLight },
-  selectedCell: { backgroundColor: palette.butter },
+  selectedCell: { backgroundColor: palette.sun },
   hintCell: { borderWidth: 4, borderColor: palette.star, backgroundColor: palette.butterLight },
-  targetDot: { position: 'absolute', width: 16, height: 16, backgroundColor: 'rgba(58, 52, 69, 0.22)', borderRadius: 8, zIndex: 1 },
+  targetDot: { position: 'absolute', width: 18, height: 18, backgroundColor: 'rgba(46, 42, 58, 0.25)', borderRadius: 9, zIndex: 1 },
+  targetRing: { position: 'absolute', top: 3, left: 3, right: 3, bottom: 3, borderWidth: 4, borderColor: palette.red, borderRadius: 999, zIndex: 3 },
   marker: { position: 'absolute', color: palette.star },
   markerBadge: { position: 'absolute', top: 2, right: 4, color: palette.star, zIndex: 3 },
   piece: { zIndex: 2 },
   // 고른 기물은 살짝 들려 보이게
-  lifted: { transform: [{ scale: 1.15 }, { translateY: -2 }] },
+  lifted: { transform: [{ scale: 1.12 }, { translateY: -4 }] },
   hidden: { opacity: 0 },
   floating: { position: 'absolute', justifyContent: 'center', alignItems: 'center', zIndex: 10, pointerEvents: 'none' },
 });
