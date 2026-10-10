@@ -1,9 +1,10 @@
 import { type Href, router, useFocusEffect } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { MAX_STARS, STAGES, clearedStageCount, nextStageId } from '../src/campaign/stages';
 import { track } from '../src/analytics';
+import { CAPSULES, STAGES_PER_CAPSULE, earnedBadges, opponentFor } from '../src/campaign/league';
+import { getStage, nextStageId } from '../src/campaign/stages';
 import { RulesButton } from '../src/components/RulesButton';
 import { WelcomeModal } from '../src/components/WelcomeModal';
 import { strings } from '../src/i18n';
@@ -11,6 +12,13 @@ import { getDailyPuzzle } from '../src/puzzles/daily';
 import { type Progress, currentStreak, emptyProgress, loadProgress, recordOnboarded, totalStars } from '../src/storage/progress';
 import { palette } from '../src/theme';
 import { LESSONS } from '../src/tutorial/lessons';
+import { CapsuleBadge } from '../src/ui/CapsuleBadge';
+import { Chip } from '../src/ui/Chip';
+import { GameButton } from '../src/ui/GameButton';
+import { MascotFace } from '../src/ui/MascotFace';
+import { Panel } from '../src/ui/Panel';
+import { PieceImage } from '../src/ui/PieceImage';
+import { Text } from '../src/ui/Text';
 import { formatCountdown, msUntilNextDay } from '../src/utils/date';
 
 export default function HomeScreen() {
@@ -34,10 +42,12 @@ export default function HomeScreen() {
   const solvedToday = !!progress.daily.records[daily.dateKey]?.solved;
   const streak = currentStreak(progress, daily.dateKey);
   const stars = totalStars(progress);
-  const next = nextStageId(progress.campaign);
-  const cleared = clearedStageCount(progress.campaign);
+  const badges = earnedBadges(progress.campaign);
+  const nextId = nextStageId(progress.campaign);
+  const nextStage = nextId ? getStage(nextId) : undefined;
+  const opponent = nextStage ? opponentFor(nextStage) : null;
   const lessonsDone = LESSONS.filter(l => progress.tutorial[l.id]).length;
-  const isNewPlayer = lessonsDone === 0 && cleared === 0;
+  const isNewPlayer = lessonsDone === 0 && !progress.campaign[1];
 
   // 오늘 퍼즐을 풀었으면 다음 퍼즐까지 남은 시간 표시
   useEffect(() => {
@@ -54,85 +64,116 @@ export default function HomeScreen() {
     if (href) router.push(href);
   };
 
+  const openLeague = () => router.push(nextStage ? `/campaign/${nextStage.id}` : '/campaign');
+
   return (
     <SafeAreaView style={styles.container}>
-      {/* 화면이 넉넉하면 가운데, 작은 휴대폰에서는 스크롤 (로고·메뉴가 잘리지 않게) */}
+      {/* 작은 휴대폰에서는 스크롤 (메뉴가 잘리지 않게) */}
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.column}>
-          {/* 상단: 연속 기록·별 + 규칙·설정 */}
-          <View style={styles.topBar}>
-            <View style={styles.chips}>
-              <View style={[styles.chip, streak === 0 && styles.chipMuted]}>
-                <Text style={styles.chipText}>🔥 {streak}</Text>
-              </View>
-              <View style={styles.chip}>
-                <Text style={styles.chipText}>★ {stars}</Text>
+          {/* 트레이너 카드: 마스코트 + 연속 기록·별 + 규칙·설정 */}
+          <Panel style={styles.trainer}>
+            <MascotFace mood="happy" size={60} />
+            <View style={styles.trainerBody}>
+              <Text style={styles.trainerName}>{strings.league.trainer}</Text>
+              <View style={styles.chips}>
+                <Chip label={`🔥 ${streak}`} />
+                <Chip label={`★ ${stars}`} />
               </View>
             </View>
-            <View style={styles.actions}>
-              <RulesButton source="home" labeled />
-              <TouchableOpacity style={styles.gear} onPress={() => router.push('/settings')} accessibilityLabel={strings.home.settings}>
-                <Text style={styles.gearText}>⚙️</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+            <RulesButton source="home" />
+            <Pressable style={styles.gear} onPress={() => router.push('/settings')} accessibilityLabel={strings.home.settings}>
+              <Text style={styles.gearText}>⚙️</Text>
+            </Pressable>
+          </Panel>
 
-          <View style={styles.hero}>
-            <Image source={require('../assets/splash-icon.png')} style={styles.logo} />
-            <Text style={styles.title}>{strings.appTitle}</Text>
-            <Text style={styles.subtitle}>{strings.subtitle}</Text>
-          </View>
+          {/* 배지 케이스 */}
+          <Panel style={styles.badges}>
+            <View style={styles.rowBetween}>
+              <Text style={styles.sectionTitle}>🏅 {strings.league.badgeCase}</Text>
+              <Pressable onPress={() => router.push('/campaign')} hitSlop={10}>
+                <Text style={styles.link}>
+                  {badges.length} / {CAPSULES.length} · {strings.home.allStages} ›
+                </Text>
+              </Pressable>
+            </View>
+            <View style={styles.badgeRow}>
+              {CAPSULES.map(c => (
+                <CapsuleBadge key={c.id} capsule={c.id} earned={badges.includes(c.id)} size={54} />
+              ))}
+            </View>
+          </Panel>
 
           {/* 가장 중요한 행동: 오늘의 퍼즐 */}
-          <TouchableOpacity style={[styles.card, styles.dailyCard]} onPress={() => router.push('/daily')}>
-            <View style={styles.cardBody}>
-              <Text style={styles.kicker}>
-                {strings.home.daily} · #{daily.number}
+          <Pressable onPress={() => router.push('/daily')}>
+            <Panel color={palette.sun} style={styles.daily}>
+              {!solvedToday && (
+                <View style={styles.newTag}>
+                  <Text style={styles.newTagText}>NEW!</Text>
+                </View>
+              )}
+              <Text style={styles.dailyKicker}>
+                {strings.home.daily} #{daily.number}
               </Text>
-              <Text style={styles.cardTitle}>{solvedToday ? strings.home.done : strings.daily.mateIn(daily.mateIn)}</Text>
-              <Text style={styles.cardSub}>
-                {solvedToday ? strings.home.nextPuzzleIn(countdown) : streak > 0 ? strings.home.keepStreak(streak) : strings.home.startStreak}
-              </Text>
-            </View>
-            <View style={[styles.pill, solvedToday && styles.pillDone]}>
-              <Text style={styles.pillText}>{solvedToday ? '✓' : `${strings.home.play} ▶`}</Text>
-            </View>
-          </TouchableOpacity>
+              <Text style={styles.dailyTitle}>{solvedToday ? strings.home.done : strings.daily.mateIn(daily.mateIn)}</Text>
+              <View style={styles.rowBetween}>
+                <Text style={styles.dailySub}>
+                  {solvedToday ? strings.home.nextPuzzleIn(countdown) : streak > 0 ? strings.home.keepStreak(streak) : strings.home.startStreak}
+                </Text>
+                <GameButton label={solvedToday ? '✓' : `${strings.home.play} ▶`} onPress={() => router.push('/daily')} variant="white" size="sm" />
+              </View>
+            </Panel>
+          </Pressable>
 
-          {/* 이어하기: 탭 한 번에 다음 단계로 */}
-          <TouchableOpacity style={styles.card} onPress={() => router.push(next ? `/campaign/${next}` : '/campaign')}>
-            <View style={styles.cardBody}>
-              <View style={styles.cardHeaderRow}>
-                <Text style={styles.kicker}>{strings.home.campaign}</Text>
-                <TouchableOpacity onPress={() => router.push('/campaign')} hitSlop={10}>
-                  <Text style={styles.link}>{strings.home.allStages} ›</Text>
-                </TouchableOpacity>
+          {/* 캡슐 리그: 다음 상대와 바로 배틀 */}
+          <Pressable onPress={openLeague}>
+            <Panel style={styles.league}>
+              <View style={styles.opponent}>
+                <PieceImage piece={opponent?.avatar ?? 'wK'} size={52} />
               </View>
-              <Text style={styles.cardTitle}>
-                {next ? `${strings.home.continueLabel} · ${strings.home.continueStage(next)}` : strings.home.allCleared}
-              </Text>
-              <View style={styles.progressTrack}>
-                <View style={[styles.progressFill, { width: `${(cleared / STAGES.length) * 100}%` }]} />
+              <View style={styles.leagueBody}>
+                <Text style={styles.muted} numberOfLines={1}>
+                  {nextStage ? `${strings.league.capsule(nextStage.world)} · ${strings.league.capsuleNames[nextStage.world - 1]}` : strings.league.title}
+                </Text>
+                <Text style={styles.leagueTitle} numberOfLines={1}>
+                  {opponent ? strings.league.nextOpponent(strings.league.opponents[opponent.index]) : strings.league.allCleared}
+                </Text>
+                {nextStage && (
+                  <View style={styles.steps}>
+                    {Array.from({ length: STAGES_PER_CAPSULE }, (_, i) => {
+                      const id = (nextStage.world - 1) * STAGES_PER_CAPSULE + i + 1;
+                      return <View key={id} style={[styles.step, (progress.campaign[id] ?? 0) > 0 && styles.stepDone, id === nextStage.id && styles.stepNow]} />;
+                    })}
+                  </View>
+                )}
               </View>
-              <Text style={styles.cardSub}>
-                {strings.home.stagesProgress(cleared, STAGES.length)} · ★ {stars} / {MAX_STARS}
-              </Text>
-            </View>
-          </TouchableOpacity>
+              <GameButton label={strings.league.battle} onPress={openLeague} variant="blue" size="sm" />
+            </Panel>
+          </Pressable>
 
           <View style={styles.tiles}>
-            <TouchableOpacity style={[styles.tile, isNewPlayer && styles.tileHighlight]} onPress={() => router.push('/learn')}>
-              <Text style={styles.tileEmoji}>🎓</Text>
-              <Text style={styles.tileLabel}>{strings.home.learn}</Text>
-              <Text style={styles.tileSub}>
-                {lessonsDone === 0 ? strings.home.learnInfoNew : strings.home.learnInfo(lessonsDone, LESSONS.length)}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.tile} onPress={() => router.push('/play')}>
-              <Text style={styles.tileEmoji}>♞</Text>
-              <Text style={styles.tileLabel}>{strings.home.freePlay}</Text>
-              <Text style={styles.tileSub}>{strings.home.freePlayInfo}</Text>
-            </TouchableOpacity>
+            <Pressable style={styles.tileWrap} onPress={() => router.push('/learn')}>
+              <Panel color={isNewPlayer ? palette.mintLight : palette.white} style={styles.tile}>
+                <PieceImage piece="wB" size={44} />
+                <View style={styles.tileBody}>
+                  <Text style={styles.tileLabel}>{strings.home.learn}</Text>
+                  <Text style={styles.tileSub} numberOfLines={2}>
+                    {lessonsDone === 0 ? strings.home.learnInfoNew : strings.home.learnInfo(lessonsDone, LESSONS.length)}
+                  </Text>
+                </View>
+              </Panel>
+            </Pressable>
+            <Pressable style={styles.tileWrap} onPress={() => router.push('/play')}>
+              <Panel style={styles.tile}>
+                <PieceImage piece="wN" size={44} />
+                <View style={styles.tileBody}>
+                  <Text style={styles.tileLabel}>{strings.home.freePlay}</Text>
+                  <Text style={styles.tileSub} numberOfLines={2}>
+                    {strings.home.freePlayInfo}
+                  </Text>
+                </View>
+              </Panel>
+            </Pressable>
           </View>
         </View>
       </ScrollView>
@@ -148,38 +189,44 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: palette.mintMist },
-  scroll: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 20, paddingVertical: 16 },
-  column: { alignSelf: 'center', width: '100%', maxWidth: 440, gap: 14 },
-  topBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  chips: { flexDirection: 'row', gap: 8 },
-  actions: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  chip: { backgroundColor: palette.white, borderWidth: 2, borderColor: palette.ink, borderRadius: 16, paddingHorizontal: 12, paddingVertical: 4 },
-  chipMuted: { borderColor: palette.line },
-  chipText: { fontSize: 15, fontWeight: '800', color: palette.ink },
-  gear: { width: 40, height: 40, borderRadius: 20, borderWidth: 2, borderColor: palette.ink, backgroundColor: palette.white, alignItems: 'center', justifyContent: 'center' },
-  gearText: { fontSize: 18 },
-  hero: { alignItems: 'center', marginBottom: 4 },
-  logo: { width: 96, height: 96 },
-  title: { fontSize: 32, fontWeight: '900', color: palette.ink, marginTop: 6 },
-  subtitle: { fontSize: 15, color: palette.inkSoft, marginTop: 2 },
-  card: { flexDirection: 'row', alignItems: 'center', backgroundColor: palette.white, borderWidth: 2, borderColor: palette.ink, borderRadius: 20, padding: 16, gap: 12 },
-  dailyCard: { backgroundColor: palette.butter, paddingVertical: 18 },
-  cardBody: { flex: 1, gap: 3 },
-  cardHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  kicker: { fontSize: 13, fontWeight: '800', color: palette.inkSoft },
-  cardTitle: { fontSize: 21, fontWeight: '900', color: palette.ink },
-  cardSub: { fontSize: 14, color: palette.ink },
-  link: { fontSize: 13, fontWeight: '800', color: palette.mintDark },
-  pill: { backgroundColor: palette.ink, borderRadius: 18, paddingHorizontal: 14, paddingVertical: 9 },
-  pillDone: { backgroundColor: palette.mintDark },
-  pillText: { color: palette.white, fontSize: 15, fontWeight: '900' },
-  progressTrack: { height: 10, borderRadius: 5, backgroundColor: palette.line, overflow: 'hidden', marginVertical: 4 },
-  progressFill: { height: '100%', backgroundColor: palette.mint, borderRadius: 5 },
+  container: { flex: 1, backgroundColor: palette.bg },
+  scroll: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 16, paddingVertical: 14 },
+  column: { alignSelf: 'center', width: '100%', maxWidth: 460, gap: 14 },
+  rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
+  muted: { flexShrink: 1, fontSize: 14, color: palette.inkSoft },
+  link: { fontSize: 14, color: palette.blueDark },
+  sectionTitle: { fontSize: 17 },
+
+  trainer: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12, paddingVertical: 10 },
+  trainerBody: { flex: 1, gap: 4 },
+  trainerName: { fontSize: 20 },
+  chips: { flexDirection: 'row', gap: 6 },
+  gear: { width: 38, height: 38, borderRadius: 19, borderWidth: 2.5, borderColor: palette.ink, backgroundColor: palette.white, alignItems: 'center', justifyContent: 'center' },
+  gearText: { fontSize: 17 },
+
+  badges: { paddingHorizontal: 14, paddingTop: 10, paddingBottom: 12, gap: 10 },
+  badgeRow: { flexDirection: 'row', justifyContent: 'space-around' },
+
+  daily: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 14, gap: 2 },
+  newTag: { position: 'absolute', top: -13, right: 14, backgroundColor: palette.red, borderWidth: 2.5, borderColor: palette.ink, borderRadius: 999, paddingHorizontal: 9, paddingVertical: 1 },
+  newTagText: { fontSize: 13, color: palette.white },
+  dailyKicker: { fontSize: 15, color: '#7A5B00' },
+  dailyTitle: { fontSize: 27 },
+  dailySub: { flexShrink: 1, fontSize: 15 },
+
+  league: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 12 },
+  opponent: { width: 62, height: 62, borderRadius: 16, borderWidth: 2.5, borderColor: palette.ink, backgroundColor: palette.redLight, alignItems: 'center', justifyContent: 'center' },
+  leagueBody: { flex: 1, gap: 3 },
+  leagueTitle: { fontSize: 18 },
+  steps: { flexDirection: 'row', gap: 5, marginTop: 3 },
+  step: { width: 20, height: 9, borderRadius: 5, borderWidth: 2, borderColor: palette.ink, backgroundColor: palette.white },
+  stepDone: { backgroundColor: palette.mint },
+  stepNow: { backgroundColor: palette.sun },
+
   tiles: { flexDirection: 'row', gap: 12 },
-  tile: { flex: 1, backgroundColor: palette.white, borderWidth: 2, borderColor: palette.ink, borderRadius: 20, padding: 14, gap: 2 },
-  tileHighlight: { backgroundColor: palette.mintLight },
-  tileEmoji: { fontSize: 24, color: palette.ink },
-  tileLabel: { fontSize: 16, fontWeight: '900', color: palette.ink, marginTop: 4 },
+  tileWrap: { flex: 1 },
+  tile: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 10 },
+  tileBody: { flex: 1 },
+  tileLabel: { fontSize: 17 },
   tileSub: { fontSize: 12, color: palette.inkSoft },
 });

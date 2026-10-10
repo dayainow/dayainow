@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, StyleSheet, Switch, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { strings } from '../src/i18n';
 import { track } from '../src/analytics';
@@ -9,6 +9,8 @@ import { disableDailyReminder, enableDailyReminder, isReminderSupported } from '
 import { resetProgress } from '../src/storage/progress';
 import { DEFAULT_SETTINGS, type Settings, loadSettings, updateSettings } from '../src/storage/settings';
 import { palette } from '../src/theme';
+import { Panel } from '../src/ui/Panel';
+import { Text } from '../src/ui/Text';
 
 export default function SettingsScreen() {
   // 실수로 지우지 않도록 두 번 눌러야 초기화 (확인 대화상자는 웹에서 동작하지 않음)
@@ -49,7 +51,7 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView edges={['bottom']} style={styles.container}>
-      <View style={styles.card}>
+      <Panel style={styles.card}>
         {isReminderSupported && (
           <View style={styles.row}>
             <Text style={styles.label}>{strings.settings.reminder}</Text>
@@ -79,9 +81,9 @@ export default function SettingsScreen() {
             thumbColor={palette.white}
           />
         </View>
-      </View>
+      </Panel>
 
-      <View style={styles.card}>
+      <Panel style={styles.card}>
         <View style={styles.row}>
           <Text style={styles.label}>{strings.settings.language}</Text>
           <Text style={styles.value}>{strings.settings.languageValue}</Text>
@@ -90,9 +92,9 @@ export default function SettingsScreen() {
           <Text style={styles.label}>{strings.settings.version}</Text>
           <Text style={styles.value}>{Constants.expoConfig?.version ?? '-'}</Text>
         </View>
-      </View>
+      </Panel>
 
-      <TouchableOpacity
+      <Pressable
         style={[styles.resetButton, resetState === 'confirming' && styles.resetButtonConfirming]}
         onPress={handleReset}
         disabled={resetState === 'done'}
@@ -104,20 +106,20 @@ export default function SettingsScreen() {
               ? strings.settings.resetDone
               : strings.settings.resetProgress}
         </Text>
-      </TouchableOpacity>
+      </Pressable>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: palette.mintMist, padding: 20, gap: 16, alignItems: 'center' },
-  card: { alignSelf: 'stretch', maxWidth: 420, width: '100%', marginHorizontal: 'auto', backgroundColor: palette.white, borderRadius: 18, borderWidth: 2, borderColor: palette.ink },
+  container: { flex: 1, backgroundColor: palette.bg, padding: 20, gap: 16, alignItems: 'center' },
+  card: { alignSelf: 'stretch', maxWidth: 440, width: '100%', marginHorizontal: 'auto', overflow: 'hidden' },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 18, borderBottomWidth: 1, borderBottomColor: palette.line },
   rowLast: { borderBottomWidth: 0 },
-  label: { fontSize: 16, fontWeight: '700', color: palette.ink },
-  value: { fontSize: 14, color: palette.inkSoft },
-  resetButton: { alignSelf: 'stretch', maxWidth: 420, width: '100%', marginHorizontal: 'auto', alignItems: 'center', paddingVertical: 14, borderRadius: 18, borderWidth: 2, borderColor: palette.line, backgroundColor: palette.white },
+  label: { fontSize: 17 },
+  value: { fontSize: 15, color: palette.inkSoft },
+  resetButton: { alignSelf: 'stretch', maxWidth: 440, width: '100%', marginHorizontal: 'auto', alignItems: 'center', paddingVertical: 13, borderRadius: 18, borderWidth: 3, borderBottomWidth: 6, borderColor: palette.line, backgroundColor: palette.white },
   resetButtonConfirming: { borderColor: palette.danger, backgroundColor: palette.coralLight },
-  resetText: { fontSize: 15, fontWeight: '700', color: palette.inkSoft },
+  resetText: { fontSize: 16, color: palette.inkSoft },
   resetTextConfirming: { color: palette.danger },
 });

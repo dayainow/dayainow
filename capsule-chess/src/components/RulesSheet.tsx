@@ -1,11 +1,13 @@
 import { router, usePathname } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Image, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { Animated, Image, Modal, Platform, Pressable, ScrollView, StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { INITIAL_BOARD } from '../engine/chessEngine';
 import { strings } from '../i18n';
 import { PIECE_ORDER, type PieceType, pieceDiagram } from '../rules/diagrams';
 import { palette, sideColors } from '../theme';
+import { Text } from '../ui/Text';
+import { PieceImage } from '../ui/PieceImage';
 import { MiniBoard } from './MiniBoard';
 import { RuleList } from './RuleList';
 
@@ -16,15 +18,6 @@ const PADDING = 20;
 const GRID_GAP = 12;
 const SHEET_BORDER = 3;
 
-// 기물 이름은 튜토리얼 레슨 제목을 그대로 씀
-const PIECE_NAME: Record<PieceType, keyof typeof strings.tutorial.lessons> = {
-  K: 'king',
-  Q: 'queen',
-  R: 'rook',
-  B: 'bishop',
-  N: 'knight',
-  P: 'pawn',
-};
 const DIAGRAMS = PIECE_ORDER.map(type => ({ type, ...pieceDiagram(type) }));
 
 type Props = { visible: boolean; onClose: () => void };
@@ -118,7 +111,10 @@ export function RulesSheet({ visible, onClose }: Props) {
                   {DIAGRAMS.map(d => (
                     <View key={d.type} style={[styles.pieceCard, { width: cardWidth }]}>
                       <MiniBoard board={d.board} size={cardWidth - 20} moves={d.moves} captures={d.captures} focus={d.from} />
-                      <Text style={styles.pieceName}>{strings.tutorial.lessons[PIECE_NAME[d.type]].title}</Text>
+                      <View style={styles.pieceTitle}>
+                        <PieceImage piece={`w${d.type}`} size={30} />
+                        <Text style={styles.pieceName}>{strings.pieces[d.type]}</Text>
+                      </View>
                       <Text style={styles.pieceMove}>{strings.rules.pieces[d.type]}</Text>
                     </View>
                   ))}
@@ -140,7 +136,7 @@ export function RulesSheet({ visible, onClose }: Props) {
 
 const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'rgba(58, 52, 69, 0.5)', justifyContent: 'flex-end', alignItems: 'center' },
-  sheet: { height: '88%', backgroundColor: palette.mintMist, borderTopLeftRadius: 28, borderTopRightRadius: 28, borderWidth: SHEET_BORDER, borderBottomWidth: 0, borderColor: palette.ink, overflow: 'hidden' },
+  sheet: { height: '88%', backgroundColor: palette.bg, borderTopLeftRadius: 28, borderTopRightRadius: 28, borderWidth: SHEET_BORDER, borderBottomWidth: 0, borderColor: palette.ink, overflow: 'hidden' },
   grabber: { alignSelf: 'center', width: 44, height: 5, borderRadius: 3, backgroundColor: palette.line, marginTop: 10 },
   header: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: PADDING, paddingTop: 8, paddingBottom: 12 },
   mascot: { width: 44, height: 44 },
@@ -165,7 +161,8 @@ const styles = StyleSheet.create({
   legendText: { fontSize: 13, fontWeight: '700', color: palette.inkSoft },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: GRID_GAP },
   pieceCard: { alignItems: 'center', backgroundColor: palette.white, borderRadius: 18, borderWidth: 2, borderColor: palette.ink, paddingTop: 10, paddingBottom: 12, paddingHorizontal: 8 },
-  pieceName: { fontSize: 16, fontWeight: '900', color: palette.ink, marginTop: 8 },
+  pieceTitle: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 },
+  pieceName: { fontSize: 17 },
   pieceMove: { fontSize: 12, color: palette.inkSoft, textAlign: 'center', marginTop: 2, lineHeight: 16 },
   cta: { alignItems: 'center', backgroundColor: palette.butter, borderWidth: 2, borderColor: palette.ink, borderRadius: 22, paddingVertical: 13, marginTop: 10 },
   ctaText: { fontSize: 16, fontWeight: '900', color: palette.ink },

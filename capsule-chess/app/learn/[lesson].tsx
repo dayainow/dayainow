@@ -1,8 +1,9 @@
 import { Redirect, Stack, router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChessBoard } from '../../src/components/ChessBoard';
+import { EvolutionOverlay } from '../../src/components/EvolutionOverlay';
 import { ResultModal } from '../../src/components/ResultModal';
 import { type Move, findKing, isInCheck, simulateMove } from '../../src/engine/chessEngine';
 import { isCheckmated } from '../../src/engine/mateSolver';
@@ -11,7 +12,13 @@ import { feedback } from '../../src/feedback/feedback';
 import { strings } from '../../src/i18n';
 import { recordLessonDone } from '../../src/storage/progress';
 import { palette } from '../../src/theme';
-import { LESSONS, type Lesson, getLesson, nextLesson } from '../../src/tutorial/lessons';
+import { DialogBox } from '../../src/ui/DialogBox';
+import { GameButton } from '../../src/ui/GameButton';
+import { MascotFace } from '../../src/ui/MascotFace';
+import { Panel } from '../../src/ui/Panel';
+import { PieceImage } from '../../src/ui/PieceImage';
+import { Text } from '../../src/ui/Text';
+import { LESSONS, LESSON_PIECE, type Lesson, getLesson, nextLesson } from '../../src/tutorial/lessons';
 
 type LessonId = keyof typeof strings.tutorial.lessons;
 
@@ -32,9 +39,17 @@ function LessonPlay({ lesson }: { lesson: Lesson }) {
   const [done, setDone] = useState(false);
   const [showFinish, setShowFinish] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [evolving, setEvolving] = useState<'w' | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const evolveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  useEffect(() => () => clearTimeout(timer.current), []);
+  useEffect(
+    () => () => {
+      clearTimeout(timer.current);
+      clearTimeout(evolveTimer.current);
+    },
+    []
+  );
 
   const restart = () => {
     setBoard(lesson.board);
@@ -61,6 +76,8 @@ function LessonPlay({ lesson }: { lesson: Lesson }) {
 
   // 튜토리얼에서는 블루만 계속 둠 (레드는 움직이지 않는 목표물)
   const handleMove = (move: Move) => {
+    // 폰이 끝 줄에 닿으면 진화 연출 (폰 레슨의 마지막 ★)
+    if (board[move.fromR][move.fromC] === 'wP' && move.toR === 0) evolveTimer.current = setTimeout(() => setEvolving('w'), 420);
     const after = simulateMove(board, move);
     setBoard(after);
     setLastMove(move);
@@ -88,16 +105,19 @@ function LessonPlay({ lesson }: { lesson: Lesson }) {
   return (
     <SafeAreaView edges={['bottom']} style={styles.container}>
       <Stack.Screen options={{ title: strings.tutorial.lessonLabel(LESSONS.indexOf(lesson) + 1, LESSONS.length) }} />
-      <View style={styles.header}>
-        <Text style={styles.title}>{text.title}</Text>
-        <Text style={styles.body}>{text.body}</Text>
-        {done ? (
-          <Text style={styles.done}>{strings.tutorial.done}</Text>
-        ) : message ? (
-          <Text style={styles.message}>{message}</Text>
-        ) : lesson.kind === 'stars' ? (
-          <Text style={styles.status}>{strings.tutorial.starsLeft(stars.length)}</Text>
-        ) : null}
+      <View style={styles.column}>
+        <Panel style={styles.header}>
+          <PieceImage piece={LESSON_PIECE[lesson.id] ?? 'wK'} size={48} />
+          <View style={styles.headerBody}>
+            <Text style={styles.title}>{text.title}</Text>
+            {done ? (
+              <Text style={styles.done}>{strings.tutorial.done}</Text>
+            ) : lesson.kind === 'stars' ? (
+              <Text style={styles.status}>{strings.tutorial.starsLeft(stars.length)}</Text>
+            ) : null}
+          </View>
+        </Panel>
+        <DialogBox text={message ?? text.body} />
       </View>
 
       <ChessBoard
@@ -110,19 +130,19 @@ function LessonPlay({ lesson }: { lesson: Lesson }) {
         markers={stars}
       />
 
-      {done && next ? (
-        <TouchableOpacity style={styles.primaryButton} onPress={() => router.replace(`/learn/${next.id}`)}>
-          <Text style={styles.primaryText}>{strings.tutorial.next}</Text>
-        </TouchableOpacity>
-      ) : (
-        <TouchableOpacity style={styles.secondaryButton} onPress={restart}>
-          <Text style={styles.secondaryText}>{strings.tutorial.restart}</Text>
-        </TouchableOpacity>
-      )}
+      <View style={styles.column}>
+        {done && next ? (
+          <GameButton label={`${strings.tutorial.next} ▶`} onPress={() => router.replace(`/learn/${next.id}`)} />
+        ) : (
+          <GameButton label={strings.tutorial.restart} onPress={restart} variant="white" />
+        )}
+      </View>
+
+      <EvolutionOverlay side={evolving} onClose={() => setEvolving(null)} />
 
       <ResultModal
         visible={showFinish}
-        emoji="🎓"
+        art={<MascotFace mood="happy" size={100} />}
         celebrate
         title={strings.tutorial.finishTitle}
         detail={strings.tutorial.finishDetail}
@@ -140,15 +160,11 @@ function LessonPlay({ lesson }: { lesson: Lesson }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: palette.mintMist, alignItems: 'center', paddingBottom: 20 },
-  header: { alignItems: 'center', marginTop: 4, paddingHorizontal: 24, gap: 6, maxWidth: 460 },
-  title: { fontSize: 22, fontWeight: '900', color: palette.ink },
-  body: { fontSize: 15, color: palette.ink, textAlign: 'center', lineHeight: 22 },
-  status: { fontSize: 14, fontWeight: '700', color: palette.inkSoft },
-  done: { fontSize: 16, fontWeight: '900', color: palette.mintDark },
-  message: { fontSize: 14, fontWeight: '700', color: palette.danger, textAlign: 'center' },
-  primaryButton: { backgroundColor: palette.butter, borderWidth: 2, borderColor: palette.ink, paddingHorizontal: 34, paddingVertical: 12, borderRadius: 30 },
-  primaryText: { color: palette.ink, fontSize: 16, fontWeight: 'bold' },
-  secondaryButton: { backgroundColor: palette.white, borderWidth: 2, borderColor: palette.line, paddingHorizontal: 30, paddingVertical: 12, borderRadius: 30 },
-  secondaryText: { color: palette.inkSoft, fontSize: 16, fontWeight: 'bold' },
+  container: { flex: 1, backgroundColor: palette.bg, alignItems: 'center', justifyContent: 'center', paddingTop: 6, paddingBottom: 16 },
+  column: { alignSelf: 'stretch', width: '100%', maxWidth: 480, marginHorizontal: 'auto', paddingHorizontal: 14, gap: 10 },
+  header: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12, paddingVertical: 6 },
+  headerBody: { flex: 1 },
+  title: { fontSize: 22 },
+  status: { fontSize: 14, color: palette.inkSoft },
+  done: { fontSize: 15, color: palette.mintDark },
 });

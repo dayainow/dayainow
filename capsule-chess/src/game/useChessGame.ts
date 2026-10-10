@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { type AiPolicy, pickAiMove } from '../engine/chessAI';
-import { type GameStatus, type Move, INITIAL_BOARD, findKing, getGameStatus, simulateMove } from '../engine/chessEngine';
+import { type GameStatus, type Move, BOARD_SIZE, INITIAL_BOARD, findKing, getGameStatus, simulateMove } from '../engine/chessEngine';
 
 type Board = (string | null)[][];
 type Side = 'w' | 'b';
@@ -14,7 +14,16 @@ export type GameResult = {
 const isFinished = (status: GameStatus) => status === 'checkmate' || status === 'stalemate' || status === 'draw';
 
 // 무르기를 위해 매 수 직전의 상태를 저장
-export type Snapshot = { board: Board; turn: Side; status: GameStatus; lastMove: Move | null; lastCaptured: string | null; blueMoves: number };
+export type Snapshot = {
+  board: Board;
+  turn: Side;
+  status: GameStatus;
+  lastMove: Move | null;
+  lastMover: string | null;
+  lastCaptured: string | null;
+  lastPromoted: boolean;
+  blueMoves: number;
+};
 
 // 무르기로 돌아갈 기록 위치. AI 대전에서는 내 차례(블루)가 될 때까지 거슬러 올라감 (AI 수 + 내 수)
 export const undoTargetIndex = (history: Snapshot[], vsAi: boolean): number | null => {
@@ -30,7 +39,9 @@ export const useChessGame = ({ initialBoard = INITIAL_BOARD, ai }: { initialBoar
   const [turn, setTurn] = useState<Side>('w');
   const [status, setStatus] = useState<GameStatus>(() => getGameStatus('w', initialBoard));
   const [lastMove, setLastMove] = useState<Move | null>(null);
-  const [lastCaptured, setLastCaptured] = useState<string | null>(null); // 마지막 수로 잡힌 기물 (마스코트 반응용)
+  const [lastMover, setLastMover] = useState<string | null>(null); // 마지막에 움직인 기물 (승급 전 모습, 실황 대사용)
+  const [lastCaptured, setLastCaptured] = useState<string | null>(null); // 마지막 수로 잡힌 기물
+  const [lastPromoted, setLastPromoted] = useState(false); // 마지막 수가 폰 → 퀸 진화였는지
   const [blueMoves, setBlueMoves] = useState(0);
   // 결과 모달 내용. 다시 시작해도 모달이 닫히는 동안 내용이 바뀌지 않도록 초기화하지 않음
   const [result, setResult] = useState<GameResult | null>(null);
@@ -42,7 +53,8 @@ export const useChessGame = ({ initialBoard = INITIAL_BOARD, ai }: { initialBoar
   const canUndo = !isGameOver && history.length > 0;
 
   const move = (m: Move) => {
-    setHistory(h => [...h, { board, turn, status, lastMove, lastCaptured, blueMoves }]);
+    setHistory(h => [...h, { board, turn, status, lastMove, lastMover, lastCaptured, lastPromoted, blueMoves }]);
+    const mover = board[m.fromR][m.fromC];
     const nextBoard = simulateMove(board, m);
     const nextTurn: Side = turn === 'w' ? 'b' : 'w';
     const nextStatus = getGameStatus(nextTurn, nextBoard);
@@ -52,7 +64,9 @@ export const useChessGame = ({ initialBoard = INITIAL_BOARD, ai }: { initialBoar
     setTurn(nextTurn);
     setStatus(nextStatus);
     setLastMove(m);
+    setLastMover(mover);
     setLastCaptured(board[m.toR][m.toC]);
+    setLastPromoted(mover?.[1] === 'P' && (m.toR === 0 || m.toR === BOARD_SIZE - 1));
     setBlueMoves(nextBlueMoves);
     if (isFinished(nextStatus)) {
       // 체크메이트면 방금 둔 쪽이 승리
@@ -78,7 +92,9 @@ export const useChessGame = ({ initialBoard = INITIAL_BOARD, ai }: { initialBoar
     setTurn(snapshot.turn);
     setStatus(snapshot.status);
     setLastMove(snapshot.lastMove);
+    setLastMover(snapshot.lastMover);
     setLastCaptured(snapshot.lastCaptured);
+    setLastPromoted(snapshot.lastPromoted);
     setBlueMoves(snapshot.blueMoves);
     setHistory(history.slice(0, index));
   };
@@ -88,10 +104,29 @@ export const useChessGame = ({ initialBoard = INITIAL_BOARD, ai }: { initialBoar
     setTurn('w');
     setStatus(getGameStatus('w', nextBoard));
     setLastMove(null);
+    setLastMover(null);
     setLastCaptured(null);
+    setLastPromoted(false);
     setBlueMoves(0);
     setHistory([]);
   };
 
-  return { board, turn, status, lastMove, lastCaptured, checkedKing, isGameOver, canPlayerMove, canUndo, blueMoves, result, move, undo, reset };
+  return {
+    board,
+    turn,
+    status,
+    lastMove,
+    lastMover,
+    lastCaptured,
+    lastPromoted,
+    checkedKing,
+    isGameOver,
+    canPlayerMove,
+    canUndo,
+    blueMoves,
+    result,
+    move,
+    undo,
+    reset,
+  };
 };

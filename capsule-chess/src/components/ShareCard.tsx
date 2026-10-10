@@ -1,10 +1,11 @@
 import * as Sharing from 'expo-sharing';
 import React, { useRef } from 'react';
-import { Image, Modal, Platform, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Modal, Platform, Share, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { captureRef } from 'react-native-view-shot';
 import { track } from '../analytics';
 import { strings } from '../i18n';
 import { palette } from '../theme';
+import { Text } from '../ui/Text';
 
 type CardData = { number: number; mateIn: number; attempts: number; hints: number; streak: number };
 

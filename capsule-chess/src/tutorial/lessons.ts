@@ -44,3 +44,6 @@ export const LESSONS: Lesson[] = [
 export const getLesson = (id: string): Lesson | undefined => LESSONS.find(l => l.id === id);
 
 export const nextLesson = (id: string): Lesson | undefined => LESSONS[LESSONS.findIndex(l => l.id === id) + 1];
+
+// 레슨 목록·머리에 보여 줄 기물 몬스터
+export const LESSON_PIECE: Record<string, string> = { king: 'wK', rook: 'wR', bishop: 'wB', queen: 'wQ', knight: 'wN', pawn: 'wP', escape: 'wK', mate: 'wQ' };

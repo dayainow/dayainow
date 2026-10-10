@@ -1,3 +1,5 @@
+import { josa } from './josa';
+
 // 화면 문구 원본 (한국어). 다른 언어 파일은 이 구조를 그대로 따라야 타입 검사를 통과함
 export const ko = {
   appTitle: '캡슐체스',
@@ -25,23 +27,7 @@ export const ko = {
     keepStreak: (streak: number) => `오늘 풀면 🔥 ${streak + 1}일 연속!`,
     startStreak: '오늘부터 연속 기록을 시작해 봐요',
   },
-  // 마스코트 말풍선 대사 (상황마다 여러 개 중 하나)
-  mascot: {
-    start: ['한 판 해 볼까요? 먼저 두세요!', '준비됐어요! 첫 수를 둬 봐요'],
-    yourTurn: ['내 차례예요!', '어디로 갈까요?', '좋아요, 계속 가요!'],
-    thinking: ['음… 생각 중', '어디 보자…', '흠흠, 고민돼요'],
-    goodCapture: ['좋은 수! 👍', '냠! 잡았어요', '오, 날카로운데요?'],
-    gotCaptured: ['앗, 잡혔어요!', '어라라…', '괜찮아요, 다시 가요!'],
-    giveCheck: ['체크! 몰아붙여요!', '킹이 떨고 있어요!'],
-    inCheck: ['앗, 체크! 킹을 지켜요!', '위험해요! 킹을 피해요!'],
-    win: ['이겼다! 🎉', '최고예요!'],
-    lose: ['아쉬워요… 다시 해 봐요!', '다음엔 이길 수 있어요!'],
-    draw: ['무승부! 팽팽했어요'],
-    pvpTurn: (side: string) => `${side} 차례예요!`,
-    pvpCheck: ['체크!', '앗, 체크예요!'],
-    pvpCapture: ['잡았다!', '오, 날카로운데요?'],
-    pvpWin: (side: string) => `${side} 승리! 🎉`,
-  },
+
   game: {
     yourTurn: '내 차례',
     aiThinking: 'AI가 생각 중…',
@@ -137,6 +123,61 @@ ${'🟥'.repeat(attempts - 1)}🟩${'💡'.repeat(hints)}
     rulesIntro: '일반 체스와 이것만 기억하면 돼요',
     startChallenge: '바로 도전하기',
   },
+  pieces: { K: '킹', Q: '퀸', R: '룩', B: '비숍', N: '나이트', P: '폰' },
+  // 배틀 화면 실황 대사 (side: 블루/레드, piece: 기물 이름)
+  battle: {
+    power: '전력',
+    me: '블루 팀 (나)',
+    blueTeam: '블루 팀',
+    redTeam: '레드 팀',
+    movesUsed: (n: number) => `내가 둔 수 ${n}`,
+    start: '배틀 시작! 블루가 먼저 둬요.',
+    startVs: (name: string) => `${name}${josa(name, '이', '가')} 승부를 걸어왔다! 먼저 두세요.`,
+    capture: (side: string, mover: string, other: string, captured: string, check: boolean) =>
+      `${side} ${mover}의 공격! ${other} ${captured}${josa(captured, '을', '를')} 잡았다!${check ? ' 게다가 체크!' : ''}`,
+    check: (side: string, mover: string, other: string) => `${side} ${mover}의 체크! ${other} 킹이 위험하다!`,
+    promote: (side: string) => `${side} 폰이 끝 줄에 닿아 퀸으로 진화했다!`,
+    moveThinking: (mover: string) => `블루 ${mover} 이동! 레드 팀이 생각 중…`,
+    moveYourTurn: (mover: string) => `레드 ${mover}${josa(mover, '이', '가')} 움직였다. 내 차례!`,
+    movePvp: (side: string, mover: string, next: string) => `${side} ${mover} 이동! 이제 ${next} 차례.`,
+    win: '레드 킹을 붙잡았다! 체크메이트로 승리!',
+    lose: '블루 킹이 붙잡혔다… 다시 도전해 봐요!',
+    pvpWin: (side: string) => `체크메이트! ${side} 팀의 승리!`,
+    stalemate: '둘 곳이 없다! 스테일메이트로 무승부.',
+    draw: '킹만 남았다! 무승부.',
+  },
+  evolution: {
+    title: '진화!',
+    line: (side: string) => `축하해요! 끝 줄에 닿은 ${side} 폰이 퀸으로 진화했다!`,
+    continue: '계속하기',
+  },
+  // 캡슐 리그 (단계별 도전)
+  league: {
+    title: '캡슐 리그',
+    trainer: '캡슐 트레이너',
+    capsule: (n: number) => `캡슐 ${n}`,
+    capsuleNames: ['새싹 캡슐', '질주 캡슐', '지혜 캡슐', '왕관 캡슐'],
+    badgeNames: ['새싹 배지', '질주 배지', '지혜 배지', '왕관 배지'],
+    opponents: [
+      '꾸벅이 레드', '느긋한 레드', '장난꾸러기 레드', '씩씩한 레드', '새싹 마스터',
+      '날쌘 레드', '깡충 레드', '번뜩 레드', '단단한 레드', '질주 마스터',
+      '꾀돌이 레드', '반짝 레드', '수다쟁이 레드', '조용한 레드', '지혜 마스터',
+      '불꽃 레드', '얼음 레드', '그림자 레드', '폭풍 레드', '왕관 마스터',
+    ],
+    level: (n: number) => `Lv.${n}`,
+    badgeCase: '배지 케이스',
+    nextOpponent: (name: string) => `다음 상대: ${name}`,
+    battle: '배틀',
+    allCleared: '리그 정복! 별 모으기에 도전해 봐요',
+    badgeEarned: (badge: string) => `${badge}${josa(badge, '을', '를')} 받았다!`,
+    stageLabel: (capsule: number, n: number) => `캡슐 ${capsule} · ${n}단계`,
+    master: '마스터전',
+    challenge: (name: string) => `${name}${josa(name, '이', '가')} 승부를 걸어왔다!`,
+    condition: (par: number) => `★★★ 조건: ${par}수 안에 이기기`,
+    without: (pieces: string) => `레드는 ${pieces} 없이 출전`,
+    fullTeam: '레드는 기물 전부 출전',
+    start: '배틀 시작!',
+  },
   // 어디서든 여는 규칙 안내 (? 버튼)
   rules: {
     button: '규칙',
@@ -148,7 +189,7 @@ ${'🟥'.repeat(attempts - 1)}🟩${'💡'.repeat(hints)}
     diffTitle: '일반 체스와 다른 점',
     diffs: [
       { icon: '🐣', title: '폰은 언제나 한 칸', body: '처음에도 두 칸 전진은 없어요' },
-      { icon: '👑', title: '끝 줄에 닿으면 퀸', body: '폰이 맨 끝 줄에 가면 자동으로 퀸이 돼요' },
+      { icon: '👑', title: '끝 줄에 닿으면 퀸으로 진화', body: '폰이 맨 끝 줄에 가면 자동으로 퀸이 돼요' },
       { icon: '🚫', title: '캐슬링·앙파상 없음', body: '복잡한 특수 규칙은 뺐어요' },
     ],
     outcomeTitle: '꼭 알아야 할 것',
@@ -188,7 +229,7 @@ ${'🟥'.repeat(attempts - 1)}🟩${'💡'.repeat(hints)}
       bishop: { title: '비숍', body: '비숍은 대각선으로 원하는 만큼 움직여요. 항상 같은 색 칸에만 있어요.' },
       queen: { title: '퀸', body: '퀸은 룩과 비숍을 합친 것처럼 가로·세로·대각선 모두 갈 수 있어요.' },
       knight: { title: '나이트', body: '나이트는 L자 모양으로 움직이고, 다른 기물을 뛰어넘을 수 있어요.' },
-      pawn: { title: '폰', body: '폰은 앞으로 한 칸만 가고, 잡을 때는 대각선 앞으로 잡아요. 끝 줄에 닿으면 퀸이 돼요!' },
+      pawn: { title: '폰', body: '폰은 앞으로 한 칸만 가고, 잡을 때는 대각선 앞으로 잡아요. 끝 줄에 닿으면 퀸으로 진화해요!' },
       escape: { title: '체크 벗어나기', body: '킹이 공격받는 상태를 체크라고 해요. 킹을 피하거나, 공격 길을 막아서 벗어나 보세요.' },
       mate: { title: '체크메이트', body: '킹이 어디로도 피할 수 없게 공격하면 체크메이트, 승리예요! 한 수로 끝내 보세요.' },
     },

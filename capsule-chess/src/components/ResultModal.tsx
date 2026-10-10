@@ -1,38 +1,40 @@
 import React from 'react';
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Modal, StyleSheet, View } from 'react-native';
 import { palette } from '../theme';
+import { GameButton } from '../ui/GameButton';
+import { Panel } from '../ui/Panel';
+import { Text } from '../ui/Text';
 import { Confetti } from './Confetti';
 
 type Action = { label: string; onPress: () => void };
 
 type Props = {
   visible: boolean;
-  emoji: string;
+  art: React.ReactNode; // 위쪽 그림 (마스코트 표정, 몬스터 등)
   title: string;
   detail?: string;
   detailColor?: string;
+  extra?: React.ReactNode; // 배지 획득 같은 추가 내용
   primary: Action;
   secondary?: Action;
   celebrate?: boolean; // 승리했을 때 색종이
 };
 
-export function ResultModal({ visible, emoji, title, detail, detailColor = palette.inkSoft, primary, secondary, celebrate = false }: Props) {
+// 게임 결과 창: RPG 창 모양 + 장난감 버튼
+export function ResultModal({ visible, art, title, detail, detailColor = palette.inkSoft, extra, primary, secondary, celebrate = false }: Props) {
   return (
-    <Modal visible={visible} transparent animationType="fade">
+    <Modal visible={visible} transparent animationType="fade" statusBarTranslucent navigationBarTranslucent>
       <View style={styles.overlay}>
-        <View style={styles.content}>
-          <Text style={styles.emoji}>{emoji}</Text>
+        <Panel style={styles.content}>
+          <View style={styles.art}>{art}</View>
           <Text style={styles.title}>{title}</Text>
           {detail ? <Text style={[styles.detail, { color: detailColor }]}>{detail}</Text> : null}
-          <TouchableOpacity style={styles.primaryButton} onPress={primary.onPress}>
-            <Text style={styles.primaryText}>{primary.label}</Text>
-          </TouchableOpacity>
-          {secondary ? (
-            <TouchableOpacity style={styles.secondaryButton} onPress={secondary.onPress}>
-              <Text style={styles.secondaryText}>{secondary.label}</Text>
-            </TouchableOpacity>
-          ) : null}
-        </View>
+          {extra}
+          <View style={styles.actions}>
+            <GameButton label={primary.label} onPress={primary.onPress} />
+            {secondary ? <GameButton label={secondary.label} onPress={secondary.onPress} variant="white" size="sm" /> : null}
+          </View>
+        </Panel>
         <Confetti run={visible && celebrate} />
       </View>
     </Modal>
@@ -40,14 +42,10 @@ export function ResultModal({ visible, emoji, title, detail, detailColor = palet
 }
 
 const styles = StyleSheet.create({
-  overlay: { flex: 1, backgroundColor: 'rgba(58, 52, 69, 0.45)', justifyContent: 'center', alignItems: 'center' },
-  content: { backgroundColor: palette.white, padding: 28, borderRadius: 24, borderWidth: 3, borderColor: palette.ink, alignItems: 'center', width: 290 },
-  emoji: { fontSize: 50, marginBottom: 10 },
-  title: { fontSize: 24, fontWeight: '900', color: palette.ink, marginBottom: 6, textAlign: 'center' },
-  detail: { fontSize: 18, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
-  // 캡슐 아래 반쪽처럼 버터색 + 잉크 외곽선
-  primaryButton: { alignSelf: 'stretch', alignItems: 'center', backgroundColor: palette.butter, borderWidth: 2, borderColor: palette.ink, paddingVertical: 12, borderRadius: 20 },
-  primaryText: { color: palette.ink, fontSize: 18, fontWeight: 'bold' },
-  secondaryButton: { alignSelf: 'stretch', alignItems: 'center', paddingVertical: 12, marginTop: 6 },
-  secondaryText: { color: palette.inkSoft, fontSize: 16, fontWeight: '600' },
+  overlay: { flex: 1, backgroundColor: 'rgba(46, 42, 58, 0.5)', justifyContent: 'center', alignItems: 'center', padding: 24 },
+  content: { alignItems: 'center', width: '100%', maxWidth: 320, paddingHorizontal: 22, paddingTop: 18, paddingBottom: 20 },
+  art: { marginBottom: 6 },
+  title: { fontSize: 27, textAlign: 'center' },
+  detail: { fontSize: 18, marginTop: 4, textAlign: 'center' },
+  actions: { alignSelf: 'stretch', gap: 10, marginTop: 18 },
 });

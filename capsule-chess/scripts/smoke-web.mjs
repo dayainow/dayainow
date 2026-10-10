@@ -22,8 +22,8 @@ const PROGRESS = {
 };
 
 const TEXT = {
-  ko: { knowsChess: '체스를 알아요', openRules: '규칙 보기', piecesTab: '기물 움직임' },
-  en: { knowsChess: 'I know chess', openRules: 'Show rules', piecesTab: 'How pieces move' },
+  ko: { knowsChess: '체스를 알아요', openRules: '규칙 보기', piecesTab: '기물 움직임', start: '배틀 시작!' },
+  en: { knowsChess: 'I know chess', openRules: 'Show rules', piecesTab: 'How pieces move', start: 'Battle start!' },
 };
 
 const ROUTES = ['/', '/daily', '/campaign', '/campaign/1', '/play', '/learn', '/learn/knight', '/settings'];
@@ -35,6 +35,22 @@ const clickText = async (page, text) => {
     return !!el;
   }, text);
   if (!done) throw new Error(`"${text}" 버튼을 찾지 못함`);
+};
+
+// 보드 칸 중심을 실제 마우스로 탭
+const tapSquare = async (page, r, c) => {
+  const point = await page.evaluate(
+    (row, col) => {
+      const board = [...document.querySelectorAll('div')].find(
+        d => getComputedStyle(d).borderTopWidth === '4px' && d.querySelectorAll('div[tabindex="0"]').length === 25
+      );
+      const rect = board.querySelectorAll('div[tabindex="0"]')[row * 5 + col].getBoundingClientRect();
+      return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
+    },
+    r,
+    c
+  );
+  await page.mouse.click(point.x, point.y);
 };
 
 const clickLabel = async (page, label, index = 0) => {
@@ -114,6 +130,40 @@ const run = async (browser, locale) => {
     await clickLabel(page, t.openRules);
     await wait(900);
     await shot(page, 'rules-from-game');
+    await context.close();
+  }
+
+  // 5) 단계 배틀: VS 화면 → 배틀 시작 → 한 수 두고 AI 응수
+  {
+    const { context, page } = await newPage(PROGRESS);
+    await page.goto(BASE + '/campaign/3', { waitUntil: 'networkidle0', timeout: 120_000 });
+    await wait(1500);
+    await shot(page, 'battle-intro');
+    await clickText(page, t.start);
+    await wait(700);
+    await tapSquare(page, 3, 2);
+    await wait(250);
+    await shot(page, 'battle-select');
+    await tapSquare(page, 2, 2);
+    await wait(2200);
+    await shot(page, 'battle-reply');
+    await context.close();
+  }
+  // 6) 폰 레슨: 끝 줄에 닿아 퀸으로 진화
+  {
+    const { context, page } = await newPage(PROGRESS);
+    await page.goto(BASE + '/learn/pawn', { waitUntil: 'networkidle0', timeout: 120_000 });
+    await wait(900);
+    for (const [fr, fc, tr, tc] of [[3, 1, 2, 1], [2, 1, 1, 2], [1, 2, 0, 2]]) {
+      await tapSquare(page, fr, fc);
+      await wait(200);
+      await tapSquare(page, tr, tc);
+      await wait(600);
+    }
+    await wait(400);
+    await shot(page, 'evolution-flicker');
+    await wait(1800);
+    await shot(page, 'evolution');
     await context.close();
   }
   return errors;

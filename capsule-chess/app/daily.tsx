@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { track } from '../src/analytics';
 import { nextStageId } from '../src/campaign/stages';
@@ -16,6 +16,12 @@ import { getDailyPuzzle } from '../src/puzzles/daily';
 import { type Progress, currentStreak, loadProgress, recordDailySolve } from '../src/storage/progress';
 import { DEFAULT_SETTINGS, type Settings, loadSettings, updateSettings } from '../src/storage/settings';
 import { palette } from '../src/theme';
+import { Chip } from '../src/ui/Chip';
+import { DialogBox } from '../src/ui/DialogBox';
+import { GameButton } from '../src/ui/GameButton';
+import { MascotFace } from '../src/ui/MascotFace';
+import { Panel } from '../src/ui/Panel';
+import { Text } from '../src/ui/Text';
 import { formatCountdown, msUntilNextDay } from '../src/utils/date';
 
 export default function DailyScreen() {
@@ -158,13 +164,15 @@ export default function DailyScreen() {
 
   return (
     <SafeAreaView edges={['bottom']} style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>
-          {strings.daily.title(puzzle.number)} · {strings.daily.mateIn(puzzle.mateIn)}
-        </Text>
-        <Text style={styles.instruction}>{solved ? strings.daily.alreadySolved : strings.daily.instruction}</Text>
-        {!solved && <Text style={styles.movesLeft}>{strings.daily.movesLeft(movesLeft)}</Text>}
-        {message && <Text style={[styles.message, message === strings.daily.hintShown && styles.hintMessage]}>{message}</Text>}
+      <View style={styles.column}>
+        <Panel color={palette.sun} style={styles.header}>
+          <View style={styles.headerBody}>
+            <Text style={styles.kicker}>{strings.daily.title(puzzle.number)}</Text>
+            <Text style={styles.title}>{strings.daily.mateIn(puzzle.mateIn)}</Text>
+          </View>
+          {!solved && <Chip label={strings.daily.movesLeft(movesLeft)} />}
+          {solved && <Chip label={`🔥 ${Math.max(streak, 1)}`} />}
+        </Panel>
       </View>
 
       <ChessBoard
@@ -177,37 +185,30 @@ export default function DailyScreen() {
         hint={hintSquare}
       />
 
-      {solved ? (
-        <View style={styles.footer}>
-          <Text style={styles.countdown}>{strings.daily.nextPuzzleIn(countdown)}</Text>
-          <View style={styles.row}>
-            <TouchableOpacity style={styles.primaryButton} onPress={share}>
-              <Text style={styles.primaryText}>{strings.daily.share}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.outlineButton} onPress={continueCampaign}>
-              <Text style={styles.outlineText}>{strings.daily.continueCampaign}</Text>
-            </TouchableOpacity>
-          </View>
-          {askReminder && (
-            <View style={styles.reminderCard}>
-              <Text style={styles.reminderTitle}>{strings.daily.reminderTitle}</Text>
-              <Text style={styles.reminderBody}>{strings.daily.reminderBody}</Text>
-              <View style={styles.row}>
-                <TouchableOpacity style={styles.smallPrimary} onPress={turnOnReminder}>
-                  <Text style={styles.smallPrimaryText}>{strings.daily.reminderOn}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.smallGhost} onPress={dismissReminder}>
-                  <Text style={styles.smallGhostText}>{strings.daily.reminderLater}</Text>
-                </TouchableOpacity>
-              </View>
+      <View style={styles.column}>
+        <DialogBox text={message ?? (solved ? strings.daily.alreadySolved : strings.daily.instruction)} />
+        {solved ? (
+          <>
+            <Text style={styles.countdown}>{strings.daily.nextPuzzleIn(countdown)}</Text>
+            <View style={styles.row}>
+              <GameButton label={strings.daily.share} onPress={share} style={styles.flex} />
+              <GameButton label={strings.daily.continueCampaign} onPress={continueCampaign} variant="white" style={styles.flex} />
             </View>
-          )}
-        </View>
-      ) : (
-        <TouchableOpacity style={[styles.outlineButton, (turn !== 'w' || !!hintSquare) && styles.disabled]} onPress={showHint} disabled={turn !== 'w' || !!hintSquare}>
-          <Text style={styles.outlineText}>{strings.daily.hint}</Text>
-        </TouchableOpacity>
-      )}
+            {askReminder && (
+              <Panel style={styles.reminder}>
+                <Text style={styles.reminderTitle}>{strings.daily.reminderTitle}</Text>
+                <Text style={styles.reminderBody}>{strings.daily.reminderBody}</Text>
+                <View style={styles.row}>
+                  <GameButton label={strings.daily.reminderOn} onPress={turnOnReminder} variant="mint" size="sm" />
+                  <GameButton label={strings.daily.reminderLater} onPress={dismissReminder} variant="white" size="sm" />
+                </View>
+              </Panel>
+            )}
+          </>
+        ) : (
+          <GameButton label={strings.daily.hint} onPress={showHint} variant="white" disabled={turn !== 'w' || !!hintSquare} />
+        )}
+      </View>
 
       <ShareCardModal
         visible={showShare}
@@ -222,7 +223,7 @@ export default function DailyScreen() {
 
       <ResultModal
         visible={showResult}
-        emoji="🎉"
+        art={<MascotFace mood="happy" size={100} />}
         celebrate
         title={strings.daily.solved}
         detail={`${strings.daily.attempts(attempts)}${hints > 0 ? ` · 💡${hints}` : ''} · ${strings.daily.streak(Math.max(streak, 1))}`}
@@ -235,26 +236,16 @@ export default function DailyScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: palette.mintMist, alignItems: 'center', paddingBottom: 20 },
-  header: { alignItems: 'center', marginTop: 4, paddingHorizontal: 24, gap: 4 },
-  title: { fontSize: 18, fontWeight: '900', color: palette.ink },
-  instruction: { fontSize: 14, color: palette.inkSoft, textAlign: 'center' },
-  movesLeft: { fontSize: 14, fontWeight: '700', color: palette.mintDark },
-  message: { fontSize: 14, fontWeight: '700', color: palette.danger, textAlign: 'center' },
-  hintMessage: { color: palette.mintDark },
-  footer: { alignItems: 'center', gap: 10, paddingHorizontal: 16, alignSelf: 'stretch' },
-  countdown: { fontSize: 14, fontWeight: '700', color: palette.inkSoft },
-  row: { flexDirection: 'row', gap: 10, justifyContent: 'center', flexWrap: 'wrap' },
-  primaryButton: { backgroundColor: palette.butter, borderWidth: 2, borderColor: palette.ink, paddingHorizontal: 22, paddingVertical: 12, borderRadius: 26 },
-  primaryText: { color: palette.ink, fontSize: 16, fontWeight: '800' },
-  outlineButton: { backgroundColor: palette.white, borderWidth: 2, borderColor: palette.ink, paddingHorizontal: 22, paddingVertical: 12, borderRadius: 26 },
-  outlineText: { color: palette.ink, fontSize: 16, fontWeight: '800' },
-  disabled: { borderColor: palette.line, opacity: 0.6 },
-  reminderCard: { alignSelf: 'stretch', maxWidth: 420, width: '100%', marginHorizontal: 'auto', backgroundColor: palette.white, borderRadius: 18, borderWidth: 2, borderColor: palette.ink, padding: 14, gap: 6, alignItems: 'center' },
-  reminderTitle: { fontSize: 15, fontWeight: '800', color: palette.ink },
+  container: { flex: 1, backgroundColor: palette.bg, alignItems: 'center', justifyContent: 'center', paddingTop: 6, paddingBottom: 16 },
+  column: { alignSelf: 'stretch', width: '100%', maxWidth: 480, marginHorizontal: 'auto', paddingHorizontal: 14, gap: 10 },
+  header: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, paddingVertical: 8 },
+  headerBody: { flex: 1 },
+  kicker: { fontSize: 14, color: '#7A5B00' },
+  title: { fontSize: 22 },
+  countdown: { fontSize: 15, color: palette.inkSoft, textAlign: 'center' },
+  row: { flexDirection: 'row', gap: 10, justifyContent: 'center' },
+  flex: { flex: 1 },
+  reminder: { alignItems: 'center', gap: 6, padding: 12 },
+  reminderTitle: { fontSize: 16 },
   reminderBody: { fontSize: 13, color: palette.inkSoft, textAlign: 'center', marginBottom: 4 },
-  smallPrimary: { backgroundColor: palette.mint, borderWidth: 2, borderColor: palette.ink, paddingHorizontal: 18, paddingVertical: 8, borderRadius: 20 },
-  smallPrimaryText: { color: palette.ink, fontSize: 14, fontWeight: '800' },
-  smallGhost: { paddingHorizontal: 14, paddingVertical: 8 },
-  smallGhostText: { color: palette.inkSoft, fontSize: 14, fontWeight: '700' },
 });
