@@ -37,7 +37,7 @@ export function Confetti({ run }: { run: boolean }) {
   if (!run) return null;
 
   return (
-    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+    <View style={[StyleSheet.absoluteFill, styles.passThrough]}>
       {pieces.map((p, i) => (
         <Animated.View
           key={i}
@@ -61,5 +61,6 @@ export function Confetti({ run }: { run: boolean }) {
 }
 
 const styles = StyleSheet.create({
+  passThrough: { pointerEvents: 'none' },
   piece: { position: 'absolute', left: '50%', top: '42%', width: 9, height: 15, marginLeft: -4.5, borderRadius: 5, borderWidth: 1.5, borderColor: palette.ink },
 });

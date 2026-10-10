@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Image, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { strings } from '../i18n';
 import { palette } from '../theme';
+import { RuleList } from './RuleList';
 
 type Props = {
   visible: boolean;
@@ -38,12 +39,9 @@ export function WelcomeModal({ visible, onNewPlayer, onKnowsChess, onLater }: Pr
               <Text style={styles.title}>{strings.onboarding.rulesTitle}</Text>
               <Text style={styles.question}>{strings.onboarding.rulesIntro}</Text>
               <View style={styles.rules}>
-                {strings.tutorial.rules.map(rule => (
-                  <Text key={rule} style={styles.rule}>
-                    • {rule}
-                  </Text>
-                ))}
+                <RuleList items={strings.rules.diffs} compact />
               </View>
+              <Text style={styles.anywhere}>{strings.rules.anywhere}</Text>
               <TouchableOpacity style={styles.primaryButton} onPress={onKnowsChess}>
                 <Text style={styles.primaryText}>{strings.onboarding.startChallenge}</Text>
               </TouchableOpacity>
@@ -64,8 +62,8 @@ const styles = StyleSheet.create({
   logo: { width: 84, height: 84, marginBottom: 6 },
   title: { fontSize: 21, fontWeight: '900', color: palette.ink, textAlign: 'center' },
   question: { fontSize: 15, color: palette.inkSoft, textAlign: 'center', marginTop: 6, marginBottom: 16 },
-  rules: { alignSelf: 'stretch', backgroundColor: palette.mintMist, borderRadius: 14, padding: 12, marginBottom: 16 },
-  rule: { fontSize: 14, color: palette.ink, lineHeight: 21 },
+  rules: { alignSelf: 'stretch', backgroundColor: palette.mintMist, borderRadius: 16, padding: 14 },
+  anywhere: { fontSize: 12, color: palette.inkSoft, textAlign: 'center', marginTop: 10, marginBottom: 16 },
   primaryButton: { alignSelf: 'stretch', alignItems: 'center', backgroundColor: palette.butter, borderWidth: 2, borderColor: palette.ink, paddingVertical: 13, borderRadius: 20 },
   primaryText: { color: palette.ink, fontSize: 16, fontWeight: 'bold' },
   outlineButton: { alignSelf: 'stretch', alignItems: 'center', backgroundColor: palette.white, borderWidth: 2, borderColor: palette.ink, paddingVertical: 13, borderRadius: 20, marginTop: 10 },
