@@ -27,3 +27,6 @@ npm-debug.*
 
 # 로컬 도구 설정
 .claude/
+
+# 디자인 시안 렌더링 결과 (최종본은 docs/design/에 복사)
+/design/out/
