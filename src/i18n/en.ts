@@ -147,6 +147,13 @@ ${'🟥'.repeat(attempts - 1)}🟩${'💡'.repeat(hints)}
     stalemate: 'No moves left! Stalemate, a draw.',
     draw: 'Only kings remain! A draw.',
   },
+  guide: {
+    movePiece: 'First time? Tap the glowing pawn 👆',
+    moveTarget: 'Dots show where it can go. Tap the glowing square to move!',
+    capturePiece: 'A chance to capture! Tap the glowing piece',
+    captureTarget: 'A red ring means you can capture. Tap it!',
+    done: 'Nice! Keep capturing and corner the enemy King for checkmate',
+  },
   evolution: {
     title: 'Evolution!',
     line: (side: string) => `Congrats! ${side} Pawn reached the far row and evolved into a Queen!`,

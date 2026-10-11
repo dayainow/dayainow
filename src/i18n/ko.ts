@@ -149,6 +149,14 @@ ${'🟥'.repeat(attempts - 1)}🟩${'💡'.repeat(hints)}
     stalemate: '둘 곳이 없다! 스테일메이트로 무승부.',
     draw: '킹만 남았다! 무승부.',
   },
+  // 첫 배틀 손가락 가이드
+  guide: {
+    movePiece: '처음이죠? 반짝이는 폰을 눌러 보세요 👆',
+    moveTarget: '점이 있는 칸이 갈 수 있는 곳이에요. 반짝이는 칸을 눌러 옮겨요!',
+    capturePiece: '잡을 기회예요! 반짝이는 기물을 눌러 보세요',
+    captureTarget: '빨간 고리는 잡을 수 있는 칸! 눌러서 잡아요',
+    done: '잘했어요! 이렇게 잡으면서 상대 킹을 몰아붙여 체크메이트하면 승리예요',
+  },
   evolution: {
     title: '진화!',
     line: (side: string) => `축하해요! 끝 줄에 닿은 ${side} 폰이 퀸으로 진화했다!`,

@@ -11,6 +11,7 @@ export type DailyRecord = {
 
 export type Progress = {
   onboarded: boolean; // 첫 실행 환영 안내를 봤는지
+  guideDone: boolean; // 첫 배틀 손가락 가이드를 끝냈는지
   tutorial: Record<string, boolean>; // 레슨 id -> 완료 여부
   campaign: Record<string, number>; // 단계 id -> 최고 별 개수 (1~3)
   daily: {
@@ -36,6 +37,7 @@ const STORAGE_KEY = 'progress:v1';
 
 export const emptyProgress = (): Progress => ({
   onboarded: false,
+  guideDone: false,
   tutorial: {},
   campaign: {},
   daily: { streak: 0, bestStreak: 0, lastSolved: null, records: {} },
@@ -54,6 +56,7 @@ export const loadProgress = async (): Promise<Progress> => {
     const empty = emptyProgress();
     return {
       onboarded: saved?.onboarded === true,
+      guideDone: saved?.guideDone === true,
       tutorial: isObject(saved?.tutorial) ? (saved.tutorial as Record<string, boolean>) : empty.tutorial,
       campaign: isObject(saved?.campaign) ? (saved.campaign as Record<string, number>) : empty.campaign,
       daily: isObject(saved?.daily) ? { ...empty.daily, ...(saved.daily as object) } : empty.daily,
@@ -159,6 +162,13 @@ export const totalStars = (progress: Progress): number =>
 export const recordOnboarded = (): Promise<Progress> =>
   serial(async () => {
     const next = { ...(await loadProgress()), onboarded: true };
+    await saveProgress(next);
+    return next;
+  });
+
+export const recordGuideDone = (): Promise<Progress> =>
+  serial(async () => {
+    const next = { ...(await loadProgress()), guideDone: true };
     await saveProgress(next);
     return next;
   });
