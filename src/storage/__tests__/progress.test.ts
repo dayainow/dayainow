@@ -153,3 +153,13 @@ describe('concurrent saves', () => {
     expect(saved.stats).toMatchObject({ evolutions: 1, wins: 1 });
   });
 });
+
+describe('reset while saving', () => {
+  it('stays reset even if a save was already queued', async () => {
+    await recordStageResult(1, 3);
+    const pending = recordStat('wins');
+    await resetProgress();
+    await pending;
+    expect((await loadProgress()).campaign).toEqual({});
+  });
+});

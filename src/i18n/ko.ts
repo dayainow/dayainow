@@ -133,6 +133,7 @@ ${'🟥'.repeat(attempts - 1)}🟩${'💡'.repeat(hints)}
     blueTeam: '블루 팀',
     redTeam: '레드 팀',
     movesUsed: (n: number) => `내가 둔 수 ${n}`,
+    goal: (stars: number, moves: number) => `${'★'.repeat(stars)} ${moves}수`,
     start: '배틀 시작! 블루가 먼저 둬요.',
     startVs: (name: string) => `${name}${josa(name, '이', '가')} 승부를 걸어왔다! 먼저 두세요.`,
     capture: (side: string, mover: string, other: string, captured: string, check: boolean) =>

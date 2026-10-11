@@ -51,6 +51,7 @@ function StagePlay({ stage }: { stage: Stage }) {
   const [showIntro, setShowIntro] = useState(true);
   const [evolving, setEvolving] = useState<'w' | null>(null);
   const evolveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const badgeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const opponent = opponentFor(stage);
   const opponentName = strings.league.opponents[opponent.index];
   const maxPower = useMemo(() => ({ w: powerOf(initialBoard, 'w'), b: powerOf(initialBoard, 'b') }), [initialBoard]);
@@ -62,6 +63,7 @@ function StagePlay({ stage }: { stage: Stage }) {
     return () => {
       clearTimeout(evolveTimer.current);
       clearTimeout(swapTimer.current);
+      clearTimeout(badgeTimer.current);
     };
   }, []);
 
@@ -81,7 +83,7 @@ function StagePlay({ stage }: { stage: Stage }) {
       recordStageResult(stage.id, stars).then(after => {
         const earned = newBadge(before.campaign, after.campaign);
         setBadge(earned);
-        if (earned) swapTimer.current = setTimeout(feedback.badge, 900);
+        if (earned) badgeTimer.current = setTimeout(feedback.badge, 900);
         setBadgeCount(earnedBadges(after.campaign).length);
       })
     );
@@ -93,12 +95,13 @@ function StagePlay({ stage }: { stage: Stage }) {
     setNotice(null);
     game.move(move);
     if (mover === 'wP' && move.toR === 0) {
-      evolveTimer.current = setTimeout(() => setEvolving('w'), EVOLVE_DELAY);
-      recordStat('evolutions');
+      evolveTimer.current = setTimeout(() => {
+        setEvolving('w');
+        recordStat('evolutions');
+      }, EVOLVE_DELAY);
     }
   };
 
-  // 처음부터 다시: 무르기 횟수도 새로 셈
   // 결과 창 → 공유 창 (닫히는 애니메이션이 끝난 뒤 띄움)
   const openShare = (content: ShareContent) => {
     setHideResult(true);
@@ -109,8 +112,13 @@ function StagePlay({ stage }: { stage: Stage }) {
     swapTimer.current = setTimeout(() => setHideResult(false), MODAL_SWAP_MS);
   };
 
+  // 처음부터 다시: 무르기 횟수, 지난 판 결과(별·배지), 대기 중인 연출·소리도 새로
   const restart = () => {
+    clearTimeout(evolveTimer.current);
+    clearTimeout(badgeTimer.current);
     setHideResult(false);
+    setBadge(null);
+    setEarnedStars(0);
     game.reset();
     setUndos(0);
     setNotice(null);
@@ -159,7 +167,7 @@ function StagePlay({ stage }: { stage: Stage }) {
           side="w"
           avatar="wK"
           name={strings.battle.me}
-          detail={`${strings.battle.movesUsed(game.blueMoves)} · ${undos > 0 ? '★★' : `★${stage.par}`}`}
+          detail={`${strings.battle.movesUsed(game.blueMoves)} · ${undos > 0 ? strings.battle.goal(2, stage.par + 6) : strings.battle.goal(3, stage.par)}`}
           power={powerOf(game.board, 'w')}
           maxPower={maxPower.w}
           active={game.turn === 'w' && !game.isGameOver}
@@ -168,6 +176,7 @@ function StagePlay({ stage }: { stage: Stage }) {
         <GameControls
           canUndo={game.canUndo}
           onUndo={() => {
+            clearTimeout(evolveTimer.current);
             game.undo();
             if (undos === 0) setNotice(strings.campaign.undoNotice);
             setUndos(n => n + 1);

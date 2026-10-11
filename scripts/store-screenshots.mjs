@@ -123,6 +123,8 @@ const shoot = async (browser, locale, scene) => {
   await wait(1500);
   if (scene.setup) await scene.setup(page, locale);
   await wait(scene.settle ?? 700);
+  // 창이 열리며 첫 버튼에 생긴 키보드 포커스 테두리가 사진에 찍히지 않게
+  await page.evaluate(() => document.activeElement?.blur());
   const out = join(ROOT, 'assets', 'store', 'screenshots', locale, `${scene.name}.png`);
   await page.screenshot({ path: out });
   await context.close();

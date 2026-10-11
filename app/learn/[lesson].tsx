@@ -52,6 +52,7 @@ function LessonPlay({ lesson }: { lesson: Lesson }) {
   );
 
   const restart = () => {
+    clearTimeout(evolveTimer.current);
     setBoard(lesson.board);
     setStars(lesson.stars);
     setLastMove(null);
@@ -78,8 +79,10 @@ function LessonPlay({ lesson }: { lesson: Lesson }) {
   const handleMove = (move: Move) => {
     // 폰이 끝 줄에 닿으면 진화 연출 (폰 레슨의 마지막 ★)
     if (board[move.fromR][move.fromC] === 'wP' && move.toR === 0) {
-      evolveTimer.current = setTimeout(() => setEvolving('w'), 420);
-      recordStat('evolutions');
+      evolveTimer.current = setTimeout(() => {
+        setEvolving('w');
+        recordStat('evolutions');
+      }, 420);
     }
     const after = simulateMove(board, move);
     setBoard(after);

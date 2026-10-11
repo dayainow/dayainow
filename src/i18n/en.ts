@@ -131,6 +131,7 @@ ${'🟥'.repeat(attempts - 1)}🟩${'💡'.repeat(hints)}
     blueTeam: 'Blue team',
     redTeam: 'Red team',
     movesUsed: (n: number) => `Moves ${n}`,
+    goal: (stars: number, moves: number) => `${'★'.repeat(stars)} ${moves}`,
     start: 'Battle start! Blue moves first.',
     startVs: (name: string) => `${name} wants to battle! You move first.`,
     capture: (side: string, mover: string, other: string, captured: string, check: boolean) =>

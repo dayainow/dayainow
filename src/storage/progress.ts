@@ -113,13 +113,15 @@ const saveProgress = async (progress: Progress): Promise<void> => {
   }
 };
 
-export const resetProgress = async (): Promise<void> => {
-  try {
-    await AsyncStorage.removeItem(STORAGE_KEY);
-  } catch {
-    // 무시
-  }
-};
+// 다른 저장이 처리 중이어도 그 뒤에 지워서, 예전 기록이 다시 저장되지 않게
+export const resetProgress = (): Promise<void> =>
+  serial(async () => {
+    try {
+      await AsyncStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // 무시
+    }
+  });
 
 export const applyLessonDone = (progress: Progress, lessonId: string): Progress =>
   progress.tutorial[lessonId] ? progress : { ...progress, tutorial: { ...progress.tutorial, [lessonId]: true } };
