@@ -141,6 +141,7 @@ AI Workflow  Cursor · MCP · Figma MCP · 역할 분리 에이전트 · Skill/R
 
 | 프로젝트 | 소개 |
 | --- | --- |
+| [**캡슐체스 (Capsule Chess)**](./capsule-chess) | 5×5 미니체스를 몬스터 배틀 RPG 감성으로 만든 Expo(React Native) 앱. 캡슐 리그 20단계 · 오늘의 퍼즐 · 퍼즐 도장 120문제 · 폰 진화 연출 · 배지·업적. 스토어 출시 준비 중. <br> <img src="./capsule-chess/assets/store/screenshots/ko/03-versus.png" width="150" alt="Capsule Chess VS" /> <img src="./capsule-chess/assets/store/screenshots/ko/02-battle.png" width="150" alt="Capsule Chess Battle" /> |
 | [**5x5 Minichess**](./minichess-prototype) | 1~3분 안에 끝나는 빠르고 캐주얼한 모바일 웹 체스. HTML/JS 및 PWA 지원. <br> <img src="./assets/minichess-app.jpg" width="150" alt="Minichess Screenshot" /> |
 
 ### 자동화 구성 방식 (요약)
