@@ -1,4 +1,5 @@
-// 브랜드 아이콘(캡슐 속 폰, 시안 B-2 수정안 2)과 스토어 이미지를 SVG로 만들고 로컬 Edge/Chrome 헤드리스로 PNG를 렌더링한다.
+// 브랜드 아이콘(캡슐 속 폰, 시안 B-2 수정안 2)과 스토어 아이콘을 SVG로 만들고 로컬 Edge/Chrome 헤드리스로 PNG를 렌더링한다.
+// 스토어 대표 이미지(1024x500)는 design/feature.mjs에서 만든다.
 // 사용: node scripts/build-icons.mjs   (브라우저 경로는 BROWSER_PATH 환경변수로 지정 가능)
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
@@ -97,51 +98,6 @@ const NOTIFICATION_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1
 </svg>
 `;
 
-// Play 스토어 대표 이미지 (1024x500): 왼쪽 캡슐, 오른쪽 제목·한 줄 소개·특징 칩
-const FEATURE_TEXT = {
-  ko: { titleLines: ['캡슐체스'], titleSize: 104, tagline: '3분이면 끝나는 귀여운 미니 체스', chips: ['오늘의 퍼즐', '20단계 도전', '튜토리얼'], chipSize: 24 },
-  en: { titleLines: ['Capsule', 'Chess'], titleSize: 84, tagline: 'Cute mini chess in 3 minutes', chips: ['Daily puzzle', '20 stages', 'Tutorial'], chipSize: 22 },
-};
-const FONT = `'Malgun Gothic', 'Apple SD Gothic Neo', 'Segoe UI', sans-serif`;
-// 칩 너비 대략 계산: 한글은 글자 폭이 넓음
-const textWidth = (text, size) => [...text].reduce((w, ch) => w + (ch.charCodeAt(0) > 0x3000 ? 1 : 0.62) * size, 0);
-
-const CONFETTI = [
-  [480, 40, 20, BRAND.butter], [960, 70, -30, BRAND.coral], [600, 455, 35, '#8EC5FF'], [990, 430, 15, BRAND.mint],
-  [430, 400, -20, BRAND.coral], [55, 60, 25, BRAND.butter], [40, 440, -35, '#8EC5FF'], [880, 470, 50, BRAND.butter],
-];
-
-const buildFeatureSvg = ({ titleLines, titleSize, tagline, chips, chipSize }) => {
-  const textX = 470;
-  const titleTop = 205 - (titleLines.length - 1) * titleSize * 0.5;
-  const titles = titleLines
-    .map((line, i) => `<text x="${textX}" y="${titleTop + i * titleSize * 0.98}" font-family="${FONT}" font-size="${titleSize}" font-weight="900" fill="${BRAND.ink}">${line}</text>`)
-    .join('');
-  const taglineY = titleTop + (titleLines.length - 1) * titleSize * 0.98 + 62;
-  let chipX = textX;
-  const chipSvg = chips
-    .map(label => {
-      const width = textWidth(label, chipSize) + 36;
-      const chip = `<rect x="${chipX}" y="${taglineY + 30}" width="${width}" height="46" rx="23" fill="#FFFFFF" stroke="${BRAND.ink}" stroke-width="3"/>
-<text x="${chipX + width / 2}" y="${taglineY + 61}" text-anchor="middle" font-family="${FONT}" font-size="${chipSize}" font-weight="700" fill="${BRAND.ink}">${label}</text>`;
-      chipX += width + 12;
-      return chip;
-    })
-    .join('');
-  const confetti = CONFETTI.map(
-    ([x, y, rotate, color]) => `<rect x="${x - 9}" y="${y - 15}" width="18" height="30" rx="9" fill="${color}" stroke="${BRAND.ink}" stroke-width="3" transform="rotate(${rotate} ${x} ${y})"/>`
-  ).join('');
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 500" width="1024" height="500">
-<rect width="1024" height="500" fill="${BRAND.mintLight}"/>
-${confetti}
-<g transform="translate(240 250) scale(2.05) translate(-90 -99)">${capsule()}</g>
-${titles}
-<text x="${textX}" y="${taglineY}" font-family="${FONT}" font-size="32" font-weight="700" fill="${BRAND.ink}">${tagline}</text>
-${chipSvg}
-</svg>
-`;
-};
-
 const TARGETS = [
   // iOS/기본 아이콘: 배경 꽉 채움 (iOS는 모서리를 자동으로 둥글게 자르고, Expo가 투명도를 제거함)
   { name: 'icon', out: 'assets/icon.png', width: 1024, height: 1024, svg: buildIconSvg({ background: BRAND.mintLight, scale: 0.9, size: 1024 }) },
@@ -161,9 +117,6 @@ const TARGETS = [
   })),
   // Google Play 스토어 아이콘 512x512 (꽉 찬 정사각형, 모서리는 스토어가 둥글게 처리)
   { name: 'play-icon', out: 'assets/store/play-icon.png', width: 512, height: 512, svg: buildIconSvg({ background: BRAND.mintLight, scale: 0.9, size: 512 }) },
-  // Google Play 대표 이미지 1024x500
-  { name: 'feature-ko', out: 'assets/store/feature-ko.png', width: 1024, height: 500, svg: buildFeatureSvg(FEATURE_TEXT.ko) },
-  { name: 'feature-en', out: 'assets/store/feature-en.png', width: 1024, height: 500, svg: buildFeatureSvg(FEATURE_TEXT.en) },
 ];
 
 const render = (browser, { svg, width, height }, outPath, workDir) => {

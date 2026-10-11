@@ -8,13 +8,13 @@ const browser = () => (browserPromise ??= puppeteer.launch({ executablePath: fin
 export const FONT_LINK =
   '<link href="https://fonts.googleapis.com/css2?family=Jua&family=Fredoka:wght@600;700&display=swap" rel="stylesheet">';
 
-// html 전체 문서를 width 너비로 그려 out에 저장 (높이는 내용에 맞춤)
-export const renderHtml = async (html, out, { width = 1200, scale = 2 } = {}) => {
+// html 전체 문서를 width 너비로 그려 out에 저장. height를 주면 그 크기로 잘라냄 (없으면 내용 높이에 맞춤)
+export const renderHtml = async (html, out, { width = 1200, height, scale = 2 } = {}) => {
   const page = await (await browser()).newPage();
-  await page.setViewport({ width, height: 800, deviceScaleFactor: scale });
+  await page.setViewport({ width, height: height ?? 800, deviceScaleFactor: scale });
   await page.setContent(html, { waitUntil: 'networkidle0', timeout: 60_000 });
   await page.evaluate(() => document.fonts.ready);
-  await page.screenshot({ path: out, fullPage: true });
+  await page.screenshot(height ? { path: out, clip: { x: 0, y: 0, width, height } } : { path: out, fullPage: true });
   await page.close();
 };
 
