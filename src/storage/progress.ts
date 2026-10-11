@@ -20,9 +20,12 @@ export type Progress = {
     lastSolved: string | null; // 'YYYY-MM-DD'
     records: Record<string, DailyRecord>;
   };
+  practice: Record<string, PracticeRecord>; // 퍼즐 도장 번호 -> 처음 풀었을 때 기록
   stats: Stats; // 업적 판정용 누적 기록
   achievements: Record<string, string>; // 업적 id -> 달성한 날 'YYYY-MM-DD'
 };
+
+export type PracticeRecord = { attempts: number; hints: number };
 
 export type Stats = {
   wins: number; // 자유 대전에서 AI에게 이긴 횟수
@@ -41,6 +44,7 @@ export const emptyProgress = (): Progress => ({
   tutorial: {},
   campaign: {},
   daily: { streak: 0, bestStreak: 0, lastSolved: null, records: {} },
+  practice: {},
   stats: emptyStats(),
   achievements: {},
 });
@@ -60,6 +64,7 @@ export const loadProgress = async (): Promise<Progress> => {
       tutorial: isObject(saved?.tutorial) ? (saved.tutorial as Record<string, boolean>) : empty.tutorial,
       campaign: isObject(saved?.campaign) ? (saved.campaign as Record<string, number>) : empty.campaign,
       daily: isObject(saved?.daily) ? { ...empty.daily, ...(saved.daily as object) } : empty.daily,
+      practice: isObject(saved?.practice) ? (saved.practice as Record<string, PracticeRecord>) : empty.practice,
       stats: isObject(saved?.stats) ? { ...empty.stats, ...(saved.stats as object) } : empty.stats,
       achievements: isObject(saved?.achievements) ? (saved.achievements as Record<string, string>) : empty.achievements,
     };
@@ -165,6 +170,13 @@ export const recordOnboarded = (): Promise<Progress> =>
     await saveProgress(next);
     return next;
   });
+
+// 처음 푼 기록만 남김 (다시 풀어도 그대로)
+export const applyPracticeSolve = (progress: Progress, number: number, attempts: number, hints: number): Progress =>
+  progress.practice[number] ? progress : { ...progress, practice: { ...progress.practice, [number]: { attempts, hints } } };
+
+export const recordPracticeSolve = (number: number, attempts: number, hints: number): Promise<Progress> =>
+  serial(async () => saveWithAchievements(applyPracticeSolve(await loadProgress(), number, attempts, hints)));
 
 export const recordGuideDone = (): Promise<Progress> =>
   serial(async () => {

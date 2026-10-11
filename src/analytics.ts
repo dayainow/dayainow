@@ -20,6 +20,8 @@ export type AnalyticsEvents = {
   rules_open: { source: 'home' | 'header' | 'learn' };
   achievement: { id: string };
   guide_step: { step: 'move' | 'capture' | 'done' };
+  practice_open: { number: number };
+  practice_solved: { number: number; attempts: number; hints: number };
 };
 
 export type AnalyticsSink = (event: string, props: Record<string, unknown>) => void;

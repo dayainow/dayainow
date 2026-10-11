@@ -12,6 +12,7 @@ import { strings } from '../src/i18n';
 import { getDailyPuzzle } from '../src/puzzles/daily';
 import { type Progress, currentStreak, emptyProgress, loadProgress, recordOnboarded, totalStars } from '../src/storage/progress';
 import { palette } from '../src/theme';
+import { PRACTICE_COUNT } from '../src/puzzles/practice';
 import { LESSONS } from '../src/tutorial/lessons';
 import { CapsuleBadge } from '../src/ui/CapsuleBadge';
 import { Chip } from '../src/ui/Chip';
@@ -158,29 +159,39 @@ export default function HomeScreen() {
             </Panel>
           </Pressable>
 
+          {/* 작은 메뉴 3개: 배우기 · 퍼즐 도장 · 자유 대전 */}
           <View style={styles.tiles}>
-            <Pressable style={styles.tileWrap} onPress={() => router.push('/learn')}>
-              <Panel color={isNewPlayer ? palette.mintLight : palette.white} style={styles.tile}>
-                <PieceImage piece="wB" size={44} />
-                <View style={styles.tileBody}>
-                  <Text style={styles.tileLabel}>{strings.home.learn}</Text>
-                  <Text style={styles.tileSub} numberOfLines={2}>
-                    {lessonsDone === 0 ? strings.home.learnInfoNew : strings.home.learnInfo(lessonsDone, LESSONS.length)}
+            {[
+              {
+                key: 'learn',
+                href: '/learn' as const,
+                piece: 'wB',
+                label: strings.home.learn,
+                sub: lessonsDone === 0 ? strings.home.learnInfoNew : strings.home.learnInfo(lessonsDone, LESSONS.length),
+                color: isNewPlayer ? palette.mintLight : palette.white,
+              },
+              {
+                key: 'practice',
+                href: '/practice' as const,
+                piece: 'wQ',
+                label: strings.practice.tile,
+                sub: strings.practice.tileInfo(Object.keys(progress.practice).length, PRACTICE_COUNT),
+                color: palette.white,
+              },
+              { key: 'play', href: '/play' as const, piece: 'wN', label: strings.home.freePlay, sub: strings.home.freePlayInfo, color: palette.white },
+            ].map(tile => (
+              <Pressable key={tile.key} style={styles.tileWrap} onPress={() => router.push(tile.href)}>
+                <Panel color={tile.color} style={styles.tile}>
+                  <PieceImage piece={tile.piece} size={46} />
+                  <Text style={styles.tileLabel} numberOfLines={1}>
+                    {tile.label}
                   </Text>
-                </View>
-              </Panel>
-            </Pressable>
-            <Pressable style={styles.tileWrap} onPress={() => router.push('/play')}>
-              <Panel style={styles.tile}>
-                <PieceImage piece="wN" size={44} />
-                <View style={styles.tileBody}>
-                  <Text style={styles.tileLabel}>{strings.home.freePlay}</Text>
                   <Text style={styles.tileSub} numberOfLines={2}>
-                    {strings.home.freePlayInfo}
+                    {tile.sub}
                   </Text>
-                </View>
-              </Panel>
-            </Pressable>
+                </Panel>
+              </Pressable>
+            ))}
           </View>
         </View>
       </ScrollView>
@@ -231,10 +242,9 @@ const styles = StyleSheet.create({
   stepDone: { backgroundColor: palette.mint },
   stepNow: { backgroundColor: palette.sun },
 
-  tiles: { flexDirection: 'row', gap: 12 },
+  tiles: { flexDirection: 'row', gap: 10 },
   tileWrap: { flex: 1 },
-  tile: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 10 },
-  tileBody: { flex: 1 },
-  tileLabel: { fontSize: 17 },
-  tileSub: { fontSize: 12, color: palette.inkSoft },
+  tile: { alignItems: 'center', paddingHorizontal: 6, paddingTop: 8, paddingBottom: 10, minHeight: 124 },
+  tileLabel: { fontSize: 16, marginTop: 2 },
+  tileSub: { fontSize: 11, color: palette.inkSoft, textAlign: 'center' },
 });
