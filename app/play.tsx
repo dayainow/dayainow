@@ -14,6 +14,7 @@ import { battleEvent } from '../src/game/commentary';
 import { powerOf } from '../src/game/material';
 import { useChessGame } from '../src/game/useChessGame';
 import { strings } from '../src/i18n';
+import { recordStat } from '../src/storage/progress';
 import { DEFAULT_SETTINGS, loadSettings, updateSettings } from '../src/storage/settings';
 import { palette, sideColors } from '../src/theme';
 import { DialogBox } from '../src/ui/DialogBox';
@@ -52,6 +53,14 @@ export default function FreePlayScreen() {
   useEffect(() => {
     if (!game.isGameOver) return;
     track('free_play_end', { mode: gameMode, difficulty, result: !result?.winner ? 'draw' : playerLost ? 'lose' : 'win' });
+    // 업적용 기록
+    if (!vsAi) recordStat('pvpGames');
+    else if (result?.winner === 'w') {
+      // 저장이 겹치지 않게 차례로 기록
+      recordStat('wins').then(() => {
+        if (difficulty === 'hard') recordStat('hardWins');
+      });
+    }
     if (!result?.winner) feedback.clear();
     else if (playerLost) feedback.lose();
     else feedback.win();
@@ -67,7 +76,10 @@ export default function FreePlayScreen() {
     const mover = game.board[move.fromR][move.fromC];
     game.move(move);
     const lastRow = mover === 'wP' ? 0 : mover === 'bP' ? BOARD_SIZE - 1 : -1;
-    if (move.toR === lastRow) evolveTimer.current = setTimeout(() => setEvolving(mover![0] as 'w' | 'b'), EVOLVE_DELAY);
+    if (move.toR === lastRow) {
+      evolveTimer.current = setTimeout(() => setEvolving(mover![0] as 'w' | 'b'), EVOLVE_DELAY);
+      recordStat('evolutions');
+    }
   };
 
   const line = battleText(

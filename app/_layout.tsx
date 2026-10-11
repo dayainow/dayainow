@@ -6,11 +6,12 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
 import { track } from '../src/analytics';
+import { AchievementToast } from '../src/components/AchievementToast';
 import { RulesButton } from '../src/components/RulesButton';
 import { initFeedback } from '../src/feedback/feedback';
 import { strings } from '../src/i18n';
 import { RulesProvider } from '../src/rules/RulesProvider';
-import { loadProgress } from '../src/storage/progress';
+import { backfillAchievements, loadProgress } from '../src/storage/progress';
 import { palette } from '../src/theme';
 import { fonts } from '../src/ui/fonts';
 
@@ -23,6 +24,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     initFeedback();
+    backfillAchievements();
     loadProgress().then(progress => track('app_open', { first_open: !progress.onboarded }));
   }, []);
 
@@ -54,7 +56,9 @@ export default function RootLayout() {
         <Stack.Screen name="campaign/[stage]" options={{ title: '' }} />
         <Stack.Screen name="play" options={{ title: strings.screens.freePlay }} />
         <Stack.Screen name="settings" options={{ title: strings.screens.settings }} />
+        <Stack.Screen name="achievements" options={{ title: strings.achievements.title }} />
       </Stack>
+      <AchievementToast />
     </RulesProvider>
   );
 }

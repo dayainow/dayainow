@@ -1,5 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { previousDateKey } from '../utils/date';
+import { emitAchievements } from '../achievements/events';
+import { type AchievementId, newlyEarned } from '../achievements/list';
+import { previousDateKey, toDateKey } from '../utils/date';
 
 export type DailyRecord = {
   solved: boolean;
@@ -17,7 +19,18 @@ export type Progress = {
     lastSolved: string | null; // 'YYYY-MM-DD'
     records: Record<string, DailyRecord>;
   };
+  stats: Stats; // 업적 판정용 누적 기록
+  achievements: Record<string, string>; // 업적 id -> 달성한 날 'YYYY-MM-DD'
 };
+
+export type Stats = {
+  wins: number; // 자유 대전에서 AI에게 이긴 횟수
+  hardWins: number; // 그중 어려움 난이도
+  evolutions: number; // 내 폰이 퀸으로 진화한 횟수
+  pvpGames: number; // 2인 대전을 끝까지 둔 횟수
+};
+
+const emptyStats = (): Stats => ({ wins: 0, hardWins: 0, evolutions: 0, pvpGames: 0 });
 
 const STORAGE_KEY = 'progress:v1';
 
@@ -26,6 +39,8 @@ export const emptyProgress = (): Progress => ({
   tutorial: {},
   campaign: {},
   daily: { streak: 0, bestStreak: 0, lastSolved: null, records: {} },
+  stats: emptyStats(),
+  achievements: {},
 });
 
 const isObject = (value: unknown): value is Record<string, unknown> =>
@@ -42,11 +57,53 @@ export const loadProgress = async (): Promise<Progress> => {
       tutorial: isObject(saved?.tutorial) ? (saved.tutorial as Record<string, boolean>) : empty.tutorial,
       campaign: isObject(saved?.campaign) ? (saved.campaign as Record<string, number>) : empty.campaign,
       daily: isObject(saved?.daily) ? { ...empty.daily, ...(saved.daily as object) } : empty.daily,
+      stats: isObject(saved?.stats) ? { ...empty.stats, ...(saved.stats as object) } : empty.stats,
+      achievements: isObject(saved?.achievements) ? (saved.achievements as Record<string, string>) : empty.achievements,
     };
   } catch {
     return emptyProgress();
   }
 };
+
+// 읽고-고치고-저장하는 작업을 한 줄로 세워 차례로 처리 (진화와 승리가 동시에 저장돼도 서로 덮어쓰지 않게)
+let queue: Promise<unknown> = Promise.resolve();
+const serial = <T>(task: () => Promise<T>): Promise<T> => {
+  const run = queue.then(task, task);
+  queue = run.catch(() => {});
+  return run;
+};
+
+// 새로 만족한 업적을 오늘 날짜로 기록 (순수 함수)
+export const applyAchievements = (progress: Progress, today: string): { next: Progress; earned: AchievementId[] } => {
+  const earned = newlyEarned(progress);
+  if (!earned.length) return { next: progress, earned };
+  const achievements = { ...progress.achievements };
+  earned.forEach(id => (achievements[id] = today));
+  return { next: { ...progress, achievements }, earned };
+};
+
+// 저장하면서 새 업적이 있으면 알림
+const saveWithAchievements = async (progress: Progress): Promise<Progress> => {
+  const { next, earned } = applyAchievements(progress, toDateKey(new Date()));
+  await saveProgress(next);
+  emitAchievements(earned);
+  return next;
+};
+
+// 업데이트 전부터 이미 만족한 업적은 알림 없이 조용히 채움 (앱 시작 시 한 번)
+export const backfillAchievements = (): Promise<void> =>
+  serial(async () => {
+    const { next, earned } = applyAchievements(await loadProgress(), toDateKey(new Date()));
+    if (earned.length) await saveProgress(next);
+  });
+
+export const applyStat = (progress: Progress, key: keyof Stats): Progress => ({
+  ...progress,
+  stats: { ...progress.stats, [key]: progress.stats[key] + 1 },
+});
+
+export const recordStat = (key: keyof Stats): Promise<Progress> =>
+  serial(async () => saveWithAchievements(applyStat(await loadProgress(), key)));
 
 const saveProgress = async (progress: Progress): Promise<void> => {
   try {
@@ -97,26 +154,18 @@ export const currentStreak = (progress: Progress, todayKey: string): number =>
 export const totalStars = (progress: Progress): number =>
   Object.values(progress.campaign).reduce((sum, stars) => sum + stars, 0);
 
-export const recordOnboarded = async (): Promise<Progress> => {
-  const next = { ...(await loadProgress()), onboarded: true };
-  await saveProgress(next);
-  return next;
-};
+export const recordOnboarded = (): Promise<Progress> =>
+  serial(async () => {
+    const next = { ...(await loadProgress()), onboarded: true };
+    await saveProgress(next);
+    return next;
+  });
 
-export const recordLessonDone = async (lessonId: string): Promise<Progress> => {
-  const next = applyLessonDone(await loadProgress(), lessonId);
-  await saveProgress(next);
-  return next;
-};
+export const recordLessonDone = (lessonId: string): Promise<Progress> =>
+  serial(async () => saveWithAchievements(applyLessonDone(await loadProgress(), lessonId)));
 
-export const recordStageResult = async (stageId: number, stars: number): Promise<Progress> => {
-  const next = applyStageResult(await loadProgress(), stageId, stars);
-  await saveProgress(next);
-  return next;
-};
+export const recordStageResult = (stageId: number, stars: number): Promise<Progress> =>
+  serial(async () => saveWithAchievements(applyStageResult(await loadProgress(), stageId, stars)));
 
-export const recordDailySolve = async (dateKey: string, attempts: number, hints = 0): Promise<Progress> => {
-  const next = applyDailySolve(await loadProgress(), dateKey, attempts, hints);
-  await saveProgress(next);
-  return next;
-};
+export const recordDailySolve = (dateKey: string, attempts: number, hints = 0): Promise<Progress> =>
+  serial(async () => saveWithAchievements(applyDailySolve(await loadProgress(), dateKey, attempts, hints)));

@@ -18,6 +18,7 @@ export type AnalyticsEvents = {
   undo: { screen: 'play' | 'stage' };
   setting_change: { key: string; value: boolean | string };
   rules_open: { source: 'home' | 'header' | 'learn' };
+  achievement: { id: string };
 };
 
 export type AnalyticsSink = (event: string, props: Record<string, unknown>) => void;

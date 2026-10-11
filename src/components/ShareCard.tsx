@@ -12,6 +12,7 @@ import { GameButton } from '../ui/GameButton';
 import { MascotFace } from '../ui/MascotFace';
 import { PieceImage } from '../ui/PieceImage';
 import { Text } from '../ui/Text';
+import { useModalPresence } from '../ui/modalPresence';
 
 // 공유할 수 있는 결과 세 가지: 오늘의 퍼즐, 단계 클리어, 배지 획득
 export type ShareContent =
@@ -104,6 +105,7 @@ type Props = { visible: boolean; onClose: () => void; content: ShareContent; onC
 // 결과 카드 미리보기 + 공유 (휴대폰: 이미지/텍스트, 웹: 텍스트)
 export function ShareCardModal({ visible, onClose, content, onCopied }: Props) {
   const cardRef = useRef<View>(null);
+  useModalPresence(visible);
   const canShareImage = Platform.OS !== 'web';
 
   const shareImage = async () => {

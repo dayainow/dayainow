@@ -180,6 +180,27 @@ ${'🟥'.repeat(attempts - 1)}🟩${'💡'.repeat(hints)}
     fullTeam: '레드는 기물 전부 출전',
     start: '배틀 시작!',
   },
+  achievements: {
+    title: '업적',
+    count: (n: number, total: number) => `🏆 ${n}/${total}`,
+    unlocked: '업적 달성!',
+    progress: (n: number, total: number) => `${n} / ${total} 달성`,
+    items: {
+      first_win: { title: '첫 승리', desc: '배틀에서 처음으로 이기기' },
+      first_evolution: { title: '첫 진화', desc: '폰을 끝 줄까지 보내 퀸으로 진화시키기' },
+      perfect: { title: '완벽한 승리', desc: '단계에서 ★★★ 받기' },
+      first_badge: { title: '첫 배지', desc: '캡슐 하나의 5단계를 모두 깨기' },
+      all_badges: { title: '리그 정복', desc: '배지 4개 모두 모으기' },
+      stars_30: { title: '별 수집가', desc: '별 30개 모으기' },
+      daily_first: { title: '첫 퍼즐', desc: '오늘의 퍼즐 처음 풀기' },
+      daily_flawless: { title: '한 번에 척척', desc: '힌트 없이 첫 시도에 퍼즐 풀기' },
+      streak_3: { title: '3일 연속', desc: '오늘의 퍼즐 3일 연속 풀기' },
+      streak_7: { title: '일주일 연속', desc: '오늘의 퍼즐 7일 연속 풀기' },
+      graduate: { title: '졸업', desc: '체스 배우기 레슨 모두 끝내기' },
+      hard_win: { title: '강적 격파', desc: '자유 대전에서 어려움 AI 이기기' },
+      pvp_game: { title: '친구와 한 판', desc: '2인 대전을 끝까지 두기' },
+    },
+  },
   // 어디서든 여는 규칙 안내 (? 버튼)
   rules: {
     button: '규칙',

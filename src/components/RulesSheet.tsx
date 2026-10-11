@@ -10,6 +10,7 @@ import { Text } from '../ui/Text';
 import { PieceImage } from '../ui/PieceImage';
 import { MiniBoard } from './MiniBoard';
 import { RuleList } from './RuleList';
+import { useModalPresence } from '../ui/modalPresence';
 
 type Tab = 'basics' | 'pieces';
 
@@ -25,6 +26,7 @@ type Props = { visible: boolean; onClose: () => void };
 // 어느 화면에서든 ? 버튼으로 여는 규칙 안내 (아래에서 올라오는 시트)
 export function RulesSheet({ visible, onClose }: Props) {
   const [tab, setTab] = useState<Tab>('basics');
+  useModalPresence(visible);
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const pathname = usePathname();

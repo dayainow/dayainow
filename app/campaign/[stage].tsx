@@ -18,7 +18,7 @@ import { battleEvent } from '../../src/game/commentary';
 import { powerOf } from '../../src/game/material';
 import { useChessGame } from '../../src/game/useChessGame';
 import { strings } from '../../src/i18n';
-import { loadProgress, recordStageResult } from '../../src/storage/progress';
+import { loadProgress, recordStageResult, recordStat } from '../../src/storage/progress';
 import { palette } from '../../src/theme';
 import { CapsuleBadge } from '../../src/ui/CapsuleBadge';
 import { DialogBox } from '../../src/ui/DialogBox';
@@ -90,7 +90,10 @@ function StagePlay({ stage }: { stage: Stage }) {
     const mover = game.board[move.fromR][move.fromC];
     setNotice(null);
     game.move(move);
-    if (mover === 'wP' && move.toR === 0) evolveTimer.current = setTimeout(() => setEvolving('w'), EVOLVE_DELAY);
+    if (mover === 'wP' && move.toR === 0) {
+      evolveTimer.current = setTimeout(() => setEvolving('w'), EVOLVE_DELAY);
+      recordStat('evolutions');
+    }
   };
 
   // 처음부터 다시: 무르기 횟수도 새로 셈

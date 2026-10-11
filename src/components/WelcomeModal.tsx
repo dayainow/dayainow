@@ -7,6 +7,7 @@ import { MascotFace } from '../ui/MascotFace';
 import { Panel } from '../ui/Panel';
 import { Text } from '../ui/Text';
 import { RuleList } from './RuleList';
+import { useModalPresence } from '../ui/modalPresence';
 
 type Props = {
   visible: boolean;
@@ -18,6 +19,7 @@ type Props = {
 // 첫 실행 환영 안내: 체스를 처음 하는지 묻고, 아는 사람에게는 이 게임만의 규칙 차이만 짧게 보여 줌
 export function WelcomeModal({ visible, onNewPlayer, onKnowsChess, onLater }: Props) {
   const [step, setStep] = useState<'ask' | 'rules'>('ask');
+  useModalPresence(visible);
 
   return (
     <Modal visible={visible} transparent animationType="fade">

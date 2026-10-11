@@ -10,6 +10,7 @@ import { Panel } from '../ui/Panel';
 import { PieceImage } from '../ui/PieceImage';
 import { Text } from '../ui/Text';
 import { fonts } from '../ui/fonts';
+import { useModalPresence } from '../ui/modalPresence';
 
 const NATIVE = Platform.OS !== 'web';
 
@@ -19,6 +20,7 @@ const OUTLINE: [number, number][] = [[-3, 0], [3, 0], [0, -3], [0, 3], [-2, -2],
 // 단계 시작 화면: 레드(상대)와 블루(나)가 양쪽에서 미끄러져 들어오고 VS가 튀어나옴
 export function BattleIntro({ visible, stage, onStart }: { visible: boolean; stage: Stage; onStart: () => void }) {
   const { height } = useWindowDimensions();
+  useModalPresence(visible);
   // 짧은 화면에서는 몬스터를 줄여 대사 상자와 겹치지 않게
   const hero = Math.max(96, Math.min(150, Math.round((height - 470) / 2.2)));
   const halo = { width: hero + 16, height: hero + 16, borderRadius: (hero + 16) / 2 };

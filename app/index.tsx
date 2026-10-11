@@ -2,6 +2,7 @@ import { type Href, router, useFocusEffect } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ACHIEVEMENTS } from '../src/achievements/list';
 import { track } from '../src/analytics';
 import { CAPSULES, STAGES_PER_CAPSULE, earnedBadges, opponentFor } from '../src/campaign/league';
 import { getStage, nextStageId } from '../src/campaign/stages';
@@ -43,6 +44,7 @@ export default function HomeScreen() {
   const streak = currentStreak(progress, daily.dateKey);
   const stars = totalStars(progress);
   const badges = earnedBadges(progress.campaign);
+  const achieved = Object.keys(progress.achievements).length;
   const nextId = nextStageId(progress.campaign);
   const nextStage = nextId ? getStage(nextId) : undefined;
   const opponent = nextStage ? opponentFor(nextStage) : null;
@@ -73,14 +75,19 @@ export default function HomeScreen() {
         <View style={styles.column}>
           {/* 트레이너 카드: 마스코트 + 연속 기록·별 + 규칙·설정 */}
           <Panel style={styles.trainer}>
-            <MascotFace mood="happy" size={60} />
-            <View style={styles.trainerBody}>
-              <Text style={styles.trainerName}>{strings.league.trainer}</Text>
-              <View style={styles.chips}>
-                <Chip label={`🔥 ${streak}`} />
-                <Chip label={`★ ${stars}`} />
+            <Pressable style={styles.trainerMain} onPress={() => router.push('/achievements')} accessibilityLabel={strings.achievements.title}>
+              <MascotFace mood="happy" size={60} />
+              <View style={styles.trainerBody}>
+                <Text style={styles.trainerName} numberOfLines={1}>
+                  {strings.league.trainer}
+                </Text>
+                <View style={styles.chips}>
+                  <Chip label={`🔥 ${streak}`} />
+                  <Chip label={`★ ${stars}`} />
+                  <Chip label={strings.achievements.count(achieved, ACHIEVEMENTS.length)} color={palette.sunLight} />
+                </View>
               </View>
-            </View>
+            </Pressable>
             <RulesButton source="home" />
             <Pressable style={styles.gear} onPress={() => router.push('/settings')} accessibilityLabel={strings.home.settings}>
               <Text style={styles.gearText}>⚙️</Text>
@@ -198,9 +205,10 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 17 },
 
   trainer: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12, paddingVertical: 10 },
+  trainerMain: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10 },
   trainerBody: { flex: 1, gap: 4 },
   trainerName: { fontSize: 20 },
-  chips: { flexDirection: 'row', gap: 6 },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 5 },
   gear: { width: 38, height: 38, borderRadius: 19, borderWidth: 2.5, borderColor: palette.ink, backgroundColor: palette.white, alignItems: 'center', justifyContent: 'center' },
   gearText: { fontSize: 17 },
 
