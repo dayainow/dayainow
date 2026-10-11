@@ -79,7 +79,9 @@ function StagePlay({ stage }: { stage: Stage }) {
     setEarnedStars(stars);
     loadProgress().then(before =>
       recordStageResult(stage.id, stars).then(after => {
-        setBadge(newBadge(before.campaign, after.campaign));
+        const earned = newBadge(before.campaign, after.campaign);
+        setBadge(earned);
+        if (earned) swapTimer.current = setTimeout(feedback.badge, 900);
         setBadgeCount(earnedBadges(after.campaign).length);
       })
     );

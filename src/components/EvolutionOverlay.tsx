@@ -40,7 +40,7 @@ export function EvolutionOverlay({ side, onClose }: { side: 'w' | 'b' | null; on
     ]).start(({ finished }) => {
       if (!finished) return;
       setRevealed(true);
-      feedback.clear();
+      feedback.evolve();
     });
     const rays = Animated.loop(Animated.timing(spin, { toValue: 1, duration: 9000, easing: Easing.linear, useNativeDriver: NATIVE }));
     rays.start();

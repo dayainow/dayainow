@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, Modal, Platform, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { opponentFor, stageInCapsule } from '../campaign/league';
 import type { Stage } from '../campaign/stages';
+import { feedback } from '../feedback/feedback';
 import { strings } from '../i18n';
 import { palette } from '../theme';
 import { DialogBox } from '../ui/DialogBox';
@@ -36,6 +37,7 @@ export function BattleIntro({ visible, stage, onStart }: { visible: boolean; sta
     if (!visible) return;
     enter.setValue(0);
     vs.setValue(0);
+    feedback.versus();
     Animated.sequence([
       Animated.timing(enter, { toValue: 1, duration: 380, useNativeDriver: NATIVE }),
       Animated.spring(vs, { toValue: 1, friction: 4, tension: 120, useNativeDriver: NATIVE }),

@@ -15,6 +15,9 @@ const SOUNDS = {
   clear: require('../../assets/sounds/clear.wav'),
   win: require('../../assets/sounds/win.wav'),
   lose: require('../../assets/sounds/lose.wav'),
+  versus: require('../../assets/sounds/versus.wav'),
+  evolve: require('../../assets/sounds/evolve.wav'),
+  badge: require('../../assets/sounds/badge.wav'),
 };
 
 export type SoundName = keyof typeof SOUNDS;
@@ -98,5 +101,17 @@ export const feedback = {
   lose: () => {
     playSound('lose');
     haptic('error');
+  },
+  versus: () => {
+    playSound('versus');
+    haptic('medium');
+  },
+  evolve: () => {
+    playSound('evolve');
+    haptic('success');
+  },
+  badge: () => {
+    playSound('badge');
+    haptic('success');
   },
 };

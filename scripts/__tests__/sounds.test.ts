@@ -4,7 +4,7 @@ import { join } from 'path';
 // scripts/build-sounds.mjs가 만든 파일 검사
 const ROOT = join(__dirname, '..', '..');
 const SOUND_DIR = join(ROOT, 'assets', 'sounds');
-const SOUND_NAMES = ['select', 'move', 'capture', 'check', 'star', 'wrong', 'clear', 'win', 'lose'];
+const SOUND_NAMES = ['select', 'move', 'capture', 'check', 'star', 'wrong', 'clear', 'win', 'lose', 'versus', 'evolve', 'badge'];
 
 describe('sound files', () => {
   it.each(SOUND_NAMES)('%s.wav is a short 16-bit mono PCM wave', name => {
