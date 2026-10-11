@@ -13,6 +13,7 @@ import { enableDailyReminder, isReminderSupported } from '../src/notifications';
 import { getDailyPuzzle } from '../src/puzzles/daily';
 import { type Progress, currentStreak, loadProgress, recordDailySolve } from '../src/storage/progress';
 import { DEFAULT_SETTINGS, type Settings, loadSettings, updateSettings } from '../src/storage/settings';
+import { isReviewStreak, requestReviewLater } from '../src/review';
 import { palette } from '../src/theme';
 import { Chip } from '../src/ui/Chip';
 import { DialogBox } from '../src/ui/DialogBox';
@@ -30,6 +31,7 @@ export default function DailyScreen() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [countdown, setCountdown] = useState(() => formatCountdown(msUntilNextDay(new Date())));
   const shareTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const reviewTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const play = usePuzzle({
     board: puzzle.board,
@@ -41,6 +43,7 @@ export default function DailyScreen() {
       recordDailySolve(puzzle.dateKey, attempts, hints).then(saved => {
         setProgress(saved);
         setShowResult(true);
+        if (isReviewStreak(currentStreak(saved, puzzle.dateKey))) reviewTimer.current = requestReviewLater('streak');
       });
     },
   });
@@ -54,7 +57,10 @@ export default function DailyScreen() {
       if (record?.solved) play.restoreSolved(record.attempts, record.hints ?? 0);
     });
     loadSettings().then(setSettings);
-    return () => clearTimeout(shareTimer.current);
+    return () => {
+      clearTimeout(shareTimer.current);
+      clearTimeout(reviewTimer.current);
+    };
   }, []);
 
   // 다 풀었으면 다음 퍼즐까지 남은 시간을 1초마다 갱신
