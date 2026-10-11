@@ -57,6 +57,8 @@ export default function RootLayout() {
         <Stack.Screen name="play" options={{ title: strings.screens.freePlay }} />
         <Stack.Screen name="settings" options={{ title: strings.screens.settings }} />
         <Stack.Screen name="achievements" options={{ title: strings.achievements.title }} />
+        <Stack.Screen name="practice/index" options={{ title: strings.practice.title }} />
+        <Stack.Screen name="practice/[id]" options={{ title: '' }} />
       </Stack>
       <AchievementToast />
     </RulesProvider>

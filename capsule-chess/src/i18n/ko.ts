@@ -149,6 +149,30 @@ ${'🟥'.repeat(attempts - 1)}🟩${'💡'.repeat(hints)}
     stalemate: '둘 곳이 없다! 스테일메이트로 무승부.',
     draw: '킹만 남았다! 무승부.',
   },
+  // 퍼즐 도장 (연습 퍼즐)
+  practice: {
+    title: '퍼즐 도장',
+    tile: '퍼즐 도장',
+    tileInfo: (solved: number, total: number) => `${solved} / ${total} 해결`,
+    section: (mateIn: number) => `${mateIn}수 만에 메이트`,
+    puzzleTitle: (n: number) => `퍼즐 도장 #${n}`,
+    solved: '정답!',
+    next: '다음 퍼즐',
+    list: '퍼즐 목록',
+    allSolved: '도장의 모든 퍼즐을 풀었어요!',
+    morePuzzles: '더 풀고 싶다면? 퍼즐 도장',
+    alreadySolved: '이미 푼 퍼즐이에요. 다시 풀어도 좋아요!',
+    retry: '다시 풀기',
+    instructionOne: '블루 차례예요. 한 수 만에 체크메이트하는 수를 찾아보세요!',
+  },
+  // 첫 배틀 손가락 가이드
+  guide: {
+    movePiece: '처음이죠? 반짝이는 폰을 눌러 보세요 👆',
+    moveTarget: '점이 있는 칸이 갈 수 있는 곳이에요. 반짝이는 칸을 눌러 옮겨요!',
+    capturePiece: '잡을 기회예요! 반짝이는 기물을 눌러 보세요',
+    captureTarget: '빨간 고리는 잡을 수 있는 칸! 눌러서 잡아요',
+    done: '잘했어요! 이렇게 잡으면서 상대 킹을 몰아붙여 체크메이트하면 승리예요',
+  },
   evolution: {
     title: '진화!',
     line: (side: string) => `축하해요! 끝 줄에 닿은 ${side} 폰이 퀸으로 진화했다!`,
@@ -200,6 +224,8 @@ ${'🟥'.repeat(attempts - 1)}🟩${'💡'.repeat(hints)}
       graduate: { title: '졸업', desc: '체스 배우기 레슨 모두 끝내기' },
       hard_win: { title: '강적 격파', desc: '자유 대전에서 어려움 AI 이기기' },
       pvp_game: { title: '친구와 한 판', desc: '2인 대전을 끝까지 두기' },
+      practice_10: { title: '도장 입문', desc: '퍼즐 도장에서 10문제 풀기' },
+      practice_all: { title: '도장 사범', desc: '퍼즐 도장 문제를 모두 풀기' },
     },
   },
   // 어디서든 여는 규칙 안내 (? 버튼)

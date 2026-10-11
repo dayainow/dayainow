@@ -1,6 +1,9 @@
-// 데일리 퍼즐 뱅크 생성기: 무작위 대국에서 "정답 첫 수가 하나뿐인 N수 메이트" 위치를 모아 src/puzzles/bank.json에 저장
-// 사용: node --no-warnings --import ./scripts/register-ts.mjs scripts/generate-puzzles.ts [2수 개수] [3수 개수] [시드]
-import { writeFileSync } from 'node:fs';
+// 퍼즐 뱅크 생성기: 무작위 대국에서 "정답 첫 수가 하나뿐인 N수 메이트" 위치를 모음
+// 데일리:   node --no-warnings --import ./scripts/register-ts.mjs scripts/generate-puzzles.ts [2수] [3수] [시드]
+//           → src/puzzles/bank.json (2수·3수를 섞어서)
+// 퍼즐 도장: ... generate-puzzles.ts [2수] [3수] [시드] [1수] practice.json
+//           → src/puzzles/practice.json (데일리와 겹치지 않게, 1수 → 2수 → 3수 쉬운 순서로)
+import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { INITIAL_BOARD, getAllLegalMoves, getGameStatus, isInCheck, simulateMove } from '../src/engine/chessEngine';
@@ -10,8 +13,16 @@ import { encodeBoard, mirrorBoard } from '../src/puzzles/codec';
 type Board = (string | null)[][];
 type Color = 'w' | 'b';
 
-const [count2 = 300, count3 = 100, seed = 20261001] = process.argv.slice(2).map(Number);
-const OUT = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'puzzles', 'bank.json');
+const args = process.argv.slice(2);
+const [count2 = 300, count3 = 100, seed = 20261001, count1 = 0] = args.slice(0, 4).map(Number);
+const outName = args[4] ?? 'bank.json';
+const PUZZLE_DIR = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'puzzles');
+const OUT = join(PUZZLE_DIR, outName);
+const isPractice = outName !== 'bank.json';
+// 퍼즐 도장은 데일리 문제와 겹치면 안 됨 (미리 풀어 버리면 데일리가 시시해짐)
+const excluded = new Set<string>(
+  isPractice ? JSON.parse(readFileSync(join(PUZZLE_DIR, 'bank.json'), 'utf8')).puzzles.map((p: { b: string }) => p.b) : []
+);
 
 // 재현 가능한 난수 (mulberry32)
 let state = seed >>> 0;
@@ -42,12 +53,13 @@ const isUniqueMateIn = (board: Board, attacker: Color, n: number): boolean => {
   return findMatingMoves(board, attacker, n).length === 1;
 };
 
-const found = { 2: new Map<string, number>(), 3: new Map<string, number>() };
-const target = { 2: count2, 3: count3 };
+const found = { 1: new Map<string, number>(), 2: new Map<string, number>(), 3: new Map<string, number>() };
+const target = { 1: count1, 2: count2, 3: count3 };
+const missing = (n: 1 | 2 | 3) => found[n].size < target[n];
 const startedAt = Date.now();
 let games = 0;
 
-while (found[2].size < target[2] || found[3].size < target[3]) {
+while (missing(1) || missing(2) || missing(3)) {
   games++;
   let board: Board = INITIAL_BOARD;
   let turn: Color = 'w';
@@ -56,11 +68,16 @@ while (found[2].size < target[2] || found[3].size < target[3]) {
     if (status !== 'playing' && status !== 'check') break;
 
     if (ply >= 4 && isInteresting(board, turn)) {
-      const n = found[2].size < target[2] && (found[3].size >= target[3] || random() < 0.7) ? 2 : 3;
+      // 아직 모자란 길이 중에서 고름 (1수는 쉽게 찾히니 먼저 확인)
+      const wanted = ([1, 2, 3] as const).filter(missing);
+      const n = wanted.includes(1) ? 1 : wanted.length === 2 ? (random() < 0.7 ? 2 : 3) : wanted[0];
       if (isUniqueMateIn(board, turn, n)) {
         const normalized = turn === 'w' ? board : mirrorBoard(board);
-        found[n as 2 | 3].set(encodeBoard(normalized), n);
-        break; // 비슷한 위치가 몰리지 않게 대국당 하나만
+        const code = encodeBoard(normalized);
+        if (!excluded.has(code)) {
+          found[n].set(code, n);
+          break; // 비슷한 위치가 몰리지 않게 대국당 하나만
+        }
       }
     }
 
@@ -73,17 +90,23 @@ while (found[2].size < target[2] || found[3].size < target[3]) {
   }
   if (games % 200 === 0) {
     const secs = Math.round((Date.now() - startedAt) / 1000);
-    console.log(`${games}판, 2수 ${found[2].size}/${target[2]}, 3수 ${found[3].size}/${target[3]} (${secs}초)`);
+    console.log(`${games}판, 1수 ${found[1].size}/${target[1]}, 2수 ${found[2].size}/${target[2]}, 3수 ${found[3].size}/${target[3]} (${secs}초)`);
   }
 }
 
-// 3수 퍼즐을 고르게 섞음: 4개 중 1개 꼴로 3수
+const ones = [...found[1].keys()];
 const twos = [...found[2].keys()];
 const threes = [...found[3].keys()];
 const puzzles: { b: string; n: number }[] = [];
-while (twos.length || threes.length) {
-  const useThree = threes.length > 0 && (puzzles.length % 4 === 3 || twos.length === 0);
-  puzzles.push(useThree ? { b: threes.shift()!, n: 3 } : { b: twos.shift()!, n: 2 });
+if (isPractice) {
+  // 퍼즐 도장: 쉬운 것부터 차례로
+  puzzles.push(...ones.map(b => ({ b, n: 1 })), ...twos.map(b => ({ b, n: 2 })), ...threes.map(b => ({ b, n: 3 })));
+} else {
+  // 데일리: 3수 퍼즐을 고르게 섞음 (4개 중 1개 꼴로 3수)
+  while (twos.length || threes.length) {
+    const useThree = threes.length > 0 && (puzzles.length % 4 === 3 || twos.length === 0);
+    puzzles.push(useThree ? { b: threes.shift()!, n: 3 } : { b: twos.shift()!, n: 2 });
+  }
 }
 
 writeFileSync(OUT, JSON.stringify({ version: 1, seed, puzzles }, null, 0) + '\n');

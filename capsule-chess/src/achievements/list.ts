@@ -1,8 +1,9 @@
 import { CAPSULES, earnedBadges } from '../campaign/league';
 import type { Progress } from '../storage/progress';
+import { PRACTICE_COUNT } from '../puzzles/practice';
 import { LESSONS } from '../tutorial/lessons';
 
-// 업적 13종. 판정은 저장된 진행 기록만 보고 함 (문구는 i18n strings.achievements.items)
+// 업적 15종. 판정은 저장된 진행 기록만 보고 함 (문구는 i18n strings.achievements.items)
 export type AchievementId =
   | 'first_win'
   | 'first_evolution'
@@ -16,7 +17,9 @@ export type AchievementId =
   | 'streak_7'
   | 'graduate'
   | 'hard_win'
-  | 'pvp_game';
+  | 'pvp_game'
+  | 'practice_10'
+  | 'practice_all';
 
 export type Achievement = { id: AchievementId; icon: string; color: string; check: (p: Progress) => boolean };
 
@@ -37,6 +40,8 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: 'graduate', icon: '🎓', color: '#6FDDB7', check: p => LESSONS.every(l => p.tutorial[l.id]) },
   { id: 'hard_win', icon: '💪', color: '#B18CFF', check: p => p.stats.hardWins > 0 },
   { id: 'pvp_game', icon: '🤝', color: '#58AEFF', check: p => p.stats.pvpGames > 0 },
+  { id: 'practice_10', icon: '🥋', color: '#6FDDB7', check: p => Object.keys(p.practice).length >= 10 },
+  { id: 'practice_all', icon: '🧠', color: '#B18CFF', check: p => Object.keys(p.practice).length >= PRACTICE_COUNT },
 ];
 
 // 조건을 만족했지만 아직 기록되지 않은 업적

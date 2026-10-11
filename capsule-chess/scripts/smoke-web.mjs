@@ -26,7 +26,7 @@ const TEXT = {
   en: { knowsChess: 'I know chess', openRules: 'Show rules', piecesTab: 'How pieces move', start: 'Battle start!', continue: 'Continue' },
 };
 
-const ROUTES = ['/', '/daily', '/campaign', '/campaign/1', '/play', '/learn', '/learn/knight', '/settings', '/achievements'];
+const ROUTES = ['/', '/daily', '/campaign', '/campaign/1', '/play', '/learn', '/learn/knight', '/settings', '/achievements', '/practice', '/practice/1'];
 
 const clickText = async (page, text) => {
   const done = await page.evaluate(label => {
@@ -149,6 +149,23 @@ const run = async (browser, locale) => {
     await shot(page, 'battle-reply');
     await context.close();
   }
+  // 7) 처음 하는 사람의 첫 배틀: 손가락 가이드 (폰 고르기 → 옮기기 → 잡기)
+  {
+    const { context, page } = await newPage({ ...PROGRESS, tutorial: {}, campaign: {} });
+    await page.goto(BASE + '/campaign/1', { waitUntil: 'networkidle0', timeout: 120_000 });
+    await wait(1500);
+    await clickText(page, t.start);
+    await wait(900);
+    await shot(page, 'guide-1-piece');
+    await tapSquare(page, 3, 2);
+    await wait(500);
+    await shot(page, 'guide-2-target');
+    await tapSquare(page, 2, 2);
+    await wait(2600);
+    await shot(page, 'guide-3-capture');
+    await context.close();
+  }
+
   // 6) 폰 레슨: 끝 줄에 닿아 퀸으로 진화
   {
     const { context, page } = await newPage(PROGRESS);

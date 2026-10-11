@@ -15,10 +15,11 @@ import type { Move } from '../../src/engine/chessEngine';
 import { feedback } from '../../src/feedback/feedback';
 import { battleText } from '../../src/game/battleText';
 import { battleEvent } from '../../src/game/commentary';
+import { type GuideStep, captureGuideMove, firstGuideMove } from '../../src/game/guide';
 import { powerOf } from '../../src/game/material';
 import { useChessGame } from '../../src/game/useChessGame';
 import { strings } from '../../src/i18n';
-import { loadProgress, recordStageResult, recordStat } from '../../src/storage/progress';
+import { loadProgress, recordGuideDone, recordStageResult, recordStat } from '../../src/storage/progress';
 import { palette } from '../../src/theme';
 import { CapsuleBadge } from '../../src/ui/CapsuleBadge';
 import { DialogBox } from '../../src/ui/DialogBox';
@@ -49,6 +50,10 @@ function StagePlay({ stage }: { stage: Stage }) {
   const [undos, setUndos] = useState(0); // 이번 판에서 무르기한 횟수 (다시 시작하면 0)
   const [notice, setNotice] = useState<string | null>(null); // 실황 대신 잠깐 보여 줄 안내
   const [showIntro, setShowIntro] = useState(true);
+  // 첫 배틀 가이드: 1단계를 처음 하는 사람에게만 (한 번 끝내면 다시 안 나옴)
+  const [guideEligible, setGuideEligible] = useState(false);
+  const [guide, setGuide] = useState<GuideStep | null>(null);
+  const [selected, setSelected] = useState<{ r: number; c: number } | null>(null);
   const [evolving, setEvolving] = useState<'w' | null>(null);
   const evolveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const badgeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -57,6 +62,10 @@ function StagePlay({ stage }: { stage: Stage }) {
   const maxPower = useMemo(() => ({ w: powerOf(initialBoard, 'w'), b: powerOf(initialBoard, 'b') }), [initialBoard]);
   const nextStage = getStage(stage.id + 1);
   const won = game.result?.winner === 'w';
+
+  useEffect(() => {
+    if (stage.id === 1) loadProgress().then(p => setGuideEligible(!p.guideDone && !(p.campaign[1] > 0)));
+  }, []);
 
   useEffect(() => {
     track('stage_start', { stage: stage.id });
@@ -89,10 +98,43 @@ function StagePlay({ stage }: { stage: Stage }) {
     );
   }, [game.isGameOver]);
 
+  // 가이드가 지금 추천하는 수 (내 차례일 때만)
+  const guideMove =
+    guide && guide !== 'done' && game.turn === 'w' && !game.isGameOver
+      ? guide === 'move'
+        ? game.lastMove
+          ? null
+          : firstGuideMove(game.board)
+        : captureGuideMove(game.board)
+      : null;
+
+  // 잡을 기회가 없으면 잡기 안내는 건너뛰고 마무리
+  useEffect(() => {
+    if (guide === 'capture' && game.turn === 'w' && !game.isGameOver && !guideMove) finishGuide();
+  }, [guide, game.turn, game.board]);
+
+  const startGuide = (step: GuideStep) => {
+    setGuide(step);
+    track('guide_step', { step });
+  };
+
+  const finishGuide = () => {
+    startGuide('done');
+    recordGuideDone();
+  };
+
+  // 내 수가 들어오면 가이드를 다음 단계로
+  const advanceGuide = () => {
+    if (guide === 'move') startGuide('capture');
+    else if (guide === 'capture') finishGuide();
+    else if (guide === 'done') setGuide(null);
+  };
+
   // 내 폰이 끝 줄에 닿으면 진화 연출
   const handleMove = (move: Move) => {
     const mover = game.board[move.fromR][move.fromC];
     setNotice(null);
+    advanceGuide();
     game.move(move);
     if (mover === 'wP' && move.toR === 0) {
       evolveTimer.current = setTimeout(() => {
@@ -122,7 +164,31 @@ function StagePlay({ stage }: { stage: Stage }) {
     game.reset();
     setUndos(0);
     setNotice(null);
+    if (guide === 'move' || guide === 'capture') setGuide('move');
   };
+
+  // 가이드 손가락 위치: 추천 기물 → (그 기물을 고르면) 도착 칸. 다른 기물을 고르면 숨김
+  const pickedGuidePiece = !!guideMove && selected?.r === guideMove.fromR && selected?.c === guideMove.fromC;
+  const pointer = guideMove
+    ? pickedGuidePiece
+      ? { r: guideMove.toR, c: guideMove.toC }
+      : selected
+        ? null
+        : { r: guideMove.fromR, c: guideMove.fromC }
+    : null;
+  const guideText = game.isGameOver
+    ? null
+    : guide === 'done'
+      ? strings.guide.done
+      : guideMove
+        ? guide === 'move'
+          ? pickedGuidePiece
+            ? strings.guide.moveTarget
+            : strings.guide.movePiece
+          : pickedGuidePiece
+            ? strings.guide.captureTarget
+            : strings.guide.capturePiece
+        : null;
 
   const line = battleText(
     battleEvent({
@@ -160,6 +226,8 @@ function StagePlay({ stage }: { stage: Stage }) {
         lastMove={game.lastMove}
         checkedKing={game.checkedKing}
         onMove={handleMove}
+        pointer={pointer}
+        onSelect={setSelected}
       />
 
       <View style={styles.column}>
@@ -172,7 +240,7 @@ function StagePlay({ stage }: { stage: Stage }) {
           maxPower={maxPower.w}
           active={game.turn === 'w' && !game.isGameOver}
         />
-        <DialogBox text={notice ?? line} />
+        <DialogBox text={notice ?? guideText ?? line} />
         <GameControls
           canUndo={game.canUndo}
           onUndo={() => {
@@ -186,7 +254,14 @@ function StagePlay({ stage }: { stage: Stage }) {
         />
       </View>
 
-      <BattleIntro visible={showIntro} stage={stage} onStart={() => setShowIntro(false)} />
+      <BattleIntro
+        visible={showIntro}
+        stage={stage}
+        onStart={() => {
+          setShowIntro(false);
+          if (guideEligible) startGuide('move');
+        }}
+      />
       <EvolutionOverlay side={evolving} onClose={() => setEvolving(null)} />
 
       <ResultModal

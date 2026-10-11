@@ -26,13 +26,15 @@ type Props = {
   onMove: (move: Move) => void;
   markers?: Square[]; // 튜토리얼 ★ 표시
   hint?: Square | null; // 퍼즐 힌트: 움직일 기물을 빛나게
+  pointer?: Square | null; // 첫 배틀 가이드: 이 칸을 손가락으로 가리키며 빛나게
+  onSelect?: (square: Square | null) => void; // 기물을 고르거나 선택을 풀 때 (가이드가 다음 칸을 가리키도록)
 };
 
 // 이동 연출에 필요한 정보: 움직인 기물(승급 전 모습), 잡힌 기물
 type Slide = { move: Move; mover: string; captured: string | null };
 
 // 탭으로 기물 선택 → 이동. 남는 공간에 맞춰 크기가 정해짐 (최대 400)
-export function ChessBoard({ board, sideToMove, interactive, lastMove, checkedKing, onMove, markers = [], hint = null }: Props) {
+export function ChessBoard({ board, sideToMove, interactive, lastMove, checkedKing, onMove, markers = [], hint = null, pointer = null, onSelect }: Props) {
   const [selected, setSelected] = useState<Square | null>(null);
   const [targets, setTargets] = useState<Square[]>([]);
   const [size, setSize] = useState(MAX_BOARD_SIZE);
@@ -44,6 +46,7 @@ export function ChessBoard({ board, sideToMove, interactive, lastMove, checkedKi
   const prevBoard = useRef(board);
   const prevMove = useRef(lastMove);
   const slideTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const bounce = useRef(new Animated.Value(0)).current;
 
   const cellSize = (size - BORDER * 2) / BOARD_SIZE;
   const pieceSize = Math.round(cellSize * 0.92);
@@ -55,6 +58,20 @@ export function ChessBoard({ board, sideToMove, interactive, lastMove, checkedKi
 
   // 판이 바뀌면(상대가 두거나 다시 시작) 선택 해제
   useEffect(clearSelection, [board]);
+  useEffect(() => onSelect?.(selected), [selected]);
+
+  // 가이드 손가락이 콕콕 누르듯 위아래로 움직임
+  useEffect(() => {
+    if (!pointer) return;
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(bounce, { toValue: 1, duration: 380, easing: Easing.out(Easing.quad), useNativeDriver: USE_NATIVE_DRIVER }),
+        Animated.timing(bounce, { toValue: 0, duration: 380, easing: Easing.in(Easing.quad), useNativeDriver: USE_NATIVE_DRIVER }),
+      ])
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [pointer?.r, pointer?.c]);
   useEffect(() => () => clearTimeout(slideTimer.current), []);
 
   // 새 수가 들어오면 이전 판 기준으로 미끄러지는 연출 시작 (그리기 전에 처리해서 깜빡임 없음)
@@ -126,7 +143,7 @@ export function ChessBoard({ board, sideToMove, interactive, lastMove, checkedKi
               // 연출 중에는 도착 칸의 기물을 숨기고 위에 떠 있는 기물로 보여 줌
               const hiddenBySlide = !!slide && slide.move.toR === r && slide.move.toC === c;
               const hasMarker = at({ r, c }, markers);
-              const isHint = hint?.r === r && hint?.c === c;
+              const isHint = (hint?.r === r && hint?.c === c) || (pointer?.r === r && pointer?.c === c);
 
               return (
                 <TouchableOpacity
@@ -156,6 +173,21 @@ export function ChessBoard({ board, sideToMove, interactive, lastMove, checkedKi
             })}
           </View>
         ))}
+
+        {pointer && (
+          <Animated.View
+            style={[
+              styles.pointer,
+              {
+                left: pointer.c * cellSize + cellSize * 0.4,
+                top: pointer.r * cellSize + cellSize * 0.42,
+                transform: [{ translateY: bounce.interpolate({ inputRange: [0, 1], outputRange: [0, -cellSize * 0.12] }) }],
+              },
+            ]}
+          >
+            <Text style={{ fontSize: cellSize * 0.5 }}>👆</Text>
+          </Animated.View>
+        )}
 
         {slide && (
           <>
@@ -223,4 +255,5 @@ const styles = StyleSheet.create({
   lifted: { transform: [{ scale: 1.12 }, { translateY: -4 }] },
   hidden: { opacity: 0 },
   floating: { position: 'absolute', justifyContent: 'center', alignItems: 'center', zIndex: 10, pointerEvents: 'none' },
+  pointer: { position: 'absolute', zIndex: 20, pointerEvents: 'none' },
 });

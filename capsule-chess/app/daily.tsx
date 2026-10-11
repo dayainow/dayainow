@@ -1,15 +1,13 @@
 import { router } from 'expo-router';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { track } from '../src/analytics';
 import { nextStageId } from '../src/campaign/stages';
 import { ChessBoard } from '../src/components/ChessBoard';
 import { ResultModal } from '../src/components/ResultModal';
 import { MODAL_SWAP_MS, ShareCardModal } from '../src/components/ShareCard';
-import { type Move, findKing, isInCheck, simulateMove } from '../src/engine/chessEngine';
-import { findMatingMoves, forcesMate, isCheckmated, pickStubbornReply } from '../src/engine/mateSolver';
-import { feedback } from '../src/feedback/feedback';
+import { usePuzzle } from '../src/game/usePuzzle';
 import { strings } from '../src/i18n';
 import { enableDailyReminder, isReminderSupported } from '../src/notifications';
 import { getDailyPuzzle } from '../src/puzzles/daily';
@@ -26,39 +24,37 @@ import { formatCountdown, msUntilNextDay } from '../src/utils/date';
 
 export default function DailyScreen() {
   const puzzle = useMemo(() => getDailyPuzzle(), []);
-  const [board, setBoard] = useState(puzzle.board);
-  const [turn, setTurn] = useState<'w' | 'b'>('w');
-  const [movesLeft, setMovesLeft] = useState(puzzle.mateIn);
-  const [lastMove, setLastMove] = useState<Move | null>(null);
-  const [attempts, setAttempts] = useState(1);
-  const [hints, setHints] = useState(0);
-  const [hintSquare, setHintSquare] = useState<{ r: number; c: number } | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-  const [solved, setSolved] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [showShare, setShowShare] = useState(false);
   const [progress, setProgress] = useState<Progress | null>(null);
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [countdown, setCountdown] = useState(() => formatCountdown(msUntilNextDay(new Date())));
-  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const shareTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  const later = (fn: () => void, ms: number) => {
-    timers.current.push(setTimeout(fn, ms));
-  };
+  const play = usePuzzle({
+    board: puzzle.board,
+    mateIn: puzzle.mateIn,
+    onHint: () => track('daily_hint', { number: puzzle.number }),
+    onWrong: attempt => track('daily_wrong', { number: puzzle.number, attempt }),
+    onSolved: (attempts, hints) => {
+      track('daily_solved', { number: puzzle.number, attempts, hints });
+      recordDailySolve(puzzle.dateKey, attempts, hints).then(saved => {
+        setProgress(saved);
+        setShowResult(true);
+      });
+    },
+  });
+  const { solved, attempts, hints, setMessage } = play;
 
   useEffect(() => {
     loadProgress().then(saved => {
       setProgress(saved);
       const record = saved.daily.records[puzzle.dateKey];
       track('daily_open', { number: puzzle.number, solved: !!record?.solved });
-      if (record?.solved) {
-        setSolved(true);
-        setAttempts(record.attempts);
-        setHints(record.hints ?? 0);
-      }
+      if (record?.solved) play.restoreSolved(record.attempts, record.hints ?? 0);
     });
     loadSettings().then(setSettings);
-    return () => timers.current.forEach(clearTimeout);
+    return () => clearTimeout(shareTimer.current);
   }, []);
 
   // 다 풀었으면 다음 퍼즐까지 남은 시간을 1초마다 갱신
@@ -68,74 +64,13 @@ export default function DailyScreen() {
     return () => clearInterval(tick);
   }, [solved]);
 
-  const restart = () => {
-    setBoard(puzzle.board);
-    setTurn('w');
-    setMovesLeft(puzzle.mateIn);
-    setLastMove(null);
-    setHintSquare(null);
-  };
-
-  // 힌트: 지금 움직여야 할 기물을 빛나게 (같은 위치에서 다시 눌러도 횟수는 한 번만)
-  const showHint = () => {
-    if (solved || turn !== 'w' || hintSquare) return;
-    const [key] = findMatingMoves(board, 'w', movesLeft);
-    if (!key) return;
-    setHintSquare({ r: key.fromR, c: key.fromC });
-    setHints(n => n + 1);
-    track('daily_hint', { number: puzzle.number });
-    setMessage(strings.daily.hintShown);
-  };
-
-  const handleMove = (move: Move) => {
-    const after = simulateMove(board, move);
-    setBoard(after);
-    setLastMove(move);
-    setTurn('b');
-    setHintSquare(null);
-
-    // 남은 수 안에 메이트를 강제하지 못하는 수면 오답: 잠깐 보여 준 뒤 처음부터
-    if (!forcesMate(after, 'w', movesLeft)) {
-      setMessage(strings.daily.wrong);
-      later(feedback.wrong, 250);
-      track('daily_wrong', { number: puzzle.number, attempt: attempts });
-      later(() => {
-        setAttempts(n => n + 1);
-        restart();
-      }, 900);
-      return;
-    }
-
-    setMessage(null);
-    if (isCheckmated('b', after)) {
-      later(feedback.win, 250);
-      track('daily_solved', { number: puzzle.number, attempts, hints });
-      recordDailySolve(puzzle.dateKey, attempts, hints).then(saved => {
-        setProgress(saved);
-        setSolved(true);
-        setShowResult(true);
-      });
-      return;
-    }
-
-    // 레드는 가장 끈질기게 버티는 수로 응수
-    later(() => {
-      const reply = pickStubbornReply(after, 'w', movesLeft);
-      if (!reply) return;
-      setBoard(simulateMove(after, reply));
-      setLastMove(reply);
-      setTurn('w');
-      setMovesLeft(n => n - 1);
-    }, 600);
-  };
-
   const streak = progress ? currentStreak(progress, puzzle.dateKey) : 0;
 
   // 결과 카드 미리보기를 열어 이미지나 텍스트로 공유
   // 결과 창이 닫히는 애니메이션이 끝난 뒤 공유 창을 띄움 (iOS는 두 창을 동시에 띄우지 못함)
   const share = () => {
     setShowResult(false);
-    later(() => setShowShare(true), MODAL_SWAP_MS);
+    shareTimer.current = setTimeout(() => setShowShare(true), MODAL_SWAP_MS);
   };
   const shareContent = { kind: 'daily' as const, number: puzzle.number, mateIn: puzzle.mateIn, attempts, hints, streak: Math.max(streak, 1) };
 
@@ -156,7 +91,6 @@ export default function DailyScreen() {
     router.push(next ? `/campaign/${next}` : '/campaign');
   };
 
-  const checkedKing = isInCheck(turn, board) ? findKing(turn, board) : null;
   const askReminder = solved && isReminderSupported && !settings.reminderEnabled && !settings.reminderPromptDismissed;
 
   useEffect(() => {
@@ -171,23 +105,23 @@ export default function DailyScreen() {
             <Text style={styles.kicker}>{strings.daily.title(puzzle.number)}</Text>
             <Text style={styles.title}>{strings.daily.mateIn(puzzle.mateIn)}</Text>
           </View>
-          {!solved && <Chip label={strings.daily.movesLeft(movesLeft)} />}
+          {!solved && <Chip label={strings.daily.movesLeft(play.movesLeft)} />}
           {solved && <Chip label={`🔥 ${Math.max(streak, 1)}`} />}
         </Panel>
       </View>
 
       <ChessBoard
-        board={board}
+        board={play.board}
         sideToMove="w"
-        interactive={!solved && turn === 'w'}
-        lastMove={lastMove}
-        checkedKing={checkedKing}
-        onMove={handleMove}
-        hint={hintSquare}
+        interactive={!solved && play.turn === 'w'}
+        lastMove={play.lastMove}
+        checkedKing={play.checkedKing}
+        onMove={play.handleMove}
+        hint={play.hintSquare}
       />
 
       <View style={styles.column}>
-        <DialogBox text={message ?? (solved ? strings.daily.alreadySolved : strings.daily.instruction)} />
+        <DialogBox text={play.message ?? (solved ? strings.daily.alreadySolved : strings.daily.instruction)} />
         {solved ? (
           <>
             <Text style={styles.countdown}>{strings.daily.nextPuzzleIn(countdown)}</Text>
@@ -195,6 +129,10 @@ export default function DailyScreen() {
               <GameButton label={strings.daily.share} onPress={share} style={styles.flex} />
               <GameButton label={strings.daily.continueCampaign} onPress={continueCampaign} variant="white" style={styles.flex} />
             </View>
+            {/* 하루 한 판이 아쉬운 사람에게: 퍼즐 도장 */}
+            <Pressable onPress={() => router.push('/practice')} hitSlop={8}>
+              <Text style={styles.more}>{strings.practice.morePuzzles} ›</Text>
+            </Pressable>
             {askReminder && (
               <Panel style={styles.reminder}>
                 <Text style={styles.reminderTitle}>{strings.daily.reminderTitle}</Text>
@@ -207,7 +145,7 @@ export default function DailyScreen() {
             )}
           </>
         ) : (
-          <GameButton label={strings.daily.hint} onPress={showHint} variant="white" disabled={turn !== 'w' || !!hintSquare} />
+          <GameButton label={strings.daily.hint} onPress={play.showHint} variant="white" disabled={!play.canHint} />
         )}
       </View>
 
@@ -243,6 +181,7 @@ const styles = StyleSheet.create({
   kicker: { fontSize: 14, color: '#7A5B00' },
   title: { fontSize: 22 },
   countdown: { fontSize: 15, color: palette.inkSoft, textAlign: 'center' },
+  more: { fontSize: 15, color: palette.blueDark, textAlign: 'center' },
   row: { flexDirection: 'row', gap: 10, justifyContent: 'center' },
   flex: { flex: 1 },
   reminder: { alignItems: 'center', gap: 6, padding: 12 },
