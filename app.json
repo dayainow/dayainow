@@ -27,6 +27,9 @@
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.SYSTEM_ALERT_WINDOW"
+      ],
+      "permissions": [
+        "android.permission.MODIFY_AUDIO_SETTINGS"
       ]
     },
     "web": {
@@ -64,6 +67,13 @@
       ],
       "expo-sharing",
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "247014e9-5939-4c8d-a8c5-c47bdd498aa9"
+      }
+    },
+    "owner": "dayainow"
   }
 }
