@@ -15,7 +15,7 @@ const FILL: Record<ButtonVariant, string> = {
 };
 
 // 웹에서 창이 열릴 때 첫 버튼에 생기는 포커스 테두리를 숨김 (키보드 사용자는 눌린 효과로 구분)
-const NO_FOCUS_RING = Platform.OS === 'web' ? ({ outlineStyle: 'none' } as ViewStyle) : null;
+const NO_FOCUS_RING: ViewStyle | null = Platform.OS === 'web' ? { outlineWidth: 0 } : null;
 
 type Props = {
   label: string;
