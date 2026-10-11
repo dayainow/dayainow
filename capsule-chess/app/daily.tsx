@@ -6,7 +6,7 @@ import { track } from '../src/analytics';
 import { nextStageId } from '../src/campaign/stages';
 import { ChessBoard } from '../src/components/ChessBoard';
 import { ResultModal } from '../src/components/ResultModal';
-import { ShareCardModal } from '../src/components/ShareCard';
+import { MODAL_SWAP_MS, ShareCardModal } from '../src/components/ShareCard';
 import { type Move, findKing, isInCheck, simulateMove } from '../src/engine/chessEngine';
 import { findMatingMoves, forcesMate, isCheckmated, pickStubbornReply } from '../src/engine/mateSolver';
 import { feedback } from '../src/feedback/feedback';
@@ -132,11 +132,12 @@ export default function DailyScreen() {
   const streak = progress ? currentStreak(progress, puzzle.dateKey) : 0;
 
   // 결과 카드 미리보기를 열어 이미지나 텍스트로 공유
+  // 결과 창이 닫히는 애니메이션이 끝난 뒤 공유 창을 띄움 (iOS는 두 창을 동시에 띄우지 못함)
   const share = () => {
     setShowResult(false);
-    setShowShare(true);
+    later(() => setShowShare(true), MODAL_SWAP_MS);
   };
-  const shareData = { number: puzzle.number, mateIn: puzzle.mateIn, attempts, hints, streak: Math.max(streak, 1) };
+  const shareContent = { kind: 'daily' as const, number: puzzle.number, mateIn: puzzle.mateIn, attempts, hints, streak: Math.max(streak, 1) };
 
   const turnOnReminder = async () => {
     const enabled = await enableDailyReminder();
@@ -213,8 +214,7 @@ export default function DailyScreen() {
       <ShareCardModal
         visible={showShare}
         onClose={() => setShowShare(false)}
-        data={shareData}
-        text={strings.daily.shareText(shareData.number, shareData.mateIn, shareData.attempts, shareData.streak, shareData.hints)}
+        content={shareContent}
         onCopied={() => {
           setShowShare(false);
           setMessage(strings.daily.copied);

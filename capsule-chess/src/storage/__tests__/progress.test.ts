@@ -1,8 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
+  applyAchievements,
   applyDailySolve,
   applyLessonDone,
   applyStageResult,
+  backfillAchievements,
   currentStreak,
   emptyProgress,
   loadProgress,
@@ -10,6 +12,7 @@ import {
   recordLessonDone,
   recordOnboarded,
   recordStageResult,
+  recordStat,
   resetProgress,
   totalStars,
 } from '../progress';
@@ -114,5 +117,49 @@ describe('progress storage', () => {
   it('survives broken stored data', async () => {
     await AsyncStorage.setItem('progress:v1', '{oops');
     expect(await loadProgress()).toEqual(emptyProgress());
+  });
+});
+
+describe('achievements', () => {
+  it('unlocks once, stamped with the date, when the condition is first met', () => {
+    const first = applyAchievements(applyStageResult(emptyProgress(), 1, 3), '2026-10-11');
+    expect(first.earned).toEqual(expect.arrayContaining(['first_win', 'perfect']));
+    expect(first.next.achievements.first_win).toBe('2026-10-11');
+    expect(applyAchievements(first.next, '2026-10-12').earned).toEqual([]);
+  });
+
+  it('counts stats for wins, evolutions and two-player games', async () => {
+    await recordStat('evolutions');
+    const saved = await recordStat('pvpGames');
+    expect(saved.stats).toMatchObject({ evolutions: 1, pvpGames: 1, wins: 0 });
+    expect(Object.keys(saved.achievements)).toEqual(expect.arrayContaining(['first_evolution', 'pvp_game']));
+  });
+
+  it('fills in old saves without stats or achievements', async () => {
+    await AsyncStorage.setItem('progress:v1', JSON.stringify({ onboarded: true, campaign: { 1: 1 } }));
+    const loaded = await loadProgress();
+    expect(loaded.stats).toEqual({ wins: 0, hardWins: 0, evolutions: 0, pvpGames: 0 });
+    expect(loaded.achievements).toEqual({});
+    await backfillAchievements();
+    expect((await loadProgress()).achievements.first_win).toBeDefined();
+  });
+});
+
+describe('concurrent saves', () => {
+  it('keeps both writes when a stat and a stage result land together', async () => {
+    await Promise.all([recordStat('evolutions'), recordStageResult(3, 2), recordStat('wins')]);
+    const saved = await loadProgress();
+    expect(saved.campaign[3]).toBe(2);
+    expect(saved.stats).toMatchObject({ evolutions: 1, wins: 1 });
+  });
+});
+
+describe('reset while saving', () => {
+  it('stays reset even if a save was already queued', async () => {
+    await recordStageResult(1, 3);
+    const pending = recordStat('wins');
+    await resetProgress();
+    await pending;
+    expect((await loadProgress()).campaign).toEqual({});
   });
 });

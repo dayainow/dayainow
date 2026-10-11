@@ -10,7 +10,7 @@ export type AnalyticsEvents = {
   daily_hint: { number: number };
   daily_wrong: { number: number; attempt: number };
   daily_solved: { number: number; attempts: number; hints: number };
-  share: { source: 'daily'; format: 'image' | 'text' };
+  share: { source: 'daily' | 'stage' | 'badge'; format: 'image' | 'text' };
   reminder_prompt: { action: 'shown' | 'enabled' | 'denied' | 'dismissed' };
   stage_start: { stage: number };
   stage_end: { stage: number; result: 'win' | 'lose' | 'draw'; moves: number; stars: number; undos: number };
@@ -18,6 +18,7 @@ export type AnalyticsEvents = {
   undo: { screen: 'play' | 'stage' };
   setting_change: { key: string; value: boolean | string };
   rules_open: { source: 'home' | 'header' | 'learn' };
+  achievement: { id: string };
 };
 
 export type AnalyticsSink = (event: string, props: Record<string, unknown>) => void;

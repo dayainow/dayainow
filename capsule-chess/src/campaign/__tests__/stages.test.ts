@@ -42,6 +42,12 @@ describe('campaign stages', () => {
     expect(starsFor(stage, stage.par + 7)).toBe(1);
   });
 
+  it('caps the reward at two stars once undo is used', () => {
+    const stage = getStage(1)!;
+    expect(starsFor(stage, stage.par, 1)).toBe(2);
+    expect(starsFor(stage, stage.par + 7, 3)).toBe(1);
+  });
+
   it('points "continue" at the first unlocked stage not yet cleared', () => {
     expect(nextStageId({})).toBe(1);
     expect(nextStageId({ 1: 3, 2: 1 })).toBe(3);

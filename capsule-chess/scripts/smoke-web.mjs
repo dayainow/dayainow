@@ -22,11 +22,11 @@ const PROGRESS = {
 };
 
 const TEXT = {
-  ko: { knowsChess: '체스를 알아요', openRules: '규칙 보기', piecesTab: '기물 움직임', start: '배틀 시작!' },
-  en: { knowsChess: 'I know chess', openRules: 'Show rules', piecesTab: 'How pieces move', start: 'Battle start!' },
+  ko: { knowsChess: '체스를 알아요', openRules: '규칙 보기', piecesTab: '기물 움직임', start: '배틀 시작!', continue: '계속하기' },
+  en: { knowsChess: 'I know chess', openRules: 'Show rules', piecesTab: 'How pieces move', start: 'Battle start!', continue: 'Continue' },
 };
 
-const ROUTES = ['/', '/daily', '/campaign', '/campaign/1', '/play', '/learn', '/learn/knight', '/settings'];
+const ROUTES = ['/', '/daily', '/campaign', '/campaign/1', '/play', '/learn', '/learn/knight', '/settings', '/achievements'];
 
 const clickText = async (page, text) => {
   const done = await page.evaluate(label => {
@@ -164,6 +164,10 @@ const run = async (browser, locale) => {
     await shot(page, 'evolution-flicker');
     await wait(1800);
     await shot(page, 'evolution');
+    // 연출을 닫으면 업적 알림(첫 진화)이 내려옴
+    await clickText(page, t.continue);
+    await wait(900);
+    await shot(page, 'achievement-toast');
     await context.close();
   }
   return errors;

@@ -10,7 +10,7 @@
 |---|---|---|
 | 개인정보처리방침 페이지 | 초안 완료 `site/privacy/index.html` | **문의 이메일 넣고 공개 주소에 올려야 함** (아래 4번) |
 | 스토어 아이콘 512×512 | `assets/store/play-icon.png` | |
-| 대표 이미지 1024×500 | `assets/store/feature-ko.png`, `feature-en.png` | |
+| 대표 이미지 1024×500 | `assets/store/feature-ko.png`, `feature-en.png` | `node design/feature.mjs`로 다시 만들기 |
 | 휴대폰 스크린샷 1080×2160 | `assets/store/screenshots/ko/`, `en/` (각 6장) | `node scripts/store-screenshots.mjs`로 다시 찍기 |
 | 첫 AAB | 아직 | `npx eas-cli build -p android --profile production` |
 | 테스터 12명 이상 | 모집 필요 | Gmail(구글 계정) 이메일 주소 |

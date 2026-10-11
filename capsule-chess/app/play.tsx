@@ -14,6 +14,7 @@ import { battleEvent } from '../src/game/commentary';
 import { powerOf } from '../src/game/material';
 import { useChessGame } from '../src/game/useChessGame';
 import { strings } from '../src/i18n';
+import { recordStat } from '../src/storage/progress';
 import { DEFAULT_SETTINGS, loadSettings, updateSettings } from '../src/storage/settings';
 import { palette, sideColors } from '../src/theme';
 import { DialogBox } from '../src/ui/DialogBox';
@@ -31,6 +32,8 @@ export default function FreePlayScreen() {
   const [difficulty, setDifficulty] = useState<Difficulty>(DEFAULT_SETTINGS.difficulty); // 게임 중 바꾸면 AI의 다음 수부터 적용
   const [evolving, setEvolving] = useState<'w' | 'b' | null>(null);
   const evolveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  // 이번 판 도중에 난이도를 바꿨는지 (바꿨으면 어려움 승리로 인정하지 않음)
+  const levelChanged = useRef(false);
   const vsAi = gameMode === 'pve';
   const game = useChessGame({ ai: vsAi ? { depth: DIFFICULTY_DEPTH[difficulty] } : null });
   const { result } = game;
@@ -43,6 +46,7 @@ export default function FreePlayScreen() {
   // 난이도 버튼은 누를 때마다 쉬움 → 보통 → 어려움 순서로 바뀜
   const cycleDifficulty = () => {
     const level = LEVELS[(LEVELS.indexOf(difficulty) + 1) % LEVELS.length];
+    if (game.lastMove) levelChanged.current = true;
     setDifficulty(level);
     updateSettings({ difficulty: level });
   };
@@ -51,15 +55,31 @@ export default function FreePlayScreen() {
   const playerLost = vsAi && result?.winner === 'b';
   useEffect(() => {
     if (!game.isGameOver) return;
-    track('free_play_end', { mode: gameMode, difficulty, result: !result?.winner ? 'draw' : playerLost ? 'lose' : 'win' });
+    const playedLevel = levelChanged.current ? 'mixed' : difficulty;
+    track('free_play_end', { mode: gameMode, difficulty: playedLevel, result: !result?.winner ? 'draw' : playerLost ? 'lose' : 'win' });
+    // 업적용 기록
+    if (!vsAi) recordStat('pvpGames');
+    else if (result?.winner === 'w') {
+      // 저장이 겹치지 않게 차례로 기록
+      recordStat('wins').then(() => {
+        if (playedLevel === 'hard') recordStat('hardWins');
+      });
+    }
     if (!result?.winner) feedback.clear();
     else if (playerLost) feedback.lose();
     else feedback.win();
   }, [game.isGameOver]);
 
+  // 새 판: 대기 중인 진화 연출과 난이도 변경 표시도 함께 초기화
+  const newGame = () => {
+    clearTimeout(evolveTimer.current);
+    levelChanged.current = false;
+    game.reset();
+  };
+
   const switchMode = (mode: 'pvp' | 'pve') => {
     setGameMode(mode);
-    game.reset();
+    newGame();
   };
 
   // 사람이 둔 폰이 끝 줄에 닿으면 진화 연출 (AI의 진화는 대사로만)
@@ -67,7 +87,12 @@ export default function FreePlayScreen() {
     const mover = game.board[move.fromR][move.fromC];
     game.move(move);
     const lastRow = mover === 'wP' ? 0 : mover === 'bP' ? BOARD_SIZE - 1 : -1;
-    if (move.toR === lastRow) evolveTimer.current = setTimeout(() => setEvolving(mover![0] as 'w' | 'b'), EVOLVE_DELAY);
+    if (move.toR === lastRow) {
+      evolveTimer.current = setTimeout(() => {
+        setEvolving(mover![0] as 'w' | 'b');
+        recordStat('evolutions');
+      }, EVOLVE_DELAY);
+    }
   };
 
   const line = battleText(
@@ -136,10 +161,11 @@ export default function FreePlayScreen() {
         <GameControls
           canUndo={game.canUndo}
           onUndo={() => {
+            clearTimeout(evolveTimer.current);
             game.undo();
             track('undo', { screen: 'play' });
           }}
-          onRestart={() => game.reset()}
+          onRestart={newGame}
         />
       </View>
 
@@ -158,7 +184,7 @@ export default function FreePlayScreen() {
               : strings.result.drawDetail
         }
         detailColor={result?.winner ? sideColors[result.winner] : palette.inkSoft}
-        primary={{ label: strings.result.playAgain, onPress: () => game.reset() }}
+        primary={{ label: strings.result.playAgain, onPress: newGame }}
       />
     </SafeAreaView>
   );

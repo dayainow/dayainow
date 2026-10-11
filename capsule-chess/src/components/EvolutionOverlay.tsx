@@ -8,6 +8,7 @@ import { GameButton } from '../ui/GameButton';
 import { PieceImage } from '../ui/PieceImage';
 import { Text } from '../ui/Text';
 import { hardShadow } from '../ui/textShadow';
+import { useModalPresence } from '../ui/modalPresence';
 
 const NATIVE = Platform.OS !== 'web';
 const STAGE = 200; // 가운데 몬스터 크기
@@ -20,6 +21,7 @@ export function EvolutionOverlay({ side, onClose }: { side: 'w' | 'b' | null; on
   const reveal = useRef(new Animated.Value(0)).current;
   const spin = useRef(new Animated.Value(0)).current;
   const [revealed, setRevealed] = useState(false);
+  useModalPresence(!!side);
 
   useEffect(() => {
     if (!side) return;
@@ -38,7 +40,7 @@ export function EvolutionOverlay({ side, onClose }: { side: 'w' | 'b' | null; on
     ]).start(({ finished }) => {
       if (!finished) return;
       setRevealed(true);
-      feedback.clear();
+      feedback.evolve();
     });
     const rays = Animated.loop(Animated.timing(spin, { toValue: 1, duration: 9000, easing: Easing.linear, useNativeDriver: NATIVE }));
     rays.start();

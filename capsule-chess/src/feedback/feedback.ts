@@ -15,6 +15,9 @@ const SOUNDS = {
   clear: require('../../assets/sounds/clear.wav'),
   win: require('../../assets/sounds/win.wav'),
   lose: require('../../assets/sounds/lose.wav'),
+  versus: require('../../assets/sounds/versus.wav'),
+  evolve: require('../../assets/sounds/evolve.wav'),
+  badge: require('../../assets/sounds/badge.wav'),
 };
 
 export type SoundName = keyof typeof SOUNDS;
@@ -44,6 +47,8 @@ export const initFeedback = async (): Promise<void> => {
 const playSound = (name: SoundName) => {
   if (!getCachedSettings().soundEnabled) return;
   try {
+    // 웹 브라우저는 사용자가 화면을 한 번도 누르지 않았으면 소리 재생을 거부하고 오류를 냄 → 그때는 건너뜀
+    if (Platform.OS === 'web' && navigator.userActivation && !navigator.userActivation.hasBeenActive) return;
     const player = playerFor(name);
     player.seekTo(0);
     player.play();
@@ -98,5 +103,17 @@ export const feedback = {
   lose: () => {
     playSound('lose');
     haptic('error');
+  },
+  versus: () => {
+    playSound('versus');
+    haptic('medium');
+  },
+  evolve: () => {
+    playSound('evolve');
+    haptic('success');
+  },
+  badge: () => {
+    playSound('badge');
+    haptic('success');
   },
 };

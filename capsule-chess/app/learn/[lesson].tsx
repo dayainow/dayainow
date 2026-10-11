@@ -10,7 +10,7 @@ import { isCheckmated } from '../../src/engine/mateSolver';
 import { track } from '../../src/analytics';
 import { feedback } from '../../src/feedback/feedback';
 import { strings } from '../../src/i18n';
-import { recordLessonDone } from '../../src/storage/progress';
+import { recordLessonDone, recordStat } from '../../src/storage/progress';
 import { palette } from '../../src/theme';
 import { DialogBox } from '../../src/ui/DialogBox';
 import { GameButton } from '../../src/ui/GameButton';
@@ -52,6 +52,7 @@ function LessonPlay({ lesson }: { lesson: Lesson }) {
   );
 
   const restart = () => {
+    clearTimeout(evolveTimer.current);
     setBoard(lesson.board);
     setStars(lesson.stars);
     setLastMove(null);
@@ -77,7 +78,12 @@ function LessonPlay({ lesson }: { lesson: Lesson }) {
   // 튜토리얼에서는 블루만 계속 둠 (레드는 움직이지 않는 목표물)
   const handleMove = (move: Move) => {
     // 폰이 끝 줄에 닿으면 진화 연출 (폰 레슨의 마지막 ★)
-    if (board[move.fromR][move.fromC] === 'wP' && move.toR === 0) evolveTimer.current = setTimeout(() => setEvolving('w'), 420);
+    if (board[move.fromR][move.fromC] === 'wP' && move.toR === 0) {
+      evolveTimer.current = setTimeout(() => {
+        setEvolving('w');
+        recordStat('evolutions');
+      }, 420);
+    }
     const after = simulateMove(board, move);
     setBoard(after);
     setLastMove(move);

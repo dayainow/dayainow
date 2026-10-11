@@ -49,6 +49,22 @@ const click = ({ duration = 0.006, gain = 0.3 }) => {
   return out;
 };
 
+// 음높이가 쭉 올라가는 "슈웅" (VS 등장, 진화 직전)
+const riser = ({ from, to, duration, gain = 0.4 }) => {
+  const out = new Float32Array(samplesFor(duration));
+  let phase = 0;
+  for (let i = 0; i < out.length; i++) {
+    const t = i / RATE;
+    const freq = from * Math.pow(to / from, t / duration);
+    phase += (2 * Math.PI * freq) / RATE;
+    // 서서히 커졌다가 끝에서 빠르게 사라짐 + 살짝 떨림
+    const envelope = Math.min(1, t / (duration * 0.7)) * Math.min(1, (duration - t) / 0.03);
+    const wobble = 1 + 0.25 * Math.sin(2 * Math.PI * 18 * t);
+    out[i] = Math.sin(phase) * envelope * wobble * gain;
+  }
+  return out;
+};
+
 // [소리, 시작 시각(초)] 목록을 겹쳐서 하나로
 const mix = (...parts) => {
   const length = Math.max(...parts.map(([sound, at]) => samplesFor(at) + sound.length));
@@ -65,7 +81,7 @@ const mix = (...parts) => {
   return out;
 };
 
-const NOTE = { C4: 262, E4: 330, G4: 392, C5: 523, E5: 659, G5: 784, C6: 1047, E6: 1319, A6: 1760, C7: 2093 };
+const NOTE = { C4: 262, E4: 330, G4: 392, C5: 523, E5: 659, G5: 784, C6: 1047, E6: 1319, G6: 1568, A6: 1760, C7: 2093 };
 
 const SOUNDS = {
   select: mix([pop({ from: 1100, to: 800, duration: 0.05, decay: 60, gain: 0.35 }), 0]),
@@ -88,6 +104,31 @@ const SOUNDS = {
     [bell({ freq: NOTE.E5, duration: 0.25, decay: 8, gain: 0.4 }), 0.09],
     [bell({ freq: NOTE.G5, duration: 0.25, decay: 8, gain: 0.4 }), 0.18],
     [bell({ freq: NOTE.C6, duration: 0.7, decay: 5, gain: 0.45 }), 0.27]
+  ),
+  // VS 등장: 슈웅 → 쿵 → 짠
+  versus: mix(
+    [riser({ from: 220, to: 880, duration: 0.26, gain: 0.35 }), 0],
+    [pop({ from: 200, to: 60, duration: 0.22, decay: 14, gain: 0.9 }), 0.25],
+    [click({ duration: 0.02, gain: 0.4 }), 0.25],
+    [bell({ freq: NOTE.G5, duration: 0.3, decay: 9, gain: 0.32 }), 0.3],
+    [bell({ freq: NOTE.C6, duration: 0.45, decay: 7, gain: 0.32 }), 0.3]
+  ),
+  // 진화: 빠르게 올라가는 반짝임 → 높은 종소리
+  evolve: mix(
+    [riser({ from: 400, to: 1600, duration: 0.35, gain: 0.22 }), 0],
+    ...[NOTE.C5, NOTE.E5, NOTE.G5, NOTE.C6, NOTE.E6, NOTE.G6].map((freq, i) => [bell({ freq, duration: 0.18, decay: 16, gain: 0.3 }), 0.05 + i * 0.055]),
+    [bell({ freq: NOTE.C7, duration: 0.7, decay: 5, gain: 0.35 }), 0.4],
+    [bell({ freq: NOTE.G6, duration: 0.7, decay: 5, gain: 0.25 }), 0.4]
+  ),
+  // 배지 획득: 짧은 팡파르
+  badge: mix(
+    [bell({ freq: NOTE.G4, duration: 0.14, decay: 14, gain: 0.38 }), 0],
+    [bell({ freq: NOTE.C5, duration: 0.14, decay: 14, gain: 0.38 }), 0.1],
+    [bell({ freq: NOTE.E5, duration: 0.14, decay: 14, gain: 0.38 }), 0.2],
+    [bell({ freq: NOTE.G5, duration: 0.2, decay: 10, gain: 0.4 }), 0.3],
+    [bell({ freq: NOTE.E5, duration: 0.12, decay: 16, gain: 0.34 }), 0.46],
+    [bell({ freq: NOTE.C6, duration: 0.6, decay: 5, gain: 0.45 }), 0.56],
+    [bell({ freq: NOTE.G5, duration: 0.6, decay: 5, gain: 0.3 }), 0.56]
   ),
   lose: mix(
     [bell({ freq: NOTE.G4, duration: 0.3, decay: 7, gain: 0.38 }), 0],

@@ -5,6 +5,7 @@ import { GameButton } from '../ui/GameButton';
 import { Panel } from '../ui/Panel';
 import { Text } from '../ui/Text';
 import { Confetti } from './Confetti';
+import { useModalPresence } from '../ui/modalPresence';
 
 type Action = { label: string; onPress: () => void };
 
@@ -22,6 +23,7 @@ type Props = {
 
 // 게임 결과 창: RPG 창 모양 + 장난감 버튼
 export function ResultModal({ visible, art, title, detail, detailColor = palette.inkSoft, extra, primary, secondary, celebrate = false }: Props) {
+  useModalPresence(visible);
   return (
     <Modal visible={visible} transparent animationType="fade" statusBarTranslucent navigationBarTranslucent>
       <View style={styles.overlay}>
