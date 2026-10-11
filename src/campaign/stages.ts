@@ -53,9 +53,14 @@ export const getStage = (id: number): Stage | undefined => STAGES.find(s => s.id
 export const buildStageBoard = (stage: Stage): (string | null)[][] =>
   INITIAL_BOARD.map(row => row.map(piece => (piece && stage.removed.includes(piece) ? null : piece)));
 
-// 이겼을 때 별 개수: 목표 수 이내 3개, 목표+6수 이내 2개, 그 외 1개
-export const starsFor = (stage: Stage, blueMoves: number): number =>
-  blueMoves <= stage.par ? 3 : blueMoves <= stage.par + 6 ? 2 : 1;
+// 무르기를 한 번이라도 쓰면 받을 수 있는 최대 별 (★★★는 무르기 없이만)
+export const UNDO_STAR_CAP = 2;
+
+// 이겼을 때 별 개수: 목표 수 이내 3개, 목표+6수 이내 2개, 그 외 1개. 무르기를 썼으면 최대 2개
+export const starsFor = (stage: Stage, blueMoves: number, undos = 0): number => {
+  const stars = blueMoves <= stage.par ? 3 : blueMoves <= stage.par + 6 ? 2 : 1;
+  return undos > 0 ? Math.min(stars, UNDO_STAR_CAP) : stars;
+};
 
 export const isStageUnlocked = (campaign: Record<string, number>, id: number): boolean =>
   id === 1 || (campaign[id - 1] ?? 0) > 0;

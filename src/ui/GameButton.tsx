@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, type StyleProp, StyleSheet, type ViewStyle } from 'react-native';
+import { Platform, Pressable, type StyleProp, StyleSheet, type ViewStyle } from 'react-native';
 import { palette } from '../theme';
 import { Text } from './Text';
 import { hardShadow } from './textShadow';
@@ -13,6 +13,9 @@ const FILL: Record<ButtonVariant, string> = {
   white: palette.white,
   mint: palette.mint,
 };
+
+// 웹에서 창이 열릴 때 첫 버튼에 생기는 포커스 테두리를 숨김 (키보드 사용자는 눌린 효과로 구분)
+const NO_FOCUS_RING = Platform.OS === 'web' ? ({ outlineStyle: 'none' } as ViewStyle) : null;
 
 type Props = {
   label: string;
@@ -35,6 +38,7 @@ export function GameButton({ label, onPress, variant = 'sun', size = 'md', disab
       accessibilityLabel={accessibilityLabel}
       style={({ pressed }) => [
         styles.base,
+        NO_FOCUS_RING,
         size === 'sm' && styles.small,
         { backgroundColor: FILL[variant] },
         pressed && !disabled && styles.pressed,
