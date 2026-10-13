@@ -26,7 +26,7 @@ const TEXT = {
   en: { knowsChess: 'I know chess', openRules: 'Show rules', piecesTab: 'How pieces move', start: 'Battle start!', continue: 'Continue' },
 };
 
-const ROUTES = ['/', '/daily', '/campaign', '/campaign/1', '/play', '/learn', '/learn/knight', '/settings', '/achievements', '/practice', '/practice/1'];
+const ROUTES = ['/', '/daily', '/campaign', '/campaign/1', '/play', '/learn', '/learn/knight', '/settings', '/achievements', '/practice', '/practice/1', '/themes'];
 
 const clickText = async (page, text) => {
   const done = await page.evaluate(label => {

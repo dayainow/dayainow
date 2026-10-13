@@ -147,6 +147,17 @@ ${'🟥'.repeat(attempts - 1)}🟩${'💡'.repeat(hints)}
     stalemate: 'No moves left! Stalemate, a draw.',
     draw: 'Only kings remain! A draw.',
   },
+  themes: {
+    title: 'Board styles',
+    intro: 'Unlock new boards by earning achievements',
+    button: '🎨 Board styles',
+    names: { capsule: 'Capsule', forest: 'Forest', ocean: 'Ocean', candy: 'Candy', wood: 'Wood', night: 'Night sky', gold: 'Gold' } as Record<string, string>,
+    inUse: '✓ In use',
+    use: 'Use this',
+    locked: (achievement: string) => `🔒 Earn '${achievement}'`,
+    unlockedToast: (theme: string) => `🎨 ${theme} board unlocked`,
+    reward: (theme: string) => `🎨 ${theme} board`,
+  },
   practice: {
     title: 'Puzzle Dojo',
     tile: 'Puzzle Dojo',

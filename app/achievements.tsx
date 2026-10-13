@@ -1,4 +1,4 @@
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -6,7 +6,9 @@ import { ACHIEVEMENTS } from '../src/achievements/list';
 import { strings } from '../src/i18n';
 import { type Progress, emptyProgress, loadProgress } from '../src/storage/progress';
 import { palette } from '../src/theme';
+import { GameButton } from '../src/ui/GameButton';
 import { Panel } from '../src/ui/Panel';
+import { themeUnlockedBy } from '../src/ui/boardThemes';
 import { Text } from '../src/ui/Text';
 
 // 업적 모음: 달성한 것은 색깔 스티커, 아직인 것은 회색 + 조건
@@ -24,7 +26,10 @@ export default function AchievementsScreen() {
   return (
     <SafeAreaView edges={['bottom']} style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.summary}>{strings.achievements.progress(done, ACHIEVEMENTS.length)}</Text>
+        <View style={styles.top}>
+          <Text style={styles.summary}>{strings.achievements.progress(done, ACHIEVEMENTS.length)}</Text>
+          <GameButton label={strings.themes.button} onPress={() => router.push('/themes')} variant="white" size="sm" />
+        </View>
         <View style={styles.grid}>
           {ACHIEVEMENTS.map(a => {
             const date = progress.achievements[a.id];
@@ -40,6 +45,9 @@ export default function AchievementsScreen() {
                 <Text style={styles.desc} numberOfLines={3}>
                   {text.desc}
                 </Text>
+                {themeUnlockedBy(a.id) ? (
+                  <Text style={styles.reward}>{strings.themes.reward(strings.themes.names[themeUnlockedBy(a.id)!.id])}</Text>
+                ) : null}
                 {date ? <Text style={styles.date}>{date}</Text> : null}
               </Panel>
             );
@@ -53,7 +61,9 @@ export default function AchievementsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: palette.bg },
   content: { padding: 16, gap: 12, alignSelf: 'center', width: '100%', maxWidth: 480 },
-  summary: { fontSize: 16, color: palette.inkSoft, textAlign: 'center' },
+  top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
+  summary: { flexShrink: 1, fontSize: 16, color: palette.inkSoft },
+  reward: { fontSize: 12, color: palette.blueDark },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, justifyContent: 'space-between' },
   card: { width: '48.5%', alignItems: 'center', paddingHorizontal: 10, paddingTop: 12, paddingBottom: 10, gap: 4 },
   icon: { width: 54, height: 54, borderRadius: 27, borderWidth: 3, borderColor: palette.ink, alignItems: 'center', justifyContent: 'center' },

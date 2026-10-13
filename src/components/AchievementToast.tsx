@@ -11,6 +11,7 @@ import { palette } from '../theme';
 import { Panel } from '../ui/Panel';
 import { useAnyModalOpen } from '../ui/modalPresence';
 import { Text } from '../ui/Text';
+import { themeUnlockedBy } from '../ui/boardThemes';
 
 const NATIVE = Platform.OS !== 'web';
 const SHOW_MS = 2600;
@@ -65,6 +66,9 @@ export function AchievementToast() {
           <View style={styles.body}>
             <Text style={styles.kicker}>{strings.achievements.unlocked}</Text>
             <Text style={styles.title}>{strings.achievements.items[current].title}</Text>
+            {themeUnlockedBy(current) ? (
+              <Text style={styles.reward}>{strings.themes.unlockedToast(strings.themes.names[themeUnlockedBy(current)!.id])}</Text>
+            ) : null}
           </View>
         </Panel>
       </Pressable>
@@ -80,4 +84,5 @@ const styles = StyleSheet.create({
   body: { flexShrink: 1 },
   kicker: { fontSize: 13, color: palette.inkSoft },
   title: { fontSize: 18 },
+  reward: { fontSize: 13, color: palette.blueDark },
 });

@@ -149,6 +149,18 @@ ${'🟥'.repeat(attempts - 1)}🟩${'💡'.repeat(hints)}
     stalemate: '둘 곳이 없다! 스테일메이트로 무승부.',
     draw: '킹만 남았다! 무승부.',
   },
+  // 판 꾸미기 (업적 보상)
+  themes: {
+    title: '판 꾸미기',
+    intro: '업적을 달성하면 새 판이 열려요',
+    button: '🎨 판 꾸미기',
+    names: { capsule: '캡슐', forest: '숲', ocean: '바다', candy: '사탕', wood: '나무', night: '밤하늘', gold: '황금' } as Record<string, string>,
+    inUse: '✓ 사용 중',
+    use: '이 판 쓰기',
+    locked: (achievement: string) => `🔒 '${achievement}' 달성`,
+    unlockedToast: (theme: string) => `🎨 '${theme}' 판이 열렸어요`,
+    reward: (theme: string) => `🎨 ${theme} 판`,
+  },
   // 퍼즐 도장 (연습 퍼즐)
   practice: {
     title: '퍼즐 도장',

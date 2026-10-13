@@ -22,6 +22,7 @@ export type AnalyticsEvents = {
   guide_step: { step: 'move' | 'capture' | 'done' };
   practice_open: { number: number };
   review_prompt: { trigger: 'badge' | 'streak' };
+  theme_select: { id: string };
   practice_solved: { number: number; attempts: number; hints: number };
 };
 

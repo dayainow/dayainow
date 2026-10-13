@@ -6,6 +6,7 @@ import { moveFeedbackKind } from '../feedback/moveKind';
 import { palette } from '../theme';
 import { Text } from '../ui/Text';
 import { PieceImage } from '../ui/PieceImage';
+import { currentBoardTheme } from '../ui/boardThemes';
 
 const MAX_BOARD_SIZE = 400;
 const BORDER = 4;
@@ -48,6 +49,7 @@ export function ChessBoard({ board, sideToMove, interactive, lastMove, checkedKi
   const slideTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const bounce = useRef(new Animated.Value(0)).current;
 
+  const theme = currentBoardTheme();
   const cellSize = (size - BORDER * 2) / BOARD_SIZE;
   const pieceSize = Math.round(cellSize * 0.92);
 
@@ -152,7 +154,7 @@ export function ChessBoard({ board, sideToMove, interactive, lastMove, checkedKi
                   onPress={() => handlePress(r, c)}
                   style={[
                     styles.cell,
-                    isLight ? styles.lightCell : styles.darkCell,
+                    { backgroundColor: isLight ? theme.light : theme.dark },
                     isLastMove && styles.lastMoveCell,
                     isCheckedKing && styles.checkCell,
                     isSelected && styles.selectedCell,
@@ -240,8 +242,6 @@ const styles = StyleSheet.create({
   board: { borderWidth: BORDER, borderBottomWidth: BORDER + LIFT, borderColor: palette.ink, borderRadius: 18, overflow: 'hidden', backgroundColor: palette.white },
   row: { flex: 1, flexDirection: 'row' },
   cell: { flex: 1, justifyContent: 'center', alignItems: 'center', position: 'relative' },
-  lightCell: { backgroundColor: palette.cream },
-  darkCell: { backgroundColor: palette.mintLight },
   lastMoveCell: { backgroundColor: palette.sunLight },
   checkCell: { backgroundColor: palette.coralLight },
   selectedCell: { backgroundColor: palette.sun },
