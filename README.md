@@ -23,7 +23,7 @@
 | **체스 배우기** | 기물별 레슨 8개 (★ 모으기, 체크 벗어나기, 체크메이트) |
 | **자유 대전** | AI(쉬움·보통·어려움) 또는 친구와 한 기기로 2인 대전 |
 
-공통 요소: 기물 몬스터 12종, 실황 대사 상자, 전력 게이지, 폰 → 퀸 **진화 연출**, 업적 15종, 첫 배틀 손가락 가이드, 어디서나 여는 규칙 안내(? 버튼), 한국어·영어.
+공통 요소: 기물 몬스터 12종, 실황 대사 상자, 전력 게이지, 폰 → 퀸 **진화 연출**, 업적 15종, 첫 배틀 손가락 가이드, 어디서나 여는 규칙 안내(? 버튼), 판 꾸미기(업적 보상 7종), 한국어·영어·일본어.
 
 **규칙(일반 체스와 다른 점)**: 5×5 판 · 폰은 처음에도 한 칸 · 캐슬링·앙파상 없음 · 끝 줄에 닿은 폰은 자동으로 퀸 · 둘 곳이 없거나 킹만 남으면 무승부.
 
@@ -46,16 +46,17 @@ npm test              # 자동 테스트 (Jest)
 | `src/game/` | 한 판 상태(`useChessGame`), 퍼즐 풀이(`usePuzzle`), 실황 대사, 전력 계산, 첫 배틀 가이드 |
 | `src/puzzles/` | 데일리 퍼즐 550개(`bank.json`), 퍼즐 도장 120개(`practice.json`) |
 | `src/achievements/` | 업적 15종 판정과 달성 알림 이벤트 |
+| `src/ui/boardThemes.ts` | 판 테마 7종 (업적 보상) |
 | `src/components/` | 보드(이동·손가락 가이드), VS 화면, 진화 연출, 결과·공유 카드, 규칙 안내, 업적 알림 |
 | `src/ui/` | 디자인 시스템 부품: 패널, 장난감 버튼, 대사 상자, 전력 게이지, 기물 이미지, 배지, 글꼴 |
 | `src/feedback/` | 효과음 + 진동 |
 | `src/storage/` | 설정·진행 기록 저장 (AsyncStorage, 저장은 한 줄로 차례 처리) |
-| `src/i18n/` | 한국어·영어 문구 (기기 언어로 자동 선택) |
+| `src/i18n/` | 한국어·영어·일본어 문구 (기기 언어로 자동 선택) |
 | `design/` | 기물 몬스터 원본(SVG 코드), 디자인 시안, 스토어 대표 이미지 |
 
 ## 디자인
 
-"캡슐 리그": 굵은 잉크 외곽선 + 쨍한 블루·레드 팀 색 + 아래 그림자로 장난감·스티커 같은 손맛. 기물은 체스 실루엣을 그대로 살린 몬스터(얼굴·발·팀 색)라서 처음 보는 사람도 어떤 기물인지 바로 알아봄. 글꼴은 주아(한국어)·Fredoka(영어), 둘 다 OFL.
+"캡슐 리그": 굵은 잉크 외곽선 + 쨍한 블루·레드 팀 색 + 아래 그림자로 장난감·스티커 같은 손맛. 기물은 체스 실루엣을 그대로 살린 몬스터(얼굴·발·팀 색)라서 처음 보는 사람도 어떤 기물인지 바로 알아봄. 글꼴은 주아(한국어)·모치이 팝 원(일본어)·Fredoka(영어), 모두 OFL.
 
 포켓몬 같은 몬스터 배틀 **감성**만 가져오고, 다른 작품의 이름·캐릭터·공 모양·로고 글꼴·유명 대사는 쓰지 않음.
 
@@ -68,7 +69,7 @@ node scripts/build-pieces.mjs       # 기물 몬스터 12종 PNG (design/creatur
 node scripts/build-icons.mjs        # 앱 아이콘·스플래시·마스코트 표정
 node scripts/build-sounds.mjs       # 효과음 합성
 node design/concept.mjs             # 디자인 시안 이미지
-node design/feature.mjs             # 스토어 대표 이미지 (1024×500)
+node design/feature.mjs             # 스토어 대표 이미지 (1024×500, 한·영·일)
 node --no-warnings --import ./scripts/register-ts.mjs scripts/generate-puzzles.ts 400 150                       # 데일리 퍼즐
 node --no-warnings --import ./scripts/register-ts.mjs scripts/generate-puzzles.ts 60 30 20261011 30 practice.json # 퍼즐 도장
 node --no-warnings --import ./scripts/register-ts.mjs scripts/campaign-balance.ts 40                              # 단계 난이도 시뮬레이션

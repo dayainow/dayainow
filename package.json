@@ -17,6 +17,7 @@
   "dependencies": {
     "@expo-google-fonts/fredoka": "^0.4.1",
     "@expo-google-fonts/jua": "^0.4.1",
+    "@expo-google-fonts/mochiy-pop-one": "^0.4.1",
     "@expo/metro-runtime": "~57.0.16",
     "@react-native-async-storage/async-storage": "2.2.0",
     "expo": "~57.0.27",
