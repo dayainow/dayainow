@@ -1,6 +1,6 @@
 # Google Play 출시 가이드 — 캡슐체스
 
-> 작성: 2026-10-05 · 대상: 개인 계정(2023-11-13 이후 생성) → **비공개 테스트 테스터 12명 × 14일 필수**
+> 작성: 2026-10-05 · 갱신: 2026-10-13 · 대상: 개인 계정(2023-11-13 이후 생성) → **비공개 테스트 테스터 12명 × 14일 필수**
 
 이 문서의 답변은 **지금 버전 기준**이다(광고·분석·결제 없음, 데이터 수집 없음). 광고나 결제를 넣으면 "앱 콘텐츠" 답변과 개인정보처리방침을 반드시 같이 고친다.
 
@@ -8,18 +8,18 @@
 
 | 항목 | 상태 | 비고 |
 |---|---|---|
-| 개인정보처리방침 페이지 | 초안 완료 `site/privacy/index.html` | **문의 이메일 넣고 공개 주소에 올려야 함** (아래 4번) |
+| 개인정보처리방침 페이지 | 한·영·일 완료 `site/privacy/index.html` (+ 소개 페이지 `site/index.html`) | **문의 이메일 넣고 공개** (아래 4번, GitHub Pages) |
 | 스토어 아이콘 512×512 | `assets/store/play-icon.png` | |
-| 대표 이미지 1024×500 | `assets/store/feature-ko.png`, `feature-en.png` | `node design/feature.mjs`로 다시 만들기 |
-| 휴대폰 스크린샷 1080×2160 | `assets/store/screenshots/ko/`, `en/` (각 6장) | `node scripts/store-screenshots.mjs`로 다시 찍기 |
-| 첫 AAB | 아직 | `npx eas-cli build -p android --profile production` |
+| 대표 이미지 1024×500 | `assets/store/feature-ko.png`, `feature-en.png`, `feature-ja.png` | `node design/feature.mjs`로 다시 만들기 |
+| 휴대폰 스크린샷 1080×2160 | `assets/store/screenshots/ko/`, `en/`, `ja/` (각 6장) | `node scripts/store-screenshots.mjs`로 다시 찍기 |
+| 첫 AAB | EAS 빌드 완료 후 Expo 빌드 페이지에서 내려받기 | `npx eas-cli build -p android --profile production` |
 | 테스터 12명 이상 | 모집 필요 | Gmail(구글 계정) 이메일 주소 |
 
 ## 1. 앱 만들기
 
 Play Console → **앱 만들기**
 
-- 앱 이름: `캡슐체스: 3분 미니 체스`
+- 앱 이름: `캡슐체스: 몬스터 미니 체스`
 - 기본 언어: 한국어 – ko-KR
 - 앱 또는 게임: **게임**
 - 무료 또는 유료: **무료** (나중에 유료로 바꿀 수 없음. 광고 제거는 인앱 구매로)
@@ -42,6 +42,8 @@ Play Console → **앱 만들기**
 | 광고 ID | **광고 ID를 사용하지 않음** ← 광고 SDK 넣으면 변경 |
 
 > 알림: 퍼즐 알림(POST_NOTIFICATIONS)은 사용자가 앱 안에서 켤 때만 권한을 묻고, 기기 안에서 예약된다. 데이터 보안 답변은 그대로 "수집 없음". 정확한 알람 권한은 쓰지 않는다.
+>
+> 별점 요청: Google Play 인앱 리뷰 API(공식 평가 창)만 쓰고, 별점·리뷰 내용은 앱이 받지 않는다 → 데이터 수집 아님. 평가 전에 "재밌나요?"처럼 묻거나 보상을 주지 않는다(정책 위반).
 
 ### 콘텐츠 등급 설문 (IARC)
 
@@ -229,14 +231,16 @@ AIの強さ(やさしい・ふつう・むずかしい)を選んで練習した�
 
 **グラフィック**: `play-icon.png`, `feature-ja.png`, `screenshots/ja/01~06`
 
-## 4. 개인정보처리방침 공개하기
+## 4. 개인정보처리방침 공개하기 (GitHub Pages, 무료)
 
 1. `site/privacy/index.html`의 `[문의 이메일]`, `[contact email]`을 실제 이메일로 바꾼다 (스토어에도 공개되는 주소).
-2. 공개 주소에 올린다. 가장 쉬운 방법:
-   - **Netlify Drop**: app.netlify.com/drop 에 `site` 폴더를 끌어다 놓으면 바로 주소가 생김
-   - **GitHub Pages**: 공개 저장소(예: `capsule-chess-site`)에 `site` 내용을 올리고 Pages 켜기 → `https://dayainow.github.io/capsule-chess-site/privacy/`
-   - 나중에 `capsulechess.app` 도메인을 사면 그 주소로 옮김
-3. 앱 콘텐츠 → 개인정보처리방침에 주소 입력
+2. 공개 저장소 `dayainow/dayainow` → **Settings → Pages** → Source: **Deploy from a branch** → Branch: `main` / `/(root)` → Save
+   - 저장소 루트의 `.nojekyll` 파일 덕분에 파일이 그대로 공개됨
+3. 1~2분 뒤 아래 주소가 열리는지 확인
+   - 개인정보처리방침: `https://dayainow.github.io/dayainow/capsule-chess/site/privacy/`
+   - 앱 소개(스토어 "웹사이트" 칸): `https://dayainow.github.io/dayainow/capsule-chess/site/`
+4. 앱 콘텐츠 → 개인정보처리방침에 위 주소 입력
+5. 나중에 `capsulechess.app` 같은 도메인을 사면 그 주소로 옮김
 
 ## 5. 비공개 테스트 시작
 
@@ -255,12 +259,13 @@ AIの強さ(やさしい・ふつう・むずかしい)を選んで練習した�
 ## 6. 테스터 모집 메시지 (복사해서 쓰기)
 
 ```
-안녕하세요! 제가 만든 미니 체스 게임 "캡슐체스"를 구글 플레이에 출시하려고 하는데,
+안녕하세요! 제가 만든 몬스터 미니 체스 게임 "캡슐체스"를 구글 플레이에 출시하려고 하는데,
 출시 전에 테스터 12명이 2주 동안 참여해야 해서 도움을 부탁드려요 🙏
 
 ✔ 안드로이드 폰 + 구글(Gmail) 계정만 있으면 돼요
 ✔ 앱을 설치하고 2주 동안 지우지만 않으면 돼요 (가끔 한 판씩 해 주면 더 좋아요!)
-✔ 5×5 작은 판이라 한 판에 3분, 매일 퍼즐도 있어요
+✔ 5×5 작은 판이라 한 판에 3분! 귀여운 몬스터 기물, 캡슐 리그, 매일 퍼즐, 폰 진화까지 있어요
+✔ 체스를 몰라도 손가락 가이드와 레슨으로 바로 배울 수 있어요
 
 참여해 주실 분은 구글 계정 이메일을 알려 주세요. 초대 링크를 보내 드릴게요!
 ```
