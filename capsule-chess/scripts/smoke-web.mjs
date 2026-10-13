@@ -1,4 +1,4 @@
-// 웹에서 모든 화면을 열어 보고 오류를 모으는 점검 스크립트 (한국어·영어)
+// 웹에서 모든 화면을 열어 보고 오류를 모으는 점검 스크립트 (한국어·영어·일본어)
 // 사용: 개발 서버를 켠 상태에서  node scripts/smoke-web.mjs [주소=http://localhost:8081]
 // 화면 사진은 .claude/smoke/ 에 저장 (git에 올라가지 않음)
 import { mkdirSync } from 'node:fs';
@@ -24,9 +24,10 @@ const PROGRESS = {
 const TEXT = {
   ko: { knowsChess: '체스를 알아요', openRules: '규칙 보기', piecesTab: '기물 움직임', start: '배틀 시작!', continue: '계속하기' },
   en: { knowsChess: 'I know chess', openRules: 'Show rules', piecesTab: 'How pieces move', start: 'Battle start!', continue: 'Continue' },
+  ja: { knowsChess: 'チェスを知っている', openRules: 'ルールを見る', piecesTab: '駒の動き', start: 'バトル開始!', continue: 'つづける' },
 };
 
-const ROUTES = ['/', '/daily', '/campaign', '/campaign/1', '/play', '/learn', '/learn/knight', '/settings', '/achievements', '/practice', '/practice/1'];
+const ROUTES = ['/', '/daily', '/campaign', '/campaign/1', '/play', '/learn', '/learn/knight', '/settings', '/achievements', '/practice', '/practice/1', '/themes'];
 
 const clickText = async (page, text) => {
   const done = await page.evaluate(label => {
@@ -193,7 +194,7 @@ const run = async (browser, locale) => {
 const main = async () => {
   mkdirSync(OUT, { recursive: true });
   const all = [];
-  for (const locale of ['ko', 'en']) {
+  for (const locale of ['ko', 'en', 'ja']) {
     const browser = await puppeteer.launch({ executablePath: findBrowser(), headless: true, args: [`--lang=${locale}`, '--hide-scrollbars'] });
     try {
       all.push(...(await run(browser, locale)));

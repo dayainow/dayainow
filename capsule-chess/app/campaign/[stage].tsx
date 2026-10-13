@@ -20,6 +20,7 @@ import { powerOf } from '../../src/game/material';
 import { useChessGame } from '../../src/game/useChessGame';
 import { strings } from '../../src/i18n';
 import { loadProgress, recordGuideDone, recordStageResult, recordStat } from '../../src/storage/progress';
+import { requestReviewLater } from '../../src/review';
 import { palette } from '../../src/theme';
 import { CapsuleBadge } from '../../src/ui/CapsuleBadge';
 import { DialogBox } from '../../src/ui/DialogBox';
@@ -57,6 +58,7 @@ function StagePlay({ stage }: { stage: Stage }) {
   const [evolving, setEvolving] = useState<'w' | null>(null);
   const evolveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const badgeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const reviewTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const opponent = opponentFor(stage);
   const opponentName = strings.league.opponents[opponent.index];
   const maxPower = useMemo(() => ({ w: powerOf(initialBoard, 'w'), b: powerOf(initialBoard, 'b') }), [initialBoard]);
@@ -73,6 +75,7 @@ function StagePlay({ stage }: { stage: Stage }) {
       clearTimeout(evolveTimer.current);
       clearTimeout(swapTimer.current);
       clearTimeout(badgeTimer.current);
+      clearTimeout(reviewTimer.current);
     };
   }, []);
 
@@ -92,7 +95,10 @@ function StagePlay({ stage }: { stage: Stage }) {
       recordStageResult(stage.id, stars).then(after => {
         const earned = newBadge(before.campaign, after.campaign);
         setBadge(earned);
-        if (earned) badgeTimer.current = setTimeout(feedback.badge, 900);
+        if (earned) {
+          badgeTimer.current = setTimeout(feedback.badge, 900);
+          reviewTimer.current = requestReviewLater('badge');
+        }
         setBadgeCount(earnedBadges(after.campaign).length);
       })
     );

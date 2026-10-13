@@ -1,5 +1,6 @@
 import Constants from 'expo-constants';
 import React, { useEffect, useState } from 'react';
+import { router } from 'expo-router';
 import { Pressable, StyleSheet, Switch, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { strings } from '../src/i18n';
@@ -7,7 +8,7 @@ import { track } from '../src/analytics';
 import { feedback } from '../src/feedback/feedback';
 import { disableDailyReminder, enableDailyReminder, isReminderSupported } from '../src/notifications';
 import { resetProgress } from '../src/storage/progress';
-import { DEFAULT_SETTINGS, type Settings, loadSettings, updateSettings } from '../src/storage/settings';
+import { DEFAULT_SETTINGS, type Settings, getCachedSettings, loadSettings, updateSettings } from '../src/storage/settings';
 import { palette } from '../src/theme';
 import { Panel } from '../src/ui/Panel';
 import { Text } from '../src/ui/Text';
@@ -82,6 +83,15 @@ export default function SettingsScreen() {
           />
         </View>
       </Panel>
+
+      <Pressable onPress={() => router.push('/themes')}>
+        <Panel style={styles.card}>
+          <View style={[styles.row, styles.rowLast]}>
+            <Text style={styles.label}>{strings.themes.button}</Text>
+            <Text style={styles.value}>{strings.themes.names[getCachedSettings().boardTheme] ?? ''} ›</Text>
+          </View>
+        </Panel>
+      </Pressable>
 
       <Panel style={styles.card}>
         <View style={styles.row}>

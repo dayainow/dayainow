@@ -7,6 +7,8 @@ export type Settings = {
   hapticsEnabled: boolean;
   reminderEnabled: boolean; // 매일 아침 퍼즐 알림
   reminderPromptDismissed: boolean; // "알림 받을까요?" 카드를 닫았는지
+  reviewRequests: string[]; // 스토어 평가 창을 요청한 날 'YYYY-MM-DD' (너무 자주 묻지 않게)
+  boardTheme: string; // 판 테마 id (src/ui/boardThemes.ts)
 };
 
 // 저장 형식을 바꿀 땐 버전을 올려서 예전 데이터와 섞이지 않게 함 (필드 추가는 기본값으로 채워서 그대로 사용)
@@ -18,6 +20,8 @@ export const DEFAULT_SETTINGS: Settings = {
   hapticsEnabled: true,
   reminderEnabled: false,
   reminderPromptDismissed: false,
+  reviewRequests: [],
+  boardTheme: 'capsule',
 };
 
 // 효과음·진동처럼 매번 비동기로 읽기 곤란한 곳을 위해 마지막으로 읽은 값을 기억
@@ -39,6 +43,10 @@ export const loadSettings = async (): Promise<Settings> => {
       hapticsEnabled: bool(saved?.hapticsEnabled, DEFAULT_SETTINGS.hapticsEnabled),
       reminderEnabled: bool(saved?.reminderEnabled, DEFAULT_SETTINGS.reminderEnabled),
       reminderPromptDismissed: bool(saved?.reminderPromptDismissed, DEFAULT_SETTINGS.reminderPromptDismissed),
+      reviewRequests: Array.isArray(saved?.reviewRequests)
+        ? saved.reviewRequests.filter((d: unknown) => typeof d === 'string')
+        : DEFAULT_SETTINGS.reviewRequests,
+      boardTheme: typeof saved?.boardTheme === 'string' ? saved.boardTheme : DEFAULT_SETTINGS.boardTheme,
     };
   } catch {
     // 저장 데이터가 깨져 있어도 기본값으로 게임은 계속

@@ -143,7 +143,7 @@ export default function HomeScreen() {
                 <Text style={styles.muted} numberOfLines={1}>
                   {nextStage ? `${strings.league.capsule(nextStage.world)} · ${strings.league.capsuleNames[nextStage.world - 1]}` : strings.league.title}
                 </Text>
-                <Text style={styles.leagueTitle} numberOfLines={1}>
+                <Text style={styles.leagueTitle} numberOfLines={2}>
                   {opponent ? strings.league.nextOpponent(strings.league.opponents[opponent.index]) : strings.league.allCleared}
                 </Text>
                 {nextStage && (

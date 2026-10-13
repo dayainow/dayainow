@@ -1,5 +1,6 @@
 import { Fredoka_600SemiBold, Fredoka_700Bold } from '@expo-google-fonts/fredoka';
 import { Jua_400Regular } from '@expo-google-fonts/jua';
+import { MochiyPopOne_400Regular } from '@expo-google-fonts/mochiy-pop-one';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -9,7 +10,7 @@ import { track } from '../src/analytics';
 import { AchievementToast } from '../src/components/AchievementToast';
 import { RulesButton } from '../src/components/RulesButton';
 import { initFeedback } from '../src/feedback/feedback';
-import { strings } from '../src/i18n';
+import { isJapanese, strings } from '../src/i18n';
 import { RulesProvider } from '../src/rules/RulesProvider';
 import { backfillAchievements, loadProgress } from '../src/storage/progress';
 import { palette } from '../src/theme';
@@ -18,8 +19,11 @@ import { fonts } from '../src/ui/fonts';
 // 글꼴을 다 불러올 때까지 시작 화면을 유지 (글꼴이 바뀌며 깜빡이지 않게)
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
+// 일본어 글꼴은 크기가 커서 일본어일 때만 불러옴
+const FONTS = { Jua_400Regular, Fredoka_600SemiBold, Fredoka_700Bold, ...(isJapanese ? { MochiyPopOne_400Regular } : {}) };
+
 export default function RootLayout() {
-  const [fontsLoaded, fontError] = useFonts({ Jua_400Regular, Fredoka_600SemiBold, Fredoka_700Bold });
+  const [fontsLoaded, fontError] = useFonts(FONTS);
   const ready = fontsLoaded || !!fontError;
 
   useEffect(() => {
@@ -58,6 +62,7 @@ export default function RootLayout() {
         <Stack.Screen name="settings" options={{ title: strings.screens.settings }} />
         <Stack.Screen name="achievements" options={{ title: strings.achievements.title }} />
         <Stack.Screen name="practice/index" options={{ title: strings.practice.title }} />
+        <Stack.Screen name="themes" options={{ title: strings.themes.title }} />
         <Stack.Screen name="practice/[id]" options={{ title: '' }} />
       </Stack>
       <AchievementToast />

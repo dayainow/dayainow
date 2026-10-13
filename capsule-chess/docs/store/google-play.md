@@ -70,28 +70,37 @@ Play Console → **앱 만들기**
 
 **앱 이름** (30자 이내)
 ```
-캡슐체스: 3분 미니 체스
+캡슐체스: 몬스터 미니 체스
 ```
 
 **간단한 설명** (80자 이내)
 ```
-5×5 작은 판에서 3분이면 끝나는 귀여운 미니 체스. 매일 퍼즐과 20단계 도전!
+귀여운 몬스터와 3분 미니 체스! 캡슐 리그, 오늘의 퍼즐, 폰 진화까지
 ```
 
 **자세한 설명** (4000자 이내)
 ```
-캡슐 하나에 체스 한 판을 담았어요!
+캡슐에서 튀어나온 체스 몬스터들과 한 판 붙어 볼까요?
 
-캡슐체스는 5×5 작은 판에서 두는 미니 체스예요. 킹, 퀸, 룩, 비숍, 나이트, 폰까지 모든 기물이 다 들어 있지만, 판이 작아서 한 판이 3분이면 끝나요. 출퇴근길이나 쉬는 시간에 스낵처럼 즐겨 보세요.
+캡슐체스는 5×5 작은 판에서 두는 미니 체스예요. 킹, 퀸, 룩, 비숍, 나이트, 폰까지 모든 기물이 귀여운 몬스터가 되어 등장하고, 판이 작아서 한 판이 3분이면 끝나요. 출퇴근길이나 쉬는 시간에 스낵처럼 즐겨 보세요.
+
+■ 캡슐 리그
+4개의 캡슐, 20명의 레드 팀 상대와 차례로 배틀! 캡슐마다 마지막엔 마스터전이 기다려요. 적은 수로 이길수록 별을 더 받고, 캡슐을 모두 깨면 배지를 모아요.
+
+■ 폰이 퀸으로 진화!
+폰이 끝 줄에 닿는 순간, 반짝반짝 진화 연출과 함께 퀸으로 변신해요.
 
 ■ 오늘의 퍼즐
-매일 새로운 "N수 만에 메이트" 퍼즐이 열려요. 같은 날엔 모두 같은 문제를 풀어요. 연속 기록을 이어 가고 결과를 친구에게 공유해 보세요.
+매일 새로운 "N수 만에 메이트" 퍼즐. 같은 날엔 모두 같은 문제를 풀어요. 연속 기록을 이어 가고 결과 카드를 친구에게 공유해 보세요.
 
-■ 단계별 도전 20단계
-4개의 캡슐, 20단계의 AI와 차례로 겨뤄요. 적은 수로 이길수록 별을 더 많이 받아요.
+■ 퍼즐 도장 120문제
+1수 메이트부터 3수 메이트까지, 쉬운 문제부터 차근차근 실력을 키워요.
 
 ■ 체스가 처음이어도 괜찮아요
-8개의 짧은 레슨으로 기물 움직이는 법부터 체크메이트까지 배워요.
+8개의 짧은 레슨과 첫 배틀 손가락 가이드로 기물 움직이는 법부터 체크메이트까지 배워요. 규칙은 언제든 ? 버튼으로 다시 볼 수 있어요.
+
+■ 모으는 재미
+업적 15종을 달성하면 숲·바다·사탕·밤하늘 같은 새 판이 열려요.
 
 ■ 자유 대전
 AI 난이도(쉬움·보통·어려움)를 골라 연습하거나, 기기 하나로 친구와 대결하세요.
@@ -99,13 +108,13 @@ AI 난이도(쉬움·보통·어려움)를 골라 연습하거나, 기기 하나
 ■ 이런 점이 좋아요
 • 인터넷 연결 없이 플레이
 • 회원가입 없음, 개인정보 수집 없음
-• 귀여운 캡슐 효과음과 진동
-• 한국어·영어 지원
+• 손맛 나는 효과음과 진동
+• 한국어·영어·일본어 지원
 
 [캡슐체스 규칙]
 • 폰은 처음에도 한 칸만 앞으로 가요.
 • 캐슬링과 앙파상은 없어요.
-• 폰이 끝 줄에 닿으면 퀸이 돼요.
+• 폰이 끝 줄에 닿으면 퀸으로 진화해요.
 ```
 
 **그래픽**: 앱 아이콘 `play-icon.png`, 대표 이미지 `feature-ko.png`, 휴대폰 스크린샷 `screenshots/ko/01~06`
@@ -118,28 +127,37 @@ AI 난이도(쉬움·보통·어려움)를 골라 연습하거나, 기기 하나
 
 **App name**
 ```
-Capsule Chess: Mini Chess
+Capsule Chess: Monster Mini
 ```
 
 **Short description**
 ```
-Cute 5×5 mini chess you can finish in 3 minutes. Daily puzzles & 20 stages!
+Cute monster mini chess in 3 minutes! Capsule League, daily puzzles, evolution
 ```
 
 **Full description**
 ```
-A whole game of chess, packed into one tiny capsule!
+Chess monsters just popped out of their capsules. Ready to battle?
 
-Capsule Chess is mini chess on a 5×5 board. Every piece is there — king, queen, rook, bishop, knight and pawns — but the small board means a game takes about 3 minutes. Perfect for your commute or a coffee break.
+Capsule Chess is mini chess on a 5×5 board. Every piece is here as a cute monster — king, queen, rook, bishop, knight and pawns — and the small board means a game takes about 3 minutes. Perfect for your commute or a coffee break.
+
+■ Capsule League
+Battle 20 Red team opponents across 4 capsules, each ending in a Master battle. Win in fewer moves to earn more stars, and collect a badge for every capsule you clear.
+
+■ Pawns evolve!
+The moment a pawn reaches the far row, it sparkles and evolves into a Queen.
 
 ■ Daily Puzzle
-A new "mate in N" puzzle every day, the same for everyone. Keep your streak going and share your result with friends.
+A new "mate in N" puzzle every day, the same for everyone. Keep your streak going and share your result card with friends.
 
-■ 20-stage Challenge
-Work your way through 4 capsules and 20 AI opponents. Win in fewer moves to earn more stars.
+■ Puzzle Dojo: 120 puzzles
+From mate in 1 to mate in 3, sharpen your skills step by step.
 
 ■ New to chess? No problem
-8 bite-sized lessons take you from how the pieces move all the way to checkmate.
+8 bite-sized lessons and a first-battle finger guide take you from how the pieces move all the way to checkmate. Tap ? anytime to see the rules.
+
+■ Collect them all
+Earn 15 achievements to unlock new boards like Forest, Ocean, Candy and Night Sky.
 
 ■ Free Play
 Practice against the AI (Easy, Normal or Hard) or play a friend on one device.
@@ -147,16 +165,69 @@ Practice against the AI (Easy, Normal or Hard) or play a friend on one device.
 ■ Why you'll love it
 • Plays offline
 • No sign-up, no personal data collected
-• Cute capsule sound effects and haptics
-• Korean and English
+• Satisfying sound effects and haptics
+• English, Korean and Japanese
 
 [Capsule Chess rules]
 • Pawns move one square forward, even on their first move.
 • No castling and no en passant.
-• A pawn that reaches the last row becomes a queen.
+• A pawn that reaches the last row evolves into a queen.
 ```
 
 **Graphics**: `play-icon.png`, `feature-en.png`, `screenshots/en/01~06`
+
+### 일본어 (번역 추가: 번역 관리 → 日本語)
+
+**アプリ名**
+```
+カプセルチェス: モンスターミニチェス
+```
+
+**簡単な説明**
+```
+かわいいモンスターと3分ミニチェス!カプセルリーグ、今日のパズル、ポーンの進化
+```
+
+**詳しい説明**
+```
+カプセルから飛び出したチェスモンスターと、1局勝負してみませんか?
+
+カプセルチェスは5×5の小さなボードで遊ぶミニチェス。キング、クイーン、ルーク、ビショップ、ナイト、ポーン、すべての駒がかわいいモンスターになって登場します。ボードが小さいので1局約3分。通勤中や休憩時間に、おやつ感覚で楽しめます。
+
+■ カプセルリーグ
+4つのカプセル、20人のレッドチームと順番にバトル!各カプセルの最後にはマスター戦が待っています。少ない手数で勝つほど★がたくさんもらえ、カプセルをクリアするとバッジをゲット。
+
+■ ポーンがクイーンに進化!
+ポーンが最後の列に着いた瞬間、キラキラの進化演出とともにクイーンに変身します。
+
+■ 今日のパズル
+毎日新しい「N手詰め」パズル。同じ日はみんな同じ問題。連続記録をつなげて、結果カードを友だちにシェアしよう。
+
+■ パズル道場 120問
+1手詰めから3手詰めまで、やさしい問題から少しずつ実力アップ。
+
+■ チェスがはじめてでも大丈夫
+8つの短いレッスンと、はじめてのバトルの指ガイドで、駒の動かし方からチェックメイトまで学べます。ルールはいつでも ? ボタンで確認できます。
+
+■ 集める楽しさ
+15種類の実績を達成すると、森・海・キャンディ・夜空などの新しいボードが開放されます。
+
+■ フリー対戦
+AIの強さ(やさしい・ふつう・むずかしい)を選んで練習したり、1台の端末で友だちと対戦したり。
+
+■ おすすめポイント
+• オフラインで遊べる
+• 会員登録なし、個人情報の収集なし
+• 気持ちいい効果音と振動
+• 日本語・英語・韓国語に対応
+
+[カプセルチェスのルール]
+• ポーンは最初の一手でも1マスだけ進みます。
+• キャスリングとアンパッサンはありません。
+• ポーンが最後の列に着くとクイーンに進化します。
+```
+
+**グラフィック**: `play-icon.png`, `feature-ja.png`, `screenshots/ja/01~06`
 
 ## 4. 개인정보처리방침 공개하기
 

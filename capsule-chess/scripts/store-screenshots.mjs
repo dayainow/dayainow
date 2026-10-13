@@ -9,7 +9,7 @@ import { findBrowser } from './lib/browser.mjs';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const BASE = process.argv[2] ?? 'http://localhost:8081';
 const VIEWPORT = { width: 360, height: 720, deviceScaleFactor: 3 };
-const LOCALES = ['ko', 'en'];
+const LOCALES = ['ko', 'en', 'ja'];
 
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 const pad = n => String(n).padStart(2, '0');
@@ -48,7 +48,7 @@ const move = async (page, [fromR, fromC, toR, toC]) => {
 };
 
 // 버튼 글자로 찾아 누르기 (VS 화면의 "배틀 시작!")
-const START = { ko: '배틀 시작!', en: 'Battle start!' };
+const START = { ko: '배틀 시작!', en: 'Battle start!', ja: 'バトル開始!' };
 const clickText = (page, label) =>
   page.evaluate(text => {
     const el = [...document.querySelectorAll('[role="button"]')].reverse().find(d => d.innerText?.trim() === text);

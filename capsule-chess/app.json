@@ -36,7 +36,8 @@
       "favicon": "./assets/icon.png"
     },
     "locales": {
-      "ko": "./locales/ko.json"
+      "ko": "./locales/ko.json",
+      "ja": "./locales/ja.json"
     },
     "plugins": [
       "expo-router",
