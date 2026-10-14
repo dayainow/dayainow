@@ -1,94 +1,76 @@
-# dayainow · 프론트엔드 중심 풀스택 개발
+# dayainow · Personal Projects
 
-**React·TypeScript를 중심으로 웹과 모바일 제품을 만들고, AI 서비스와 개발 인프라로 확장합니다.**
-기획부터 UI·API 구현, 테스트와 배포까지 연결하며, 반복되는 개발 작업은 재사용 가능한 도구로 정리합니다.
+**React·TypeScript를 주력으로 웹·모바일과 AI 관련 서비스를 개발하는 프론트엔드 중심 풀스택 개발자입니다.**
+기획부터 디자인, UI·API 구현, QA와 배포까지 연결하고, 그 과정에서 반복되는 작업을 개발 도구와 재사용 가능한 템플릿으로 정리합니다.
 
 [포트폴리오 사이트](https://candid-blini-c6f102.netlify.app/) · [프로젝트 상세 문서](./personal-projects.md) · [문의](https://github.com/dayainow/dayainow/issues)
 
-## 핵심 역량
+## 프로젝트
 
-| 분야 | 구현 경험 | 주요 기술 |
-| --- | --- | --- |
-| **프론트엔드** | 복잡한 폼·상태 관리, 문서 편집·칸반, 반응형 UI | TypeScript · React · Next.js |
-| **풀스택** | API·인증·권한, 데이터 모델링, 배포 구성 | Node.js · NestJS · Supabase · PostgreSQL |
-| **모바일** | 검색·위치·즐겨찾기, 게임 UI와 상호작용 | Expo · React Native |
-| **AI·개발 인프라** | RAG·MCP 연동, 자동 테스트, CI/CD와 개발 도구 | Python · MCP · GitHub Actions · Vercel |
+웹 서비스, 모바일 앱, MCP 및 개발 도구를 분야별로 정리했습니다.
 
-## 먼저 살펴볼 프로젝트
+### MCP 서버
 
-### Folio — 개발자 워크스페이스
+| 프로젝트 | 한 줄 소개 | 역할·기술 | 링크 |
+| --- | --- | --- | --- |
+| [**마음길잡이**](https://github.com/dayainow/mind-guide-mcp) | 카카오 PlayMCP 등록 — 카카오톡 한 마디로 정신건강복지센터·복지제도 연결, 위기 시 즉시 연락처 안내 | Python · FastMCP · 공공데이터 · Render · 카카오 PlayMCP | [GitHub](https://github.com/dayainow/mind-guide-mcp) · [PlayMCP](https://playmcp.kakao.com) |
+| [**API Layer Codegen MCP**](https://github.com/dayainow/dayainow/tree/main/api-layer-codegen-mcp) | OpenAPI 탐지 → TypeScript/Zod/TanStack Query API 레이어 생성까지 stdio 하네스로 검증하는 MCP 서버 | TypeScript · MCP · OpenAPI · Zod · TanStack Query | [소스](https://github.com/dayainow/dayainow/tree/main/api-layer-codegen-mcp) |
 
-일지·문서·칸반·프로세스를 한 화면에서 연결해 개발 기록을 관리합니다.
+### 웹 서비스
 
-- **구현:** 로컬 우선 저장, 문서 편집과 위키 링크, 칸반, MCP·Beacon 연동
-- **기술:** Next.js · React · TypeScript · Supabase
-- **확인 자료:** [코드·아키텍처·실행 화면](https://github.com/dayainow/folio)
+| 프로젝트 | 한 줄 소개 | 역할·기술 | 링크 |
+| --- | --- | --- | --- |
+| [**청년정책 처방전**](https://github.com/dayainow/youthrx-app) | 오프라인 마포청년축제 부스 운영(80여 명 체험) — 맞춤형 청년정책 약봉투 처방 진단 앱 | React · Vite · TypeScript · Tailwind | [GitHub](https://github.com/dayainow/youthrx-app) |
+| [**CorpBrain**](https://github.com/dayainow/corp-brain) | RBAC 기반 로컬 RAG 사내 문서 챗봇 — 문서 트리 탐색·Slack 연동·품질 게이트(Hit@3 80%)·옵션형 Cross-encoder 리랭킹 | Next.js · Ollama · AI SDK · PgVector · Redis | [GitHub](https://github.com/dayainow/corp-brain) |
+| [**OlaLab**](https://github.com/dayainow/ola) | 100+ AI 도구 큐레이션·커뮤니티 플랫폼 | Next.js · NestJS · Prisma · Supabase | [GitHub](https://github.com/dayainow/ola) |
+| [**HarnessHub**](https://github.com/dayainow/harness-hub) | AI 에이전트·하네스 **발견·평가·설치** 카탈로그 (3D UI, CLI) | Next.js · NestJS · R3F · Redis | [GitHub](https://github.com/dayainow/harness-hub) |
+| [**Folio**](https://github.com/dayainow/folio) | 일지·문서·칸반·프로세스를 한 화면에서 연결하는 **local-first 개발자 워크스페이스** — Writing-first UI · `[[위키링크]]` 그래프 · MCP 자동기록 · Beacon 연동 | Next.js · React · TypeScript · Supabase · MCP | [GitHub](https://github.com/dayainow/folio) · v1.7.0 |
+| [Zarami](https://zarami-iota.vercel.app/) | 실제 채용 데이터 기반 AI 커리어 로드맵 및 퀘스트 가이드 플랫폼 (개인화 스킬 트리·GitHub 잔디 연동 인증) | Next.js · TypeScript · Supabase · React Flow · Gemini & Groq | [GitHub](https://github.com/dayainow/zarami) · [v1.0](https://zarami-iota.vercel.app/) |
+| [**Beacon**](https://github.com/dayainow/beacon-project-os) | 프로젝트 폴더의 파일·Git을 자동 관찰해 부족한 근거, P0–P4 Gate, 산출물·변경 이력을 보여주고 Project Book으로 남기는 **로컬 우선 Project Navigation OS** | TypeScript · Node.js · SQLite · esbuild · pnpm | [GitHub](https://github.com/dayainow/beacon-project-os) · [v0.2.0](https://github.com/dayainow/beacon-project-os/releases/tag/v0.2.0) |
+| [**Critter**](https://github.com/dayainow/critter) | AI 행동 에이전트 크루가 웹 랜딩페이지와 온보딩을 출시 전에 점검하고 행동 근거를 Mission Report로 정리하는 사전 검증 플랫폼 | Product Planning · UX Research · AI Agent Design | [GitHub](https://github.com/dayainow/critter) |
+| [**Goodz**](https://github.com/dayainow/goodz) | 기획→배포를 Template·Project Run·Stage·Task·GO/HOLD/KILL Gate·증거·감사 이력으로 관리하는 **Process Control Plane**. Commerce와 Internal Service는 이식성 Reference | TypeScript · Turborepo · React · Express · SQLite · GHA CI | [GitHub](https://github.com/dayainow/goodz) |
+| [**Astra Forge · 아스트라포지**](https://github.com/dayainow/dayainow/tree/main/inquiry-desk) | 문의 데스크(Inquiry Desk) — 문의 원문·요구사항·확인 질문 분리, 상담 상태 관리, JSON 백업·검증·중복 복원 방지 | 기획·UI·검증·QA / Vanilla JS · HTML · CSS · Node.js | [README·아키텍처·스크린샷](https://github.com/dayainow/dayainow/tree/main/inquiry-desk) |
 
-### 청년정책 처방전 — 정책 안내 앱
+### 모바일 · 인터랙션
 
-청년정책을 맞춤형 약봉투 형태로 안내하는 진단 앱입니다.
+| 프로젝트 | 한 줄 소개 | 역할·기술 | 링크 |
+| --- | --- | --- | --- |
+| [**캡슐체스 (Capsule Chess)**](https://github.com/dayainow/dayainow/tree/main/capsule-chess) | 5×5 체스를 몬스터 배틀 RPG 감성으로 만든 모바일 앱. 캡슐 리그 20단계 · 오늘의 퍼즐 · 퍼즐 도장 120문제 · 폰 진화 · 배지·업적 | Expo · React Native | [소스·README](https://github.com/dayainow/dayainow/tree/main/capsule-chess) · 스토어 출시 준비 중 |
+| [**오늘의 도서관**](https://github.com/dayainow/today-library) | 전국 공공도서관 **지금 열린 곳** 검색·즐겨찾기·길찾기 | Expo · TypeScript · Vercel API | [**배포**](https://today-library-sigma.vercel.app) |
+| [**0원의품격**](https://github.com/dayainow/zero-won-poomgyeok) | 0원 문화행사·전시 정보 앱 | Expo · TypeScript · Vercel API | [**배포**](https://zero-won-poomgyeok.vercel.app) |
+| [**메모빌**](https://github.com/dayainow/memoville) | 감정 일기 → **3D 마을** 성장 인터랙션 | Expo · Three.js · R3F | [**프로토타입**](https://prototype-web-eosin.vercel.app) |
 
-- **활용:** 마포청년축제 부스에서 체험용으로 운영
-- **기술:** React · Vite · TypeScript · Tailwind
-- **확인 자료:** [프로젝트 설명·코드](https://github.com/dayainow/youthrx-app)
+---
 
-### CorpBrain — 사내 문서 검색·질의 서비스
+## 구현 역량
 
-권한을 고려해 사내 문서를 검색하고 답변하는 로컬 RAG 프로젝트입니다.
+```text
+Frontend     TypeScript · React · Next.js · Tailwind · Zustand · TanStack Query
+             복잡한 폼·권한·전역 상태 · 반응형 UI · Storybook/격리 개발 패턴
 
-- **구현:** RBAC, 문서 트리 탐색, Slack 연동, 검색 품질 평가와 선택형 리랭킹
-- **기술:** Next.js · Ollama · AI SDK · PgVector · Redis
-- **확인 자료:** [구조·평가 방법·코드](https://github.com/dayainow/corp-brain)
+Mobile       Expo · React Native · EAS · 위치·검색·오프라인 즐겨찾기
 
-## 모바일 · 인터랙션
+Backend      NestJS · Node.js · Prisma · Supabase · Vercel Serverless · Redis · PgVector
 
-| 프로젝트 | 구현 내용 | 기술·확인 자료 |
-| --- | --- | --- |
-| **[캡슐체스](https://github.com/dayainow/dayainow/tree/main/capsule-chess)** | 5×5 체스 기반 몬스터 배틀. 리그·퍼즐·진화·업적 기능, 스토어 출시 준비 | Expo · React Native / [README](https://github.com/dayainow/dayainow/tree/main/capsule-chess) |
-| **[오늘의 도서관](https://github.com/dayainow/today-library)** | 전국 도서관 운영 시간 검색·즐겨찾기·길찾기 | Expo · TypeScript / [웹 데모](https://today-library-sigma.vercel.app) |
-| **[0원의품격](https://github.com/dayainow/zero-won-poomgyeok)** | 무료 문화행사·전시 정보 탐색 | Expo · TypeScript / [웹 데모](https://zero-won-poomgyeok.vercel.app) |
-| **[메모빌](https://github.com/dayainow/memoville)** | 감정 일기와 3D 마을 성장을 연결한 프로토타입 | Expo · Three.js · R3F / [데모](https://prototype-web-eosin.vercel.app) |
+Delivery     GitHub Actions(CI/CD) · Vercel 배포 · SEO/OG · Rate Limiting
 
-## Astra Forge · 아스트라포지
+AI Workflow  Cursor · MCP · Figma MCP · 역할 분리 에이전트 · Skill/Rule 표준화 · RAG 품질 게이트(Hit@K)
+```
 
-**문의 데스크(Inquiry Desk)** — 고객 문의를 원문·요구사항·확인 질문으로 나누고 상담 상태를 관리하는 파일 기반 도구입니다.
+| 영역 | 실무에서 하는 일 |
+| --- | --- |
+| **프론트엔드** | B2C/B2B UI 구현, 디자인 시스템 연동, 성능·접근성 개선 |
+| **풀스택** | API 설계·연동, DB 스키마, 인증·권한, 배포 파이프라인 |
+| **AI 활용** | 코드 생성기가 아닌 **검증 가능한 워크플로**로 운영 (역할·게이트·재현) · **MCP 서버 직접 개발·배포** |
+| **도구화** | 반복 작업을 npm 패키지·GHA 워크플로·Cursor Skill로 추출 |
 
-- **구현:** 상담 생성·수정·필터, JSON 백업·복원, 중복 병합 방지, 잘못된 입력 검증
-- **검증:** 핵심 테스트 5개와 브라우저 저장·수정·복원 확인. Node.js만으로 실행
-- **기술·범위:** Vanilla JavaScript · HTML · CSS · Node.js. AI API 미연결, 메모리 저장과 파일 백업 방식의 사이드 프로젝트
-- **확인 자료:** [코드·아키텍처·스크린샷·실행 방법](https://github.com/dayainow/dayainow/tree/main/inquiry-desk)
+---
 
-## 그 밖의 프로젝트
+## 오픈소스 — 개발 자동화 & 워크플로
 
-<details>
-<summary>웹 서비스·개발 도구·MCP 프로젝트 펼치기</summary>
-
-| 프로젝트 | 구현 내용 | 주요 기술 |
-| --- | --- | --- |
-| [OlaLab](https://github.com/dayainow/ola) | AI 도구 큐레이션·커뮤니티 | Next.js · NestJS · Prisma |
-| [HarnessHub](https://github.com/dayainow/harness-hub) | AI 에이전트·하네스 발견·설치 카탈로그와 CLI | Next.js · NestJS · R3F |
-| [Zarami](https://github.com/dayainow/zarami) | 채용 데이터 기반 커리어 로드맵·퀘스트 | Next.js · Supabase · React Flow / [데모](https://zarami-iota.vercel.app/) |
-| [Beacon](https://github.com/dayainow/beacon-project-os) | 파일·Git 관찰, 단계별 검증·산출물·변경 이력 관리 | TypeScript · Node.js · SQLite |
-| [Goodz](https://github.com/dayainow/goodz) | 기획부터 배포까지 작업·검증·증거·감사 이력 관리 | React · Express · SQLite · Turborepo |
-| [Critter](https://github.com/dayainow/critter) | AI 에이전트 기반 랜딩·온보딩 사전 점검과 보고서 설계 | Product Planning · UX Research · AI Agent Design |
-| [마음길잡이](https://github.com/dayainow/mind-guide-mcp) | 카카오 PlayMCP 기반 정신건강·복지 정보 안내 | Python · FastMCP · 공공데이터 |
-| [API Layer Codegen MCP](https://github.com/dayainow/dayainow/tree/main/api-layer-codegen-mcp) | OpenAPI에서 TypeScript·Zod·TanStack Query 레이어 생성 및 검증 | TypeScript · MCP · OpenAPI |
-
-</details>
-
-## 개발 방식
-
-- **동작하는 흐름부터 구현:** 입력·처리·결과를 연결한 뒤 기능을 확장합니다.
-- **검증을 코드와 함께 관리:** 테스트·린트·CI를 구성하고 AI가 만든 코드에도 같은 확인 절차를 적용합니다.
-- **재사용 가능한 단위로 정리:** 반복되는 배포·폼·권한·모바일 검증을 도구와 템플릿으로 분리합니다.
-
-## 개발 자동화 · 오픈소스
-
-<details>
-<summary>분야별 도구와 저장소 펼치기</summary>
+제품 개발 중 만들어 검증한 도구입니다. 팀에 **이식 가능한 패키지·템플릿** 형태로 공개합니다.
 
 ### 배포 · 품질
-
 
 | 프로젝트 | 소개 |
 | --- | --- |
@@ -129,15 +111,57 @@
 | [**Deep Link Harness**](https://github.com/dayainow/deep-link-harness) | 앱 딥링크·Universal Link·App Link 라우팅 검증 |
 | [**Offline Sync Harness**](https://github.com/dayainow/offline-sync-harness) | 오프라인 저장·재시도 큐·네트워크 복구 시 동기화 시나리오 검증 |
 
+### 자동화 구성 방식 (요약)
 
-</details>
+업계 표준에 맞춰, 프로젝트마다 아래 층을 조합합니다.
+
+```text
+① AI 규칙      Cursor Skill · Rule · Prompt  (협업 순서·품질 게이트)
+② 로컬 품질    Husky · ESLint · Prettier     (커밋 시)
+③ UI 검증      Component Harness · Storybook · AI Test Guard (개발 중)
+④ CI/CD        GitHub Actions · CI/CD Harness (push 후 build/test/deploy)
+```
+
+```text
+제품 루프:  planner → domain-design → data-contract → implementation → qa-reviewer
+디자인:     Figma MCP → metadata 재귀 → design_context → 코드 구현
+성능:       RUM(실사용자) → Lighthouse(원인) → 코드 수정 → RUM(개선 확인)
+```
+
+---
+
+## 기술 스택
+
+```text
+Language   TypeScript (주력), JavaScript, Python
+Frontend   React, Next.js App Router, Tailwind CSS, Zustand, TanStack Query
+Mobile     Expo, React Native, EAS Build
+Backend    NestJS, Node.js, Prisma, Supabase, Vercel Serverless
+3D / UX    Three.js, React Three Fiber, Framer Motion
+Data       공공데이터 API, CDN 캐시, cron, seed fallback
+Infra      Vercel, GitHub Actions, Redis, SEO/OG, JSON-LD
+Dev / AI   Cursor, Claude, MCP, Figma MCP, Lighthouse, web-vitals
+```
+
+---
+
+## 일하는 방식
+
+```text
+아이디어 → MVP → 실사용 검증 → 패턴 추출 → 오픈소스·다음 제품에 재사용
+```
+
+- **End-to-end**: 기획(PRD)·디자인(Figma)·UI·API·QA·배포·출시 준비까지 직접 수행 — [Goodz](https://github.com/dayainow/goodz)에서 Template·Task·Gate·증거·감사 이력으로 시스템화
+- **프로토타입 우선**: 동작하는 제품 루프를 먼저 만들고 구조를 다듬음
+- **품질 게이트**: 린트·테스트·CI를 코드와 함께 유지 — AI 산출물도 동일 기준 적용
+- **UX**: 정보는 충실하되 화면은 과하지 않게 — 읽기 쉬운 인터페이스 지향
+
+---
+
 
 ## 조직 랩 · Skill Step Labs
 
-제품 프로젝트와 별도로, 아키텍처와 성능·보안 주제를 실습하는 저장소를 [Skill Step Labs](https://github.com/skill-step-labs)에 정리합니다.
-
-<details>
-<summary>아키텍처 실습 저장소 펼치기</summary>
+아키텍처·성능·보안 주제를 실습하는 프로젝트를 [Skill Step Labs](https://github.com/skill-step-labs)에 정리합니다. 아래 저장소에서 각 주제의 구현과 실습 내용을 확인할 수 있습니다.
 
 | 도메인 카테고리 | 랩 레포지토리 (Public) | 핵심 다루는 주제 |
 | --- | --- | --- |
@@ -148,8 +172,14 @@
 | **⚡ Fullstack & Backend** | [**fullstack-reliability-lab**](https://github.com/skill-step-labs/fullstack-reliability-lab) | HTTP Idempotency Key 멱등성 보장, Exponential Backoff + Jitter 재시도, 낙관적 락(Optimistic Lock), SWR 캐싱 |
 | | [**backend-performance-lab**](https://github.com/skill-step-labs/backend-performance-lab) | Python FastAPI 비동기 서빙, PostgreSQL 커넥션 풀링, N+1 쿼리 차단, Redis 캐시 및 Stampede 방지 |
 | **🐳 Infra & DevOps** | [**docker-infra-lab**](https://github.com/skill-step-labs/docker-infra-lab) | Multi-stage Dockerfile 최적화, Docker Compose 오케스트레이션, Nginx Reverse Proxy |
-| **🧠 AI & Data Platform** | [**llm-rag-data-platform-lab**](https://github.com/skill-step-labs/llm-rag-data-platform-lab) | RAG(검색 증강 생성), ChromaDB/FAISS 벡터 스토어, 코사인 유사도 검색, AWS Bedrock 파이프라인 |
+| **🧠 AI & Data Platform** | [**llm-rag-data-platform-lab**](https://github.com/skill-step-labs/llm-rag-data-platform-lab) | RAG(검색 증강 생성), ChromaDB/FAISS 벡터 스토어, 코사인 유사도 검색, AWS Bedrock Claude 3.5 파이프라인 |
 | | [**ai-product-patterns-lab**](https://github.com/skill-step-labs/ai-product-patterns-lab) | SSE(Server-Sent Events) 실시간 토큰 스트리밍, AI Provider Fallback 서킷 브레이커, Token Rate Limiter |
 | **📱 Mobile Native** | [**android-architecture-lab**](https://github.com/skill-step-labs/android-architecture-lab) | Android Clean Architecture 3계층, MVI (Model-View-Intent), Jetpack Compose, Kotlin Coroutines / StateFlow |
 
-</details>
+---
+
+<div align="center">
+
+📫 문의: [GitHub Issues](https://github.com/dayainow/dayainow/issues)
+
+</div>
