@@ -44,7 +44,7 @@
 
 | 프로젝트 | 구현 내용 | 기술·확인 자료 |
 | --- | --- | --- |
-| **[캡슐체스](./capsule-chess)** | 5×5 체스 기반 몬스터 배틀. 리그·퍼즐·진화·업적 기능, 스토어 출시 준비 | Expo · React Native / [README](./capsule-chess) |
+| **[캡슐체스](https://github.com/dayainow/dayainow/tree/main/capsule-chess)** | 5×5 체스 기반 몬스터 배틀. 리그·퍼즐·진화·업적 기능, 스토어 출시 준비 | Expo · React Native / [README](https://github.com/dayainow/dayainow/tree/main/capsule-chess) |
 | **[오늘의 도서관](https://github.com/dayainow/today-library)** | 전국 도서관 운영 시간 검색·즐겨찾기·길찾기 | Expo · TypeScript / [웹 데모](https://today-library-sigma.vercel.app) |
 | **[0원의품격](https://github.com/dayainow/zero-won-poomgyeok)** | 무료 문화행사·전시 정보 탐색 | Expo · TypeScript / [웹 데모](https://zero-won-poomgyeok.vercel.app) |
 | **[메모빌](https://github.com/dayainow/memoville)** | 감정 일기와 3D 마을 성장을 연결한 프로토타입 | Expo · Three.js · R3F / [데모](https://prototype-web-eosin.vercel.app) |
@@ -56,7 +56,7 @@
 - **구현:** 상담 생성·수정·필터, JSON 백업·복원, 중복 병합 방지, 잘못된 입력 검증
 - **검증:** 핵심 테스트 5개와 브라우저 저장·수정·복원 확인. Node.js만으로 실행
 - **기술·범위:** Vanilla JavaScript · HTML · CSS · Node.js. AI API 미연결, 메모리 저장과 파일 백업 방식의 사이드 프로젝트
-- **확인 자료:** [코드·아키텍처·스크린샷·실행 방법](./inquiry-desk)
+- **확인 자료:** [코드·아키텍처·스크린샷·실행 방법](https://github.com/dayainow/dayainow/tree/main/inquiry-desk)
 
 ## 그 밖의 프로젝트
 
@@ -72,7 +72,7 @@
 | [Goodz](https://github.com/dayainow/goodz) | 기획부터 배포까지 작업·검증·증거·감사 이력 관리 | React · Express · SQLite · Turborepo |
 | [Critter](https://github.com/dayainow/critter) | AI 에이전트 기반 랜딩·온보딩 사전 점검과 보고서 설계 | Product Planning · UX Research · AI Agent Design |
 | [마음길잡이](https://github.com/dayainow/mind-guide-mcp) | 카카오 PlayMCP 기반 정신건강·복지 정보 안내 | Python · FastMCP · 공공데이터 |
-| [API Layer Codegen MCP](./api-layer-codegen-mcp) | OpenAPI에서 TypeScript·Zod·TanStack Query 레이어 생성 및 검증 | TypeScript · MCP · OpenAPI |
+| [API Layer Codegen MCP](https://github.com/dayainow/dayainow/tree/main/api-layer-codegen-mcp) | OpenAPI에서 TypeScript·Zod·TanStack Query 레이어 생성 및 검증 | TypeScript · MCP · OpenAPI |
 
 </details>
 
@@ -134,7 +134,7 @@
 
 ## 조직 랩 · Skill Step Labs
 
-제품 프로젝트와 별도로, 아키텍처와 성능·보안 주제를 실습하는 저장소를 **[Skill Step Labs](https://github.com/skill-step-labs)**에 정리합니다.
+제품 프로젝트와 별도로, 아키텍처와 성능·보안 주제를 실습하는 저장소를 [Skill Step Labs](https://github.com/skill-step-labs)에 정리합니다.
 
 <details>
 <summary>아키텍처 실습 저장소 펼치기</summary>
