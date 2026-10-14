@@ -22,9 +22,9 @@ const PROGRESS = {
 };
 
 const TEXT = {
-  ko: { knowsChess: '체스를 알아요', openRules: '규칙 보기', piecesTab: '기물 움직임', start: '배틀 시작!', continue: '계속하기' },
-  en: { knowsChess: 'I know chess', openRules: 'Show rules', piecesTab: 'How pieces move', start: 'Battle start!', continue: 'Continue' },
-  ja: { knowsChess: 'チェスを知っている', openRules: 'ルールを見る', piecesTab: '駒の動き', start: 'バトル開始!', continue: 'つづける' },
+  ko: { tapCapsule: '캡슐을 톡 눌러 봐요', firstBattle: '첫 배틀 시작! ▶', openRules: '규칙 보기', piecesTab: '기물 움직임', start: '배틀 시작!', continue: '계속하기' },
+  en: { tapCapsule: 'Tap the capsule', firstBattle: 'Start first battle ▶', openRules: 'Show rules', piecesTab: 'How pieces move', start: 'Battle start!', continue: 'Continue' },
+  ja: { tapCapsule: 'カプセルをタップ', firstBattle: 'はじめてのバトル ▶', openRules: 'ルールを見る', piecesTab: '駒の動き', start: 'バトル開始!', continue: 'つづける' },
 };
 
 const ROUTES = ['/', '/daily', '/campaign', '/campaign/1', '/play', '/learn', '/learn/knight', '/settings', '/achievements', '/practice', '/practice/1', '/themes'];
@@ -84,14 +84,22 @@ const run = async (browser, locale) => {
   const shot = (page, name) => page.screenshot({ path: join(OUT, `${locale}-${name}.png`) });
   const t = TEXT[locale];
 
-  // 1) 처음 온 사람: 환영 안내 → 체스를 알아요 → 규칙 단계
+  // 1) 처음 온 사람: 첫 캡슐 → 세 번 톡톡톡 → 블루 팀 등장 → 첫 배틀 (가이드)
   {
     const { context, page } = await newPage(null);
     await page.goto(BASE + '/', { waitUntil: 'networkidle0', timeout: 120_000 });
     await wait(1200);
-    await clickText(page, t.knowsChess);
-    await wait(500);
-    await shot(page, 'welcome-rules');
+    await shot(page, 'opening-closed');
+    for (let i = 0; i < 3; i++) {
+      await clickLabel(page, t.tapCapsule);
+      await wait(450);
+    }
+    await wait(1600);
+    await shot(page, 'opening-open');
+    await clickText(page, t.firstBattle);
+    await wait(1500);
+    if (!page.url().endsWith('/campaign/1')) errors.push(`${locale} 첫 배틀로 가지 않음: ${page.url()}`);
+    await shot(page, 'opening-first-battle');
     await context.close();
   }
 

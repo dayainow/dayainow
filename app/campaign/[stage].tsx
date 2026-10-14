@@ -27,9 +27,11 @@ import { DialogBox } from '../../src/ui/DialogBox';
 import { GameButton } from '../../src/ui/GameButton';
 import { MascotFace } from '../../src/ui/MascotFace';
 import { TeamPanel } from '../../src/ui/TeamPanel';
+import { useDelayedFlag } from '../../src/ui/useDelayedFlag';
 import { Text } from '../../src/ui/Text';
 
 const EVOLVE_DELAY = 420; // 기물이 끝 줄에 미끄러져 도착한 뒤 진화 연출 시작
+const RESULT_DELAY_MS = 1100; // 체크메이트 도장을 보고 나서 결과 창
 
 export default function StageRoute() {
   const { stage: stageParam } = useLocalSearchParams<{ stage: string }>();
@@ -64,6 +66,7 @@ function StagePlay({ stage }: { stage: Stage }) {
   const maxPower = useMemo(() => ({ w: powerOf(initialBoard, 'w'), b: powerOf(initialBoard, 'b') }), [initialBoard]);
   const nextStage = getStage(stage.id + 1);
   const won = game.result?.winner === 'w';
+  const resultReady = useDelayedFlag(game.isGameOver, RESULT_DELAY_MS);
 
   useEffect(() => {
     if (stage.id === 1) loadProgress().then(p => setGuideEligible(!p.guideDone && !(p.campaign[1] > 0)));
@@ -271,7 +274,7 @@ function StagePlay({ stage }: { stage: Stage }) {
       <EvolutionOverlay side={evolving} onClose={() => setEvolving(null)} />
 
       <ResultModal
-        visible={game.isGameOver && !evolving && !hideResult}
+        visible={resultReady && !evolving && !hideResult}
         art={<MascotFace mood={won ? 'happy' : 'sad'} size={100} />}
         celebrate={won}
         title={won ? (nextStage ? strings.campaign.cleared : strings.campaign.allCleared) : strings.campaign.failed}

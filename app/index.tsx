@@ -7,13 +7,14 @@ import { track } from '../src/analytics';
 import { CAPSULES, STAGES_PER_CAPSULE, earnedBadges, opponentFor } from '../src/campaign/league';
 import { getStage, nextStageId } from '../src/campaign/stages';
 import { RulesButton } from '../src/components/RulesButton';
-import { WelcomeModal } from '../src/components/WelcomeModal';
+import { OpeningCapsule } from '../src/components/OpeningCapsule';
 import { strings } from '../src/i18n';
 import { getDailyPuzzle } from '../src/puzzles/daily';
 import { type Progress, currentStreak, emptyProgress, loadProgress, recordOnboarded, totalStars } from '../src/storage/progress';
 import { palette } from '../src/theme';
 import { PRACTICE_COUNT } from '../src/puzzles/practice';
 import { LESSONS } from '../src/tutorial/lessons';
+import { Alive } from '../src/ui/Alive';
 import { CapsuleBadge } from '../src/ui/CapsuleBadge';
 import { Chip } from '../src/ui/Chip';
 import { GameButton } from '../src/ui/GameButton';
@@ -59,8 +60,8 @@ export default function HomeScreen() {
     return () => clearInterval(tick);
   }, [solvedToday]);
 
-  // 환영 안내는 한 번만: 고르면 바로 기록하고 해당 화면으로 이동
-  const finishOnboarding = (choice: 'new' | 'knows' | 'later', href?: Href) => {
+  // 첫 캡슐 열기는 한 번만: 고르면 바로 기록하고 해당 화면으로 이동
+  const finishOnboarding = (choice: 'battle' | 'learn' | 'later', href?: Href) => {
     setProgress(p => ({ ...p, onboarded: true }));
     recordOnboarded();
     track('onboarding_choice', { choice });
@@ -77,7 +78,9 @@ export default function HomeScreen() {
           {/* 트레이너 카드: 마스코트 + 연속 기록·별 + 규칙·설정 */}
           <Panel style={styles.trainer}>
             <Pressable style={styles.trainerMain} onPress={() => router.push('/achievements')} accessibilityLabel={strings.achievements.title}>
-              <MascotFace mood="happy" size={60} />
+              <Alive kind="hop">
+                <MascotFace mood="happy" size={60} />
+              </Alive>
               <View style={styles.trainerBody}>
                 <Text style={styles.trainerName} numberOfLines={1}>
                   {strings.league.trainer}
@@ -116,9 +119,9 @@ export default function HomeScreen() {
           <Pressable onPress={() => router.push('/daily')}>
             <Panel color={palette.sun} style={styles.daily}>
               {!solvedToday && (
-                <View style={styles.newTag}>
+                <Alive kind="pulse" style={styles.newTag}>
                   <Text style={styles.newTagText}>NEW!</Text>
-                </View>
+                </Alive>
               )}
               <Text style={styles.dailyKicker}>
                 {strings.home.daily} #{daily.number}
@@ -137,7 +140,9 @@ export default function HomeScreen() {
           <Pressable onPress={openLeague}>
             <Panel style={styles.league}>
               <View style={styles.opponent}>
-                <PieceImage piece={opponent?.avatar ?? 'wK'} size={52} />
+                <Alive kind="bob" delay={700}>
+                  <PieceImage piece={opponent?.avatar ?? 'wK'} size={52} />
+                </Alive>
               </View>
               <View style={styles.leagueBody}>
                 <Text style={styles.muted} numberOfLines={1}>
@@ -196,10 +201,10 @@ export default function HomeScreen() {
         </View>
       </ScrollView>
 
-      <WelcomeModal
+      <OpeningCapsule
         visible={loaded && !progress.onboarded}
-        onNewPlayer={() => finishOnboarding('new', '/learn/king')}
-        onKnowsChess={() => finishOnboarding('knows', '/campaign/1')}
+        onBattle={() => finishOnboarding('battle', '/campaign/1')}
+        onLearn={() => finishOnboarding('learn', '/learn/king')}
         onLater={() => finishOnboarding('later')}
       />
     </SafeAreaView>

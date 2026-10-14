@@ -16,6 +16,7 @@ import { GameButton } from '../../src/ui/GameButton';
 import { MascotFace } from '../../src/ui/MascotFace';
 import { Panel } from '../../src/ui/Panel';
 import { Text } from '../../src/ui/Text';
+import { useDelayedFlag } from '../../src/ui/useDelayedFlag';
 
 export default function PracticeRoute() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -29,6 +30,8 @@ function PracticePlay({ puzzle }: { puzzle: PracticePuzzle }) {
   const [showResult, setShowResult] = useState(false);
   const [alreadySolved, setAlreadySolved] = useState(false);
   const next = getPracticePuzzle(puzzle.number + 1);
+  // 체크메이트 도장을 보고 나서 결과 창
+  const resultVisible = useDelayedFlag(showResult, 1000);
 
   const play = usePuzzle({
     board: puzzle.board,
@@ -89,7 +92,7 @@ function PracticePlay({ puzzle }: { puzzle: PracticePuzzle }) {
       </View>
 
       <ResultModal
-        visible={showResult}
+        visible={resultVisible}
         art={<MascotFace mood="happy" size={100} />}
         celebrate
         title={strings.practice.solved}

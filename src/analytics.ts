@@ -3,7 +3,7 @@
 
 export type AnalyticsEvents = {
   app_open: { first_open: boolean };
-  onboarding_choice: { choice: 'new' | 'knows' | 'later' };
+  onboarding_choice: { choice: 'battle' | 'learn' | 'later' };
   lesson_complete: { lesson: string };
   tutorial_complete: Record<string, never>;
   daily_open: { number: number; solved: boolean };
