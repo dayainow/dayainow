@@ -21,6 +21,7 @@ import { GameButton } from '../src/ui/GameButton';
 import { MascotFace } from '../src/ui/MascotFace';
 import { Panel } from '../src/ui/Panel';
 import { Text } from '../src/ui/Text';
+import { useDelayedFlag } from '../src/ui/useDelayedFlag';
 import { formatCountdown, msUntilNextDay } from '../src/utils/date';
 
 export default function DailyScreen() {
@@ -48,6 +49,8 @@ export default function DailyScreen() {
     },
   });
   const { solved, attempts, hints, setMessage } = play;
+  // 체크메이트 도장을 보고 나서 결과 창
+  const resultVisible = useDelayedFlag(showResult, 1000);
 
   useEffect(() => {
     loadProgress().then(saved => {
@@ -166,7 +169,7 @@ export default function DailyScreen() {
       />
 
       <ResultModal
-        visible={showResult}
+        visible={resultVisible}
         art={<MascotFace mood="happy" size={100} />}
         celebrate
         title={strings.daily.solved}

@@ -116,14 +116,18 @@ ${'🟥'.repeat(attempts - 1)}🟩${'💡'.repeat(hints)}
 🔥 ${streak}일 연속`,
   },
   onboarding: {
-    title: '캡슐체스에 온 걸 환영해요!',
-    question: '체스를 처음 해 보나요?',
-    newPlayer: '처음이에요 · 배우면서 시작',
-    knowsChess: '체스를 알아요',
-    later: '나중에 할게요',
     rulesTitle: '캡슐체스만의 규칙',
-    rulesIntro: '일반 체스와 이것만 기억하면 돼요',
-    startChallenge: '바로 도전하기',
+  },
+  // 첫 실행: 캡슐을 톡톡톡 눌러 열면 블루 팀이 튀어나옴
+  opening: {
+    welcome: '첫 캡슐이 도착했어요!',
+    tap: '캡슐을 톡 눌러 봐요',
+    tapMore: ['한 번 더!', '거의 열려요!'],
+    teamTitle: '블루 팀 등장!',
+    teamBody: '오늘부터 함께할 몬스터들이에요. 작은 5×5 판에서 레드 팀 킹을 꼼짝 못 하게 만들면 승리!',
+    battle: '첫 배틀 시작! ▶',
+    learn: '규칙부터 배울래요',
+    later: '나중에 할게요',
   },
   pieces: { K: '킹', Q: '퀸', R: '룩', B: '비숍', N: '나이트', P: '폰' },
   // 배틀 화면 실황 대사 (side: 블루/레드, piece: 기물 이름)

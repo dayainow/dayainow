@@ -21,11 +21,13 @@ import { DialogBox } from '../src/ui/DialogBox';
 import { GameButton } from '../src/ui/GameButton';
 import { MascotFace } from '../src/ui/MascotFace';
 import { TeamPanel } from '../src/ui/TeamPanel';
+import { useDelayedFlag } from '../src/ui/useDelayedFlag';
 import { Text } from '../src/ui/Text';
 
 const LEVELS = Object.keys(DIFFICULTY_DEPTH) as Difficulty[];
 const MAX_POWER = powerOf(INITIAL_BOARD, 'w');
 const EVOLVE_DELAY = 420;
+const RESULT_DELAY_MS = 1100; // 체크메이트 도장을 보고 나서 결과 창
 
 export default function FreePlayScreen() {
   const [gameMode, setGameMode] = useState<'pvp' | 'pve'>('pve');
@@ -37,6 +39,7 @@ export default function FreePlayScreen() {
   const vsAi = gameMode === 'pve';
   const game = useChessGame({ ai: vsAi ? { depth: DIFFICULTY_DEPTH[difficulty] } : null });
   const { result } = game;
+  const resultReady = useDelayedFlag(game.isGameOver, RESULT_DELAY_MS);
 
   useEffect(() => {
     loadSettings().then(settings => setDifficulty(settings.difficulty));
@@ -172,7 +175,7 @@ export default function FreePlayScreen() {
       <EvolutionOverlay side={evolving} onClose={() => setEvolving(null)} />
 
       <ResultModal
-        visible={game.isGameOver && !evolving}
+        visible={resultReady && !evolving}
         art={<MascotFace mood={!result?.winner ? 'thinking' : playerLost ? 'sad' : 'happy'} size={100} />}
         celebrate={!!result?.winner && !playerLost}
         title={result?.status === 'checkmate' ? strings.result.checkmate : result?.status === 'stalemate' ? strings.result.stalemate : strings.result.draw}
