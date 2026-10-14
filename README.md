@@ -62,12 +62,13 @@
 
 | 프로젝트 | 한 줄 소개 | 역할·기술 | 링크 |
 | --- | --- | --- | --- |
-| **Inquiry Desk · 문의 데스크** | 문의 원문·요구사항·확인 질문 분리, 상담 상태 관리, JSON 백업·검증·중복 복원 방지. 실행 가능한 사이드 프로젝트로 마감 | 기획·UI·검증·QA / Vanilla JS · HTML · CSS · Node.js | [README·아키텍처·스크린샷](./inquiry-desk) |
+| [**Astra Forge · 아스트라포지**](./inquiry-desk) | 문의 데스크(Inquiry Desk) — 문의 원문·요구사항·확인 질문 분리, 상담 상태 관리, JSON 백업·검증·중복 복원 방지 | 기획·UI·검증·QA / Vanilla JS · HTML · CSS · Node.js | [README·아키텍처·스크린샷](./inquiry-desk) |
 
 ### 모바일 · 인터랙션
 
 | 프로젝트 | 한 줄 소개 | 역할·기술 | 링크 |
 | --- | --- | --- | --- |
+| [**캡슐체스 (Capsule Chess)**](./capsule-chess) | 5×5 체스를 몬스터 배틀 RPG 감성으로 만든 모바일 앱. 캡슐 리그 20단계 · 오늘의 퍼즐 · 퍼즐 도장 120문제 · 폰 진화 · 배지·업적 | Expo · React Native | [소스·README](./capsule-chess) · 스토어 출시 준비 중 |
 | [**오늘의 도서관**](https://github.com/dayainow/today-library) | 전국 공공도서관 **지금 열린 곳** 검색·즐겨찾기·길찾기 | Expo · TypeScript · Vercel API | [**배포**](https://today-library-sigma.vercel.app) |
 | [**0원의품격**](https://github.com/dayainow/zero-won-poomgyeok) | 0원 문화행사·전시 정보 앱 | Expo · TypeScript · Vercel API | [**배포**](https://zero-won-poomgyeok.vercel.app) |
 | [**메모빌**](https://github.com/dayainow/memoville) | 감정 일기 → **3D 마을** 성장 인터랙션 | Expo · Three.js · R3F | [**프로토타입**](https://prototype-web-eosin.vercel.app) |
@@ -142,13 +143,6 @@ AI Workflow  Cursor · MCP · Figma MCP · 역할 분리 에이전트 · Skill/R
 | [**Mobile Permission Harness**](https://github.com/dayainow/mobile-permission-harness) | 위치·카메라·알림·사진 접근 권한 Mock — 실제 디바이스 없이 상태별 UI 개발 |
 | [**Deep Link Harness**](https://github.com/dayainow/deep-link-harness) | 앱 딥링크·Universal Link·App Link 라우팅 검증 |
 | [**Offline Sync Harness**](https://github.com/dayainow/offline-sync-harness) | 오프라인 저장·재시도 큐·네트워크 복구 시 동기화 시나리오 검증 |
-
-### 🎮 미니 게임 & 프로토타입
-
-| 프로젝트 | 소개 |
-| --- | --- |
-| [**캡슐체스 (Capsule Chess)**](./capsule-chess) | 5×5 미니체스를 몬스터 배틀 RPG 감성으로 만든 Expo(React Native) 앱. 캡슐 리그 20단계 · 오늘의 퍼즐 · 퍼즐 도장 120문제 · 폰 진화 연출 · 배지·업적. 스토어 출시 준비 중. <br> <img src="./capsule-chess/assets/store/screenshots/ko/03-versus.png" width="150" alt="Capsule Chess VS" /> <img src="./capsule-chess/assets/store/screenshots/ko/02-battle.png" width="150" alt="Capsule Chess Battle" /> |
-| [**5x5 Minichess**](./minichess-prototype) | 1~3분 안에 끝나는 빠르고 캐주얼한 모바일 웹 체스. HTML/JS 및 PWA 지원. <br> <img src="./assets/minichess-app.jpg" width="150" alt="Minichess Screenshot" /> |
 
 ### 자동화 구성 방식 (요약)
 
