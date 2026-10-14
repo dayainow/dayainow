@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>문의 데스크 · Astra Forge</title>
+<meta name="description" content="고객 문의를 상담 기록으로 정리하고 후속 대응을 관리하는 로컬 시연 도구">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2317263d'/%3E%3Cpath d='M9 9h14v10H14l-5 5z' fill='%2335dfab'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header><a class="brand" href="./">AF <span>ASTRA FORGE</span></a><span class="pill">가상 사례 시연 · AI 미연결</span></header>
+<main>
+<section class="intro"><div><p class="eyebrow">작은 팀의 상담 작업대</p><h1>문의는 한곳에.<br>다음 할 일은 명확하게.</h1><p>고객이 말한 내용과 확인할 내용을 나누고, 상담 기록을 남기세요.</p></div><aside><strong>파일로 보관하는 시연</strong><p>서버 전송·자동 답장 없이 작동합니다. 새로고침 전에 JSON으로 내려받으세요.</p></aside></section>
+<div id="notice" role="status" aria-live="polite"></div>
+<section class="workspace">
+<form id="editor" class="panel"><div class="section-title"><h2 id="edit-heading">01 · 문의 접수</h2><button type="button" id="sample" class="quiet">가상 예시 넣기</button></div>
+<label for="title">상담 이름</label><input id="title" maxlength="100" required placeholder="예: 카페 소개 홈페이지">
+<label for="inquiry">고객 문의 원문</label><textarea id="inquiry" rows="6" maxlength="12000" required placeholder="연락처 등 개인정보를 지운 문의를 붙여 넣으세요."></textarea>
+<div class="row"><div><label for="status">진행 상태</label><select id="status"><option>접수</option><option>확인 대기</option><option>제안 완료</option><option>종료</option></select></div><div><label for="due">다음 확인일</label><input id="due" type="date"></div></div>
+<label for="requirements">확인된 요구사항</label><textarea id="requirements" rows="3" maxlength="6000" placeholder="원문에서 확인된 내용만 적으세요."></textarea>
+<label for="questions">추가로 확인할 질문</label><textarea id="questions" rows="3" maxlength="6000" placeholder="예산 단위, 정확한 일정, 작업 범위 등"></textarea>
+<label for="reply">검토할 답장 초안</label><textarea id="reply" rows="4" maxlength="6000" placeholder="실제 금액·일정은 확인 후 안내하세요."></textarea>
+<div class="actions"><button class="primary" type="submit">상담 기록 저장</button><button type="button" id="clear">새 문의</button></div>
+<details><summary>외부 AI로 정리하고 싶다면</summary><p>아래 버튼은 요청문만 만듭니다. 내용을 확인한 뒤 본인의 AI 도구에 직접 전달하고, 결과를 검토해 위 항목에 입력하세요.</p><button type="button" id="prompt">요청문 만들기</button><label for="prompt-output">복사할 요청문</label><textarea id="prompt-output" readonly rows="7"></textarea><button type="button" id="copy">요청문 복사</button></details>
+</form>
+<section class="panel records"><div class="section-title"><h2>02 · 상담 기록</h2><span id="count" class="count">0건</span></div>
+<label for="filter">진행 상태 보기</label><select id="filter"><option>전체</option><option>접수</option><option>확인 대기</option><option>제안 완료</option><option>종료</option></select>
+<div id="record-list" class="record-list"><div class="empty"><span>아직 상담 기록이 없습니다.</span><p>왼쪽의 가상 예시로 저장과 후속 대응 관리를 먼저 확인해보세요.</p></div></div>
+<div class="backup"><h3>기록 보관</h3><p>현재 화면의 기록은 새로고침하면 초기화됩니다. JSON 파일을 내려받고 다음에 복원하세요.</p><div class="actions"><button id="export" type="button">JSON 백업</button><button id="import-button" type="button">백업 복원</button><input id="import" type="file" accept=".json,application/json" hidden></div><p class="fine">복원은 기존 기록에 추가하며, 같은 ID의 기록은 건너뜁니다.</p></div>
+</section>
+</section>
+<details id="backup-text-panel" class="panel"><summary>다운로드가 안 되나요? 텍스트로 백업·복원</summary><p>현재 기록의 JSON을 만들어 별도 파일에 보관하세요. 복원하려면 보관한 JSON을 아래에 붙여 넣으세요.</p><button id="prepare-backup" type="button">백업 텍스트 만들기</button><label for="backup-text">백업 JSON</label><textarea id="backup-text" rows="8" spellcheck="false"></textarea><div class="actions"><button id="copy-backup" type="button">백업 텍스트 복사</button><button id="restore-text" type="button">텍스트에서 복원</button></div></details>
+<footer>시연용 도구입니다. AI 분석·고객 연락·외부 서비스 연결은 실행하지 않습니다.</footer>
+</main><script type="module" src="app.js?v=20260927-backup"></script>
+</body></html>

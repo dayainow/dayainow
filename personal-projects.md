@@ -42,6 +42,12 @@ https://github.com/dayainow
 | Critter | AI 행동 에이전트 크루가 출시 전 랜딩·온보딩을 점검하고 Mission Report로 정리하는 사전 검증 플랫폼 | Product Planning · UX Research · AI Agent Design |
 | Goodz | Template·Project Run·Stage·Task·GO/HOLD/KILL Gate·증거·감사 이력으로 기획→배포를 관리하는 Process Control Plane | TypeScript · Turborepo · React · Express · SQLite · GHA CI |
 
+### 파일 기반 업무 도구
+
+| 프로젝트 | 한 줄 소개 | 기술 |
+| --- | --- | --- |
+| [Inquiry Desk · 문의 데스크](./inquiry-desk) | 상담 기록·상태 필터·JSON 백업/복원, 중복 병합 및 입력 검증. 외부 API 없이 실행되는 사이드 프로젝트 | Vanilla JavaScript · HTML · CSS · Node.js |
+
 ### 모바일 · 인터랙션
 
 | 프로젝트 | 한 줄 소개 | 기술 | 링크 |

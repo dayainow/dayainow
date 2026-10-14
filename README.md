@@ -58,6 +58,12 @@
 | [**Goodz**](https://github.com/dayainow/goodz) | 기획→배포를 Template·Project Run·Stage·Task·GO/HOLD/KILL Gate·증거·감사 이력으로 관리하는 **Process Control Plane**. Commerce와 Internal Service는 이식성 Reference | TypeScript · Turborepo · React · Express · SQLite · GHA CI | [GitHub](https://github.com/dayainow/goodz) |
 
 
+### 파일 기반 업무 도구
+
+| 프로젝트 | 한 줄 소개 | 역할·기술 | 링크 |
+| --- | --- | --- | --- |
+| **Inquiry Desk · 문의 데스크** | 문의 원문·요구사항·확인 질문 분리, 상담 상태 관리, JSON 백업·검증·중복 복원 방지. 실행 가능한 사이드 프로젝트로 마감 | 기획·UI·검증·QA / Vanilla JS · HTML · CSS · Node.js | [README·아키텍처·스크린샷](./inquiry-desk) |
+
 ### 모바일 · 인터랙션
 
 | 프로젝트 | 한 줄 소개 | 역할·기술 | 링크 |
