@@ -69,28 +69,41 @@ class Store:
  def update(self,p,revision):
   a=engine.calculate(p)
   with self.db() as db:
-   c=self.get(db);self.check(c,revision)
-   rev=c['revision']+1
-   db.execute('insert or replace into archived_revisions values(?,?,?)',('C201',c['revision'],json.dumps(c)))
-   db.execute('update cases set revision=?,status=?,inputs=?,analysis=?,ai=NULL,approval=NULL where id="C201"',
-              (rev,a['status'],json.dumps(p),json.dumps(a)))
-   db.execute('update tasks set state="SUPERSEDED" where state in ("OPEN","BLOCKED")')
-   self.event(db,rev,'CONDITIONS_CHANGED','조건 버전 변경. 이전 AI 판단·승인·미완료 작업은 현재 실행에 사용할 수 없습니다.')
-   if c['status']=='EXECUTED':
-    db.execute('insert into tasks(case_id,revision,owner,title,kind,state) values(?,?,?,?,?,?)',
-               ('C201',rev,'PM','이전 실행 영향 확인 및 변경 통지 초안 작성','RECONCILE','OPEN'))
-   for gap in a['gaps']:
-    db.execute('insert into tasks(case_id,revision,owner,title,kind,state) values(?,?,?,?,?,?)',
-               ('C201',rev,gap['owner'],gap['title'],'INFORMATION','OPEN'))
-   for impact in a.get('commitment_impacts',[]):
-    if impact['at_risk_if_new_first'] > 0 or impact['existing_shortage'] > 0:
-     title=f"{impact['customer_id']} · {impact['id']} · {impact['due_date']} 약속 보호: 신규 우선 시 {impact['at_risk_if_new_first']:,.0f} EA 노출. 물량·일정 조정"
-     db.execute('insert into tasks(case_id,revision,owner,title,kind,state) values(?,?,?,?,?,?)',('C201',rev,'영업·생산',title,'PROMISE_REVIEW','OPEN'))
-   if a['blockers']:
-    db.execute('insert into tasks(case_id,revision,owner,title,kind,state) values(?,?,?,?,?,?)',
-               ('C201',rev,'영업','전량 요구를 충족할 수 없어 물량·일정 재협상','RENEGOTIATE','OPEN'))
-   self.event(db,rev,'CALCULATED',f"제약 검증: {a['status']}. 정보 공백 {len(a['gaps'])}건.")
+   self._update(db,p,revision,a)
   return self.state()
+
+ def choose_alternative(self,candidate_id,revision):
+  from alternatives import compare
+  with self.db() as db:
+   c=self.get(db);self.check(c,revision)
+   proposal=next((x for x in compare(c['inputs'])['candidates'] if x['id']==candidate_id),None)
+   if not proposal or not proposal['selectable']: raise ValueError('선택할 수 없는 대안입니다.')
+   self._update(db,proposal['inputs'],revision,engine.calculate(proposal['inputs']))
+   self.event(db,revision+1,'ALTERNATIVE_SELECTED',json.dumps({k:proposal[k] for k in ['id','start_date','basic_qty','derma_qty','capex','requires_reconfirmation']},ensure_ascii=False))
+  return self.state()
+
+ def _update(self,db,p,revision,a):
+  c=self.get(db);self.check(c,revision)
+  rev=c['revision']+1
+  db.execute('insert or replace into archived_revisions values(?,?,?)',('C201',c['revision'],json.dumps(c)))
+  db.execute('update cases set revision=?,status=?,inputs=?,analysis=?,ai=NULL,approval=NULL where id="C201"',
+             (rev,a['status'],json.dumps(p),json.dumps(a)))
+  db.execute('update tasks set state="SUPERSEDED" where state in ("OPEN","BLOCKED")')
+  self.event(db,rev,'CONDITIONS_CHANGED','조건 버전 변경. 이전 AI 판단·승인·미완료 작업은 현재 실행에 사용할 수 없습니다.')
+  if c['status']=='EXECUTED':
+   db.execute('insert into tasks(case_id,revision,owner,title,kind,state) values(?,?,?,?,?,?)',
+              ('C201',rev,'PM','이전 실행 영향 확인 및 변경 통지 초안 작성','RECONCILE','OPEN'))
+  for gap in a['gaps']:
+   db.execute('insert into tasks(case_id,revision,owner,title,kind,state) values(?,?,?,?,?,?)',
+              ('C201',rev,gap['owner'],gap['title'],'INFORMATION','OPEN'))
+  for impact in a.get('commitment_impacts',[]):
+   if impact['at_risk_if_new_first'] > 0 or impact['existing_shortage'] > 0:
+    title=f"{impact['customer_id']} · {impact['id']} · {impact['due_date']} 약속 보호: 신규 우선 시 {impact['at_risk_if_new_first']:,.0f} EA 노출. 물량·일정 조정"
+    db.execute('insert into tasks(case_id,revision,owner,title,kind,state) values(?,?,?,?,?,?)',('C201',rev,'영업·생산',title,'PROMISE_REVIEW','OPEN'))
+  if a['blockers']:
+   db.execute('insert into tasks(case_id,revision,owner,title,kind,state) values(?,?,?,?,?,?)',
+              ('C201',rev,'영업','전량 요구를 충족할 수 없어 물량·일정 재협상','RENEGOTIATE','OPEN'))
+  self.event(db,rev,'CALCULATED',f"제약 검증: {a['status']}. 정보 공백 {len(a['gaps'])}건.")
 
  def attach_ai(self,report,revision,mode='live'):
   with self.db() as db:
@@ -135,10 +148,14 @@ class Store:
    if c['status']!='APPROVED' or c['approval']['hash']!=engine.digest(c['inputs']): raise ValueError('현재 조건에 대한 CEO 승인이 필요합니다.')
    if engine.calculate(c['inputs'])['status']!='READY_FOR_REVIEW': raise ValueError('실행 직전 제약 검증 실패')
    # Mandatory finance dependency persists even if the AI omits it.
-   kinds=list(dict.fromkeys(['CASH_REVIEW']+c['ai']['tasks']+['BID_DRAFT','INVESTMENT_PREP']))
+   investment=c['inputs']['option']!='NONE'
+   kinds=list(dict.fromkeys(['CASH_REVIEW']+c['ai']['tasks']+['BID_DRAFT']+(['INVESTMENT_PREP'] if investment else [])))
+   if not investment: kinds=[k for k in kinds if k!='INVESTMENT_PREP']
    cash_id=None
    for kind in kinds:
     owner,title=ALLOWED_TASKS[kind]
+    if kind in ['BID_DRAFT','INVESTMENT_PREP']:
+     p=c['inputs'];title+=f" · {p['option']} / {p['start_date']} / 기초 {p['basic_qty']:,}·더마 {p['derma_qty']:,} EA"
     dep=cash_id if kind=='INVESTMENT_PREP' else None
     cur=db.execute('insert into tasks(case_id,revision,owner,title,kind,state,depends_on) values(?,?,?,?,?,?,?)',
                    ('C201',revision,owner,title,kind,'BLOCKED' if dep else 'OPEN',dep))

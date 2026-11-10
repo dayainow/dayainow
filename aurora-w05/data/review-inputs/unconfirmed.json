@@ -1,0 +1,39 @@
+{
+  "start_date": "2026-09-01",
+  "basic_qty": 2000000,
+  "derma_qty": 1200000,
+  "fx": 1478.29,
+  "discount_pct": 5,
+  "option": "OPT-02",
+  "capacity_period": "month",
+  "existing_load_pct": 0,
+  "buyer_confirmed": true,
+  "schedule_confirmed": true,
+  "material_confirmed": true,
+  "validation_confirmed": true,
+  "other_cost_per_ea": 1500,
+  "scenario_note": "SYN-03 고객별 약속 모의 시나리오. 미래 납기·물량·확인은 원본 사실이 아님. 기존 가동률 보호 하한 유지.",
+  "commitments_complete": true,
+  "commitments": [
+    {
+      "id": "SYN-P001",
+      "customer_id": "C-101",
+      "product_id": "PL-01",
+      "due_date": "2026-09-04",
+      "quantity": 280000,
+      "confirmed": false,
+      "source_kind": "synthetic",
+      "source_ref": "SYN-03: 기존 고객 납기 집중을 검증하기 위한 모의 회신"
+    },
+    {
+      "id": "SYN-P002",
+      "customer_id": "C-102",
+      "product_id": "PL-01",
+      "due_date": "2026-09-06",
+      "quantity": 10000,
+      "confirmed": true,
+      "source_kind": "synthetic",
+      "source_ref": "SYN-03: 동일 주 고객 약속 합산 검증"
+    }
+  ]
+}

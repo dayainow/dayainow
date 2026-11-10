@@ -20,6 +20,9 @@ class Handler(BaseHTTPRequestHandler):
  def do_GET(self):
   path=urlsplit(self.path).path
   if path=='/api/state': return self.send(DB.state())
+  if path=='/api/alternatives':
+   from alternatives import compare
+   c=DB.state();return self.send({**compare(c['inputs']),'revision':c['revision']})
   if path=='/api/evidence': return self.send(engine.EVIDENCE)
   if path=='/api/presets': return self.send({**{n:engine.preset(n) for n in ['missing','normal','changed']}, **{n:engine.ledger_preset(n) for n in ['promises','collision','unconfirmed']}})
   if path=='/api/ai-prompt':
@@ -45,6 +48,7 @@ class Handler(BaseHTTPRequestHandler):
    if not 0<size<=100000: raise ValueError('요청 크기 오류')
    p=json.loads(self.rfile.read(size));rev=p.get('revision')
    if self.path=='/api/update': out=DB.update(p['inputs'],rev)
+   elif self.path=='/api/select-alternative':out=DB.choose_alternative(p['candidate_id'],rev)
    elif self.path=='/api/approve': out=DB.approve(rev,p['decision'],p['role'],p['reason'])
    elif self.path=='/api/execute': out=DB.execute(rev)
    elif self.path=='/api/complete':out=DB.complete(p['task_id'],rev)
