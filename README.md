@@ -36,6 +36,7 @@
 
 | 프로젝트 | 한 줄 소개 | 역할·기술 | 링크 |
 | --- | --- | --- | --- |
+| [**모아몬 (Moamon)**](https://github.com/dayainow/lorehatch) | 알을 부화시키고 집중 시간과 함께 도트 친구를 키우는 **local-first 펫 정원** — 30종(60가지 모습)·5개 서식지·친구 이야기 15편·추억 수첩·macOS 바탕화면 파트너 | JavaScript · PWA · Swift (macOS) | [GitHub](https://github.com/dayainow/lorehatch) · [**알파 체험**](https://dayainow.github.io/lorehatch/) |
 | [**캡슐체스 (Capsule Chess)**](https://github.com/dayainow/dayainow/tree/main/capsule-chess) | 5×5 체스를 몬스터 배틀 RPG 감성으로 만든 모바일 앱. 캡슐 리그 20단계 · 오늘의 퍼즐 · 퍼즐 도장 120문제 · 폰 진화 · 배지·업적 | Expo · React Native | [소스·README](https://github.com/dayainow/dayainow/tree/main/capsule-chess) · 스토어 출시 준비 중 |
 | [**오늘의 도서관**](https://github.com/dayainow/today-library) | 전국 공공도서관 **지금 열린 곳** 검색·즐겨찾기·길찾기 | Expo · TypeScript · Vercel API | [**배포**](https://today-library-sigma.vercel.app) |
 | [**0원의품격**](https://github.com/dayainow/zero-won-poomgyeok) | 0원 문화행사·전시 정보 앱 | Expo · TypeScript · Vercel API | [**배포**](https://zero-won-poomgyeok.vercel.app) |

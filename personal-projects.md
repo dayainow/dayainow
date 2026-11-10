@@ -52,6 +52,7 @@ https://github.com/dayainow
 
 | 프로젝트 | 한 줄 소개 | 기술 | 링크 |
 | --- | --- | --- | --- |
+| [모아몬 (Moamon)](https://github.com/dayainow/lorehatch) | 알을 부화시키고 집중 시간과 함께 도트 친구를 키우는 local-first 펫 정원 — 30종·5개 서식지·친구 이야기 15편·추억 수첩·macOS 바탕화면 파트너 | JavaScript · PWA · Swift (macOS) | dayainow.github.io/lorehatch |
 | 오늘의 도서관 | 전국 공공도서관 지금 열린 곳 검색·즐겨찾기·길찾기 | Expo · TypeScript · Vercel API | today-library-sigma.vercel.app |
 | 0원의품격 | 0원 문화행사·전시 정보 앱 | Expo · TypeScript · Vercel API | zero-won-poomgyeok.vercel.app |
 | 메모빌 | 감정 일기 → 3D 마을 성장 인터랙션 | Expo · Three.js · R3F | prototype-web-eosin.vercel.app |
