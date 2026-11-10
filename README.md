@@ -20,6 +20,7 @@
 
 | 프로젝트 | 한 줄 소개 | 역할·기술 | 링크 |
 | --- | --- | --- | --- |
+| [**Aurora · 공급 약속 검토실**](https://github.com/dayainow/dayainow/tree/main/aurora-w05) | 삼일PwC AX 인재전쟁 W05 참가 — 고객별 납기·확약 물량 검증 → AI 검토 → 모의 승인·부서 작업. 조건 변경 시 승인 무효화 | 기획·구현·QA / Python · SQLite · JavaScript · Codex | [README·실행·검증](https://github.com/dayainow/dayainow/tree/main/aurora-w05) · v2 개발본 |
 | [**청년정책 처방전**](https://github.com/dayainow/youthrx-app) | 오프라인 마포청년축제 부스 운영(80여 명 체험) — 맞춤형 청년정책 약봉투 처방 진단 앱 | React · Vite · TypeScript · Tailwind | [GitHub](https://github.com/dayainow/youthrx-app) |
 | [**CorpBrain**](https://github.com/dayainow/corp-brain) | RBAC 기반 로컬 RAG 사내 문서 챗봇 — 문서 트리 탐색·Slack 연동·품질 게이트(Hit@3 80%)·옵션형 Cross-encoder 리랭킹 | Next.js · Ollama · AI SDK · PgVector · Redis | [GitHub](https://github.com/dayainow/corp-brain) |
 | [**OlaLab**](https://github.com/dayainow/ola) | 100+ AI 도구 큐레이션·커뮤니티 플랫폼 | Next.js · NestJS · Prisma · Supabase | [GitHub](https://github.com/dayainow/ola) |

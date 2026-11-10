@@ -1,0 +1,7 @@
+runtime/
+__pycache__/
+*.pyc
+.env
+.claude/settings.local.json
+.codex/hooks.json
+.agents/hooks.json

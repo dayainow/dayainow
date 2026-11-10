@@ -1,0 +1,19 @@
+name: Aurora W05 checks
+on:
+  push:
+    paths: ['aurora-w05/**', '.github/workflows/aurora-w05.yml']
+  pull_request:
+    paths: ['aurora-w05/**', '.github/workflows/aurora-w05.yml']
+permissions:
+  contents: read
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+      - run: python -m unittest discover -s tests -v
+        working-directory: aurora-w05
+      - run: node --check aurora-w05/web/app.js

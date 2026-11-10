@@ -1,0 +1,77 @@
+[
+  {
+    "file": "rfp_c201.md",
+    "source": "01_corevia/docs/rfp_c201.md",
+    "sha256": "b495d4dafc23889efd3797664b49de64af584b75152ddd749b6ef0a92e060747"
+  },
+  {
+    "file": "strat_capacity_cv.csv",
+    "source": "01_corevia/production/strat_capacity_cv.csv",
+    "sha256": "d8bff0e267868a1d736dfd309dc67ae5c9a46c73d98136c406f7f9df73b99636"
+  },
+  {
+    "file": "strat_capex_plan_cv.csv",
+    "source": "01_corevia/production/strat_capex_plan_cv.csv",
+    "sha256": "bafd2c76ee394e6d0a5bdf082c6b88a30ff636562a8ae28c5ef1baba7a277ebc"
+  },
+  {
+    "file": "sales_orders_cv.csv",
+    "source": "01_corevia/sales/sales_orders_cv.csv",
+    "sha256": "1f0d49d7aca7c4550d378fd772155e4abf213218a166902a72a71423eed26d0e"
+  },
+  {
+    "file": "sales_shipments_cv.csv",
+    "source": "01_corevia/sales/sales_shipments_cv.csv",
+    "sha256": "86553f47628b0fa550af9b532b3d9ad5f1b778cc165e696544de34ae96dfed09"
+  },
+  {
+    "file": "sales_meeting_notes_cv.md",
+    "source": "01_corevia/sales/sales_meeting_notes_cv.md",
+    "sha256": "83a129a2c7f8f58f6f8c63b96bec64b3224b6d1324fa533ca877aa1800ad3c0b"
+  },
+  {
+    "file": "sales_memo_cv.md",
+    "source": "01_corevia/financials/sales_memo_cv.md",
+    "sha256": "7f12eaccb2261cdae9a540da25e2a5747a2100ff1940421af35d6813920acf49"
+  },
+  {
+    "file": "approval_authority_policy.md",
+    "source": "00_common/approval_authority_policy.md",
+    "sha256": "889f7eb5018b455f05e9c934686c4926e97ef7624d5405975a3eedc5b107769d"
+  },
+  {
+    "file": "data_dictionary.md",
+    "source": "00_common/data_dictionary.md",
+    "sha256": "74c2aae386fe01e4b6f49029882d92f56644be23187bf2dcf9d778f2a0ddd677"
+  },
+  {
+    "file": "m_product_cv.csv",
+    "source": "01_corevia/master/m_product_cv.csv",
+    "sha256": "a4c6a68ca499fcd5667b45d4b4737cc7d46d430a685267e1f6eaaf54cf496bf6"
+  },
+  {
+    "file": "m_customer_cv.csv",
+    "source": "01_corevia/master/m_customer_cv.csv",
+    "sha256": "451944a7bf1b77863e53c31fc222b014f84c7baa36b678ab2e6b9c8bc3701bf0"
+  },
+  {
+    "file": "production_material_consumption_cv.csv",
+    "source": "01_corevia/production/production_material_consumption_cv.csv",
+    "sha256": "59eda3edae91a304053d8865d67dbabb266567e7fbf5c3035bbd2768fa0d84fb"
+  },
+  {
+    "file": "prod_batch_log_cv.csv",
+    "source": "01_corevia/production/prod_batch_log_cv.csv",
+    "sha256": "6c49f0268bd75c21dee53bb8e7c6cedffcf825b836f1d42c822671fb1ebab408"
+  },
+  {
+    "file": "ext_fx_daily.csv",
+    "source": "05_external/fx/ext_fx_daily.csv",
+    "sha256": "8faca1e7c6f689f7cb17ce683440384ba0f4ad11a78161f8462bae411110d416"
+  },
+  {
+    "file": "ext_news_competitor_bid.md",
+    "source": "05_external/news/ext_news_competitor_bid.md",
+    "sha256": "3ec6e2278866639ec6d25415dd457cf85f96accf39129a1f7961f902c4899289"
+  }
+]
