@@ -233,14 +233,12 @@ AIの強さ(やさしい・ふつう・むずかしい)を選んで練習した�
 
 ## 4. 개인정보처리방침 공개하기 (GitHub Pages, 무료)
 
-1. `site/privacy/index.html`의 `[문의 이메일]`, `[contact email]`을 실제 이메일로 바꾼다 (스토어에도 공개되는 주소).
-2. 공개 저장소 `dayainow/dayainow` → **Settings → Pages** → Source: **Deploy from a branch** → Branch: `main` / `/(root)` → Save
-   - 저장소 루트의 `.nojekyll` 파일 덕분에 파일이 그대로 공개됨
-3. 1~2분 뒤 아래 주소가 열리는지 확인
-   - 개인정보처리방침: `https://dayainow.github.io/dayainow/capsule-chess/site/privacy/`
-   - 앱 소개(스토어 "웹사이트" 칸): `https://dayainow.github.io/dayainow/capsule-chess/site/`
-4. 앱 콘텐츠 → 개인정보처리방침에 위 주소 입력
-5. 나중에 `capsulechess.app` 같은 도메인을 사면 그 주소로 옮김
+웹판 배포와 함께 지원·개인정보처리방침이 공개된다.
+
+- 개인정보처리방침: https://dayainow.github.io/dayainow/site/privacy/
+- 앱 소개 및 지원: https://dayainow.github.io/dayainow/site/
+- Play Console에 필요한 공개 개발자 이메일은 운영자가 선택한 주소를 입력한다.
+
 
 ## 5. 비공개 테스트 시작
 

@@ -1,0 +1,49 @@
+name: Publish Capsule Chess web
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: capsule-chess-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: capsule-chess
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: capsule-chess/package-lock.json
+      - run: npm ci
+      - run: npm test -- --runInBand
+      - run: npx tsc --noEmit
+      - run: npx expo export --platform web
+      - run: |
+          cp dist/index.html dist/404.html
+          cp -R site dist/site
+          mkdir -p dist/assets
+          cp -R assets/store dist/assets/store
+          touch dist/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: capsule-chess/dist
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deploy

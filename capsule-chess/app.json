@@ -75,6 +75,9 @@
         "projectId": "247014e9-5939-4c8d-a8c5-c47bdd498aa9"
       }
     },
-    "owner": "dayainow"
+    "owner": "dayainow",
+    "experiments": {
+      "baseUrl": "/dayainow"
+    }
   }
 }

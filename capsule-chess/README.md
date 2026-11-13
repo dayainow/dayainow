@@ -2,6 +2,8 @@
 
 5×5 작은 판에서 3분 안에 끝나는 미니 체스를, 귀여운 **몬스터 배틀 RPG** 감성으로 만든 Expo(React Native) 앱. iOS·Android 출시 준비 중.
 
+[웹에서 플레이](https://dayainow.github.io/dayainow/) · [지원 및 개인정보처리방침](https://dayainow.github.io/dayainow/site/)
+
 <p>
   <img src="assets/store/screenshots/ko/01-home.png" width="180" alt="홈" />
   <img src="assets/store/screenshots/ko/03-versus.png" width="180" alt="VS 화면" />
@@ -77,7 +79,7 @@ node scripts/store-screenshots.mjs  # 스토어 스크린샷 (개발 서버를 �
 node scripts/smoke-web.mjs          # 웹에서 모든 화면을 열어 오류 점검 (개발 서버를 켠 상태에서)
 ```
 
-스토어 등록 절차와 입력할 내용: [docs/store/google-play.md](docs/store/google-play.md)
+스토어 등록 절차와 입력할 내용: [Google Play](docs/store/google-play.md) · [App Store](docs/store/app-store.md)
 
 ## 빌드 (EAS)
 
