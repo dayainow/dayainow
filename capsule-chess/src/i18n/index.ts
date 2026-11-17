@@ -1,12 +1,14 @@
-import { getLocales } from 'expo-localization';
 import { en } from './en';
-import { ja } from './ja';
-import { ko, Strings } from './ko';
+import { ko } from './ko';
 
-// 기기 언어가 한국어면 한국어, 일본어면 일본어, 그 외에는 모두 영어
-const languageCode = getLocales()[0]?.languageCode;
+export type { Strings } from './ko';
 
-export const isKorean = languageCode === 'ko';
-export const isJapanese = languageCode === 'ja';
+export const dictionaries = { en, ko };
+export type Language = keyof typeof dictionaries;
+export type LanguagePreference = Language | 'system';
 
-export const strings: Strings = isKorean ? ko : isJapanese ? ja : en;
+export const isLanguagePreference = (value: unknown): value is LanguagePreference =>
+  value === 'system' || value === 'ko' || value === 'en';
+
+export const resolveLanguage = (preference: LanguagePreference, deviceLanguage?: string | null): Language =>
+  preference === 'system' ? (deviceLanguage === 'ko' ? 'ko' : 'en') : preference;

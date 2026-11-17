@@ -13,7 +13,7 @@ import { battleText } from '../src/game/battleText';
 import { battleEvent } from '../src/game/commentary';
 import { powerOf } from '../src/game/material';
 import { useChessGame } from '../src/game/useChessGame';
-import { strings } from '../src/i18n';
+import { useStrings } from '../src/i18n/LanguageProvider';
 import { recordStat } from '../src/storage/progress';
 import { DEFAULT_SETTINGS, loadSettings, updateSettings } from '../src/storage/settings';
 import { palette, sideColors } from '../src/theme';
@@ -30,6 +30,7 @@ const EVOLVE_DELAY = 420;
 const RESULT_DELAY_MS = 1100; // 체크메이트 도장을 보고 나서 결과 창
 
 export default function FreePlayScreen() {
+  const strings = useStrings();
   const [gameMode, setGameMode] = useState<'pvp' | 'pve'>('pve');
   const [difficulty, setDifficulty] = useState<Difficulty>(DEFAULT_SETTINGS.difficulty); // 게임 중 바꾸면 AI의 다음 수부터 적용
   const [evolving, setEvolving] = useState<'w' | 'b' | null>(null);
@@ -99,6 +100,7 @@ export default function FreePlayScreen() {
   };
 
   const line = battleText(
+    strings,
     battleEvent({
       vsAi,
       status: game.status,
@@ -160,7 +162,7 @@ export default function FreePlayScreen() {
           maxPower={MAX_POWER}
           active={game.turn === 'w' && !game.isGameOver}
         />
-        <DialogBox text={line} />
+        <DialogBox text={game.isGameOver && result?.drawReason ? strings.endings[result.drawReason] : !game.isGameOver && game.drawRemaining <= 8 ? strings.endings.warning(game.drawRemaining, game.drawCanReset) : line} />
         <GameControls
           canUndo={game.canUndo}
           onUndo={() => {
@@ -182,9 +184,7 @@ export default function FreePlayScreen() {
         detail={
           result?.winner
             ? strings.result.winner[result.winner]
-            : result?.status === 'stalemate'
-              ? strings.result.stalemateDetail
-              : strings.result.drawDetail
+            : result?.drawReason ? strings.endings[result.drawReason] : strings.result.drawDetail
         }
         detailColor={result?.winner ? sideColors[result.winner] : palette.inkSoft}
         primary={{ label: strings.result.playAgain, onPress: newGame }}

@@ -3,7 +3,7 @@ import React, { useCallback, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ACHIEVEMENTS } from '../src/achievements/list';
-import { strings } from '../src/i18n';
+import { useStrings } from '../src/i18n/LanguageProvider';
 import { type Progress, emptyProgress, loadProgress } from '../src/storage/progress';
 import { palette } from '../src/theme';
 import { GameButton } from '../src/ui/GameButton';
@@ -13,6 +13,7 @@ import { Text } from '../src/ui/Text';
 
 // 업적 모음: 달성한 것은 색깔 스티커, 아직인 것은 회색 + 조건
 export default function AchievementsScreen() {
+  const strings = useStrings();
   const [progress, setProgress] = useState<Progress>(emptyProgress);
 
   useFocusEffect(

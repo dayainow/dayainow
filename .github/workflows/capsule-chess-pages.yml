@@ -30,7 +30,9 @@ jobs:
           cp dist/index.html dist/404.html
           cp -R site dist/site
           mkdir -p dist/assets
-          cp -R assets/store dist/assets/store
+          mkdir -p dist/assets/store/screenshots
+          cp assets/store/feature-{ko,en}.png assets/store/play-icon.png dist/assets/store/
+          cp -R assets/store/screenshots/{ko,en} dist/assets/store/screenshots/
           touch dist/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:

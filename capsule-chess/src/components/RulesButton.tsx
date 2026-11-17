@@ -1,12 +1,13 @@
 import React from 'react';
 import { Platform, Pressable, StyleSheet } from 'react-native';
-import { strings } from '../i18n';
+import { useStrings } from '../i18n/LanguageProvider';
 import { type RulesSource, useOpenRules } from '../rules/RulesProvider';
 import { palette } from '../theme';
 import { Text } from '../ui/Text';
 
 // 규칙 안내를 여는 노란 ? 버튼 (홈 트레이너 카드와 모든 화면 헤더)
 export function RulesButton({ source }: { source: RulesSource }) {
+  const strings = useStrings();
   const openRules = useOpenRules();
 
   return (

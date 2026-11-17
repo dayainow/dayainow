@@ -1,5 +1,5 @@
 // 스토어용 휴대폰 스크린샷(1080x2160, 1:2 — Google Play 허용 최대 비율)을 한국어·영어로 자동 촬영
-// 사용: 개발 서버(npm run web)를 켠 상태에서  node scripts/store-screenshots.mjs [주소=http://localhost:8081]
+// 사용: 개발 서버를 켠 상태에서 node scripts/store-screenshots.mjs [주소=http://localhost:8081/dayainow]
 import { mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -7,9 +7,9 @@ import puppeteer from 'puppeteer-core';
 import { findBrowser } from './lib/browser.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const BASE = process.argv[2] ?? 'http://localhost:8081';
+const BASE = (process.argv[2] ?? 'http://localhost:8081/dayainow').replace(/\/$/, '');
 const VIEWPORT = { width: 360, height: 720, deviceScaleFactor: 3 };
-const LOCALES = ['ko', 'en', 'ja'];
+const LOCALES = ['ko', 'en'];
 
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 const pad = n => String(n).padStart(2, '0');
@@ -20,7 +20,7 @@ const yesterday = new Date(Date.now() - 86_400_000);
 const PROGRESS = {
   onboarded: true,
   tutorial: Object.fromEntries(['king', 'rook', 'bishop', 'queen', 'knight', 'pawn', 'escape', 'mate'].map(id => [id, true])),
-  campaign: { 1: 3, 2: 3, 3: 3, 4: 2, 5: 3, 6: 2, 7: 3, 8: 1, 9: 2 },
+  campaign: { 1: 3, 2: 3, 3: 3, 4: 2 },
   daily: { streak: 6, bestStreak: 6, lastSolved: dateKey(yesterday), records: {} },
 };
 const SETTINGS = { difficulty: 'normal', soundEnabled: true, hapticsEnabled: true };
@@ -48,7 +48,7 @@ const move = async (page, [fromR, fromC, toR, toC]) => {
 };
 
 // 버튼 글자로 찾아 누르기 (VS 화면의 "배틀 시작!")
-const START = { ko: '배틀 시작!', en: 'Battle start!', ja: 'バトル開始!' };
+const START = { ko: '배틀 시작!', en: 'Battle start!' };
 const clickText = (page, label) =>
   page.evaluate(text => {
     const el = [...document.querySelectorAll('[role="button"]')].reverse().find(d => d.innerText?.trim() === text);
@@ -76,17 +76,15 @@ const SCENES = [
   // 배틀: 한 수 두고 AI 응수 뒤 나이트 선택
   {
     name: '02-battle',
-    path: '/campaign/8',
+    path: '/campaign/4',
     setup: async (page, locale) => {
       await clickText(page, START[locale]);
       await wait(700);
-      await move(page, [3, 2, 2, 2]);
-      await wait(2200);
-      await tapSquare(page, 4, 1);
+      await selectShowcasePiece(page);
     },
   },
   // 캡슐 마스터와의 VS 화면
-  { name: '03-versus', path: '/campaign/10', settle: 1600 },
+  { name: '03-versus', path: '/campaign/5', settle: 1600 },
   // 오늘의 퍼즐: 블루 기물 하나를 골라 갈 수 있는 칸 표시
   { name: '04-daily', path: '/daily', setup: selectShowcasePiece },
   // 폰 레슨: 끝 줄에 닿아 퀸으로 진화

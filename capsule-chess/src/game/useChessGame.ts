@@ -1,3 +1,4 @@
+import { evaluateEnding, MOVE_LIMIT, type DrawReason } from './endings';
 import { useEffect, useState } from 'react';
 import { type AiPolicy, pickAiMove } from '../engine/chessAI';
 import { type GameStatus, type Move, BOARD_SIZE, INITIAL_BOARD, findKing, getGameStatus, simulateMove } from '../engine/chessEngine';
@@ -7,6 +8,7 @@ type Side = 'w' | 'b';
 
 export type GameResult = {
   status: GameStatus;
+  drawReason?: DrawReason;
   winner: Side | null;
   blueMoves: number; // 블루(사용자)가 둔 수
 };
@@ -47,17 +49,20 @@ export const useChessGame = ({ initialBoard = INITIAL_BOARD, ai }: { initialBoar
   const [result, setResult] = useState<GameResult | null>(null);
   const [history, setHistory] = useState<Snapshot[]>([]);
 
+  const ending = evaluateEnding(history, { board, turn });
   const isGameOver = isFinished(status);
   const checkedKing = status === 'check' || status === 'checkmate' ? findKing(turn, board) : null;
   const canPlayerMove = !isGameOver && (ai === null || turn === 'w');
   const canUndo = !isGameOver && history.length > 0;
 
   const move = (m: Move) => {
+    if (isGameOver) return;
     setHistory(h => [...h, { board, turn, status, lastMove, lastMover, lastCaptured, lastPromoted, blueMoves }]);
     const mover = board[m.fromR][m.fromC];
     const nextBoard = simulateMove(board, m);
     const nextTurn: Side = turn === 'w' ? 'b' : 'w';
-    const nextStatus = getGameStatus(nextTurn, nextBoard);
+    const nextEnding = evaluateEnding([...history, { board, turn }], { board: nextBoard, turn: nextTurn });
+    const nextStatus = nextEnding.status;
     const nextBlueMoves = turn === 'w' ? blueMoves + 1 : blueMoves;
 
     setBoard(nextBoard);
@@ -70,7 +75,7 @@ export const useChessGame = ({ initialBoard = INITIAL_BOARD, ai }: { initialBoar
     setBlueMoves(nextBlueMoves);
     if (isFinished(nextStatus)) {
       // 체크메이트면 방금 둔 쪽이 승리
-      setResult({ status: nextStatus, winner: nextStatus === 'checkmate' ? turn : null, blueMoves: nextBlueMoves });
+      setResult({ status: nextStatus, drawReason: nextEnding.reason, winner: nextStatus === 'checkmate' ? turn : null, blueMoves: nextBlueMoves });
     }
   };
 
@@ -124,6 +129,8 @@ export const useChessGame = ({ initialBoard = INITIAL_BOARD, ai }: { initialBoar
     canPlayerMove,
     canUndo,
     blueMoves,
+    drawRemaining: ending.remaining,
+    drawCanReset: ending.remaining < MOVE_LIMIT - history.length,
     result,
     move,
     undo,

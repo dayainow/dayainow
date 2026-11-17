@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Image, Modal, Platform, Pressable, ScrollView, StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { INITIAL_BOARD } from '../engine/chessEngine';
-import { strings } from '../i18n';
+import { useStrings } from '../i18n/LanguageProvider';
 import { PIECE_ORDER, type PieceType, pieceDiagram } from '../rules/diagrams';
 import { palette, sideColors } from '../theme';
 import { Text } from '../ui/Text';
@@ -25,6 +25,7 @@ type Props = { visible: boolean; onClose: () => void };
 
 // 어느 화면에서든 ? 버튼으로 여는 규칙 안내 (아래에서 올라오는 시트)
 export function RulesSheet({ visible, onClose }: Props) {
+  const strings = useStrings();
   const [tab, setTab] = useState<Tab>('basics');
   useModalPresence(visible);
   const { width } = useWindowDimensions();
@@ -93,7 +94,7 @@ export function RulesSheet({ visible, onClose }: Props) {
 
                 <Text style={styles.sectionTitle}>{strings.rules.outcomeTitle}</Text>
                 <View style={styles.card}>
-                  <RuleList items={strings.rules.outcomes} />
+                  <RuleList items={[...strings.rules.outcomes, { icon: '↔', title: strings.result.draw, body: strings.endings.rules }]} />
                 </View>
               </>
             ) : (

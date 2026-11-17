@@ -1,5 +1,5 @@
-// 웹에서 모든 화면을 열어 보고 오류를 모으는 점검 스크립트 (한국어·영어·일본어)
-// 사용: 개발 서버를 켠 상태에서  node scripts/smoke-web.mjs [주소=http://localhost:8081]
+// 한국어·영어로 모든 화면과 언어 설정을 확인하는 점검 스크립트
+// 사용: 서버를 켠 상태에서 node scripts/smoke-web.mjs [주소=http://localhost:8081/dayainow]
 // 화면 사진은 .claude/smoke/ 에 저장 (git에 올라가지 않음)
 import { mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -8,7 +8,7 @@ import puppeteer from 'puppeteer-core';
 import { findBrowser } from './lib/browser.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const BASE = process.argv[2] ?? 'http://localhost:8081';
+const BASE = (process.argv[2] ?? 'http://localhost:8081/dayainow').replace(/\/$/, '');
 const OUT = join(ROOT, '.claude', 'smoke');
 const VIEWPORT = { width: 390, height: 844, deviceScaleFactor: 2 };
 
@@ -22,16 +22,19 @@ const PROGRESS = {
 };
 
 const TEXT = {
-  ko: { tapCapsule: '캡슐을 톡 눌러 봐요', firstBattle: '첫 배틀 시작! ▶', openRules: '규칙 보기', piecesTab: '기물 움직임', start: '배틀 시작!', continue: '계속하기' },
-  en: { tapCapsule: 'Tap the capsule', firstBattle: 'Start first battle ▶', openRules: 'Show rules', piecesTab: 'How pieces move', start: 'Battle start!', continue: 'Continue' },
-  ja: { tapCapsule: 'カプセルをタップ', firstBattle: 'はじめてのバトル ▶', openRules: 'ルールを見る', piecesTab: '駒の動き', start: 'バトル開始!', continue: 'つづける' },
+  ko: { tapCapsule: '캡슐을 톡 눌러 봐요', firstBattle: '첫 배틀 시작! ▶', skipOpening: '홈 둘러보기', tryOneMove: '1수 퍼즐부터 연습하기 ›', openRules: '규칙 보기', piecesTab: '기물 움직임', start: '배틀 시작!', continue: '계속하기', settings: '설정', language: '언어', system: '기기 설정' },
+  en: { tapCapsule: 'Tap the capsule', firstBattle: 'Start first battle ▶', skipOpening: 'Explore the home screen', tryOneMove: 'Try a mate-in-one puzzle ›', openRules: 'Show rules', piecesTab: 'How pieces move', start: 'Battle start!', continue: 'Continue', settings: 'Settings', language: 'Language', system: 'Device default' },
 };
 
 const ROUTES = ['/', '/daily', '/campaign', '/campaign/1', '/play', '/learn', '/learn/knight', '/settings', '/achievements', '/practice', '/practice/1', '/themes'];
+const PURCHASE_TEXT = {
+  ko: { heading: '전체 게임 열기', back: '게임으로 돌아가기' },
+  en: { heading: 'Unlock the full game', back: 'Return to the game' },
+};
 
 const clickText = async (page, text) => {
   const done = await page.evaluate(label => {
-    const el = [...document.querySelectorAll('div[tabindex="0"], [role="button"]')].reverse().find(d => d.innerText?.trim() === label);
+    const el = [...document.querySelectorAll('div[tabindex="0"], [role="button"], [role="radio"]')].reverse().find(d => d.innerText?.trim() === label);
     el?.click();
     return !!el;
   }, text);
@@ -84,22 +87,39 @@ const run = async (browser, locale) => {
   const shot = (page, name) => page.screenshot({ path: join(OUT, `${locale}-${name}.png`) });
   const t = TEXT[locale];
 
-  // 1) 처음 온 사람: 첫 캡슐 → 세 번 톡톡톡 → 블루 팀 등장 → 첫 배틀 (가이드)
+  // 첫 캡슐 한 번 탭 → 첫 배틀의 보드에서 바로 조작
   {
     const { context, page } = await newPage(null);
     await page.goto(BASE + '/', { waitUntil: 'networkidle0', timeout: 120_000 });
     await wait(1200);
     await shot(page, 'opening-closed');
-    for (let i = 0; i < 3; i++) {
-      await clickLabel(page, t.tapCapsule);
-      await wait(450);
-    }
+    await clickLabel(page, t.tapCapsule);
     await wait(1600);
     await shot(page, 'opening-open');
     await clickText(page, t.firstBattle);
     await wait(1500);
-    if (!page.url().endsWith('/campaign/1')) errors.push(`${locale} 첫 배틀로 가지 않음: ${page.url()}`);
+    if (!new URL(page.url()).pathname.endsWith('/campaign/1')) errors.push(`${locale} 첫 배틀로 가지 않음: ${page.url()}`);
     await shot(page, 'opening-first-battle');
+    await tapSquare(page, 3, 2);
+    await tapSquare(page, 2, 2);
+    await page.waitForFunction(() => {
+      const board = [...document.querySelectorAll('div')].find(
+        d => getComputedStyle(d).borderTopWidth === '4px' && d.querySelectorAll('div[tabindex="0"]').length === 25
+      );
+      return [...(board?.querySelectorAll('div[tabindex="0"]')[12]?.querySelectorAll('img') ?? [])].some(img => img.src.includes('/wP.'));
+    });
+    await context.close();
+  }
+
+  // 캡슐을 건너뛴 다음, 오늘의 퍼즐에서 1수 연습을 열 수 있다.
+  {
+    const { context, page } = await newPage(null);
+    await page.goto(BASE + '/', { waitUntil: 'networkidle0', timeout: 120_000 });
+    await clickText(page, t.skipOpening);
+    await page.waitForFunction(() => JSON.parse(localStorage.getItem('progress:v1'))?.onboarded === true);
+    await page.goto(BASE + '/daily', { waitUntil: 'networkidle0', timeout: 120_000 });
+    await clickText(page, t.tryOneMove);
+    await page.waitForFunction(() => location.pathname.endsWith('/practice/1'));
     await context.close();
   }
 
@@ -109,6 +129,51 @@ const run = async (browser, locale) => {
     await page.goto(BASE + route, { waitUntil: 'networkidle0', timeout: 120_000 });
     await wait(900);
     await shot(page, `route${route.replace(/\//g, '_') || '_home'}`);
+    await context.close();
+  }
+
+  // 무료 체험 범위를 직접 주소로 넘겨도 구매 안내만 표시된다.
+  {
+    const { context, page } = await newPage({
+      ...PROGRESS,
+      campaign: Object.fromEntries([1, 2, 3, 4, 5].map(id => [id, 3])),
+      practice: Object.fromEntries(Array.from({ length: 9 }, (_, i) => [i + 1, { attempts: 1, hints: 0 }])),
+    });
+    const purchase = PURCHASE_TEXT[locale];
+    await page.goto(BASE + '/practice/10', { waitUntil: 'networkidle0', timeout: 120_000 });
+    await page.waitForFunction(() => !!document.querySelector('img[src*="/pieces/"]'));
+    for (const [route, backTo] of [['/campaign/6', '/campaign'], ['/practice/11', '/practice']]) {
+      await page.goto(BASE + route, { waitUntil: 'networkidle0', timeout: 120_000 });
+      await page.waitForFunction(label => document.body.innerText.includes(label), {}, purchase.heading);
+      if (await page.$('img[src*="/pieces/"]')) errors.push(`${locale} 잠긴 콘텐츠가 표시됨: ${route}`);
+      await clickText(page, purchase.back);
+      await page.waitForFunction(path => location.pathname.endsWith(path), {}, backTo);
+    }
+    await context.close();
+  }
+
+  // 설정에서 고른 언어는 재실행 후에도 유지되고, 기기 설정으로 돌아갈 수 있다.
+  {
+    const { context, page } = await newPage(PROGRESS);
+    const other = locale === 'ko' ? 'en' : 'ko';
+    const waitForLanguage = code => page.waitForFunction(
+      (lang, label) => document.documentElement.lang === lang && document.body.innerText.split('\n').includes(label),
+      {},
+      code,
+      TEXT[code].language
+    );
+    await page.goto(BASE + '/settings', { waitUntil: 'networkidle0', timeout: 120_000 });
+    await waitForLanguage(locale);
+    await clickText(page, other === 'ko' ? '한국어' : 'English');
+    await waitForLanguage(other);
+    await shot(page, 'settings-language-switched');
+    await page.reload({ waitUntil: 'networkidle0' });
+    await waitForLanguage(other);
+    await clickText(page, TEXT[other].system);
+    await waitForLanguage(locale);
+    await page.goto(BASE + '/', { waitUntil: 'networkidle0', timeout: 120_000 });
+    await clickLabel(page, t.settings);
+    await waitForLanguage(locale);
     await context.close();
   }
 
@@ -202,7 +267,7 @@ const run = async (browser, locale) => {
 const main = async () => {
   mkdirSync(OUT, { recursive: true });
   const all = [];
-  for (const locale of ['ko', 'en', 'ja']) {
+  for (const locale of Object.keys(TEXT)) {
     const browser = await puppeteer.launch({ executablePath: findBrowser(), headless: true, args: [`--lang=${locale}`, '--hide-scrollbars'] });
     try {
       all.push(...(await run(browser, locale)));

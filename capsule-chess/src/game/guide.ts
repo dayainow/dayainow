@@ -1,3 +1,5 @@
+import { getBestMove } from '../engine/chessAI';
+import { mirrorBoard } from '../puzzles/codec';
 import { type Move, getAllLegalMoves } from '../engine/chessEngine';
 import { PIECE_POWER } from './material';
 
@@ -21,4 +23,10 @@ export const captureGuideMove = (board: Board): Move | null => {
       value(board[b.toR][b.toC]) - value(board[a.toR][a.toC]) || value(board[a.fromR][a.fromC]) - value(board[b.fromR][b.fromC])
   );
   return captures[0] ?? null;
+};
+
+// A shallow search keeps on-demand hints quick; it is a suggestion, not a guaranteed win.
+export const suggestedBlueMove = (board: Board): Move | null => {
+  const move = getBestMove(mirrorBoard(board), 2);
+  return move && { fromR: 4 - move.fromR, fromC: move.fromC, toR: 4 - move.toR, toC: move.toC };
 };

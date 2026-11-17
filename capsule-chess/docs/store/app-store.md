@@ -1,11 +1,11 @@
 # 캡슐체스 App Store 제출 준비
 
-첫 제출의 기준은 현재 소스에 있는 오프라인 게임이다. 광고, 앱 내 구매, 외부 분석은 추가하지 않았다. 무료 또는 유료 다운로드 가격은 출시 전에 결정한다.
+첫 제출은 무료로 설치하는 광고 없는 게임이다. 전체 게임은 [비소모성 앱 내 구입](monetization.md) 한 번으로 연다.
 
-- 앱 이름: 한국어 **캡슐체스**, 영어 **Capsule Chess**, 일본어 **カプセルチェス**
+- 앱 이름: 한국어 **캡슐체스**, 영어 **Capsule Chess**
 - 번들 ID: `com.dayainow.capsulechess`
 - 버전: `1.0.0`
-- 플랫폼: iPhone 및 iPad. `supportsTablet: true` 설정을 유지한다.
+- 플랫폼: iPhone 및 iPad
 - 기본 카테고리 후보: 게임 → 보드
 
 ## 스토어 문구
@@ -21,7 +21,7 @@
 - 기물별 레슨으로 움직이는 법부터 체크메이트까지 배울 수 있어요.
 - 세 가지 난이도의 AI와 대전하거나, 한 기기에서 친구와 번갈아 두세요.
 
-진행은 기기에 저장됩니다. 한국어, 영어, 일본어로 플레이할 수 있어요.
+첫 캡슐 5단계, 오늘의 퍼즐, 도장 10문제, 레슨과 자유 대전을 무료로 즐겨 보세요. 나머지 리그 15단계와 도장 110문제는 앱 내 구입 한 번으로 열 수 있어요. 광고와 회원가입 없이 오프라인으로 플레이할 수 있어요. 진행은 기기에 저장되며, 설정에서 한국어와 영어를 바꿀 수 있어요.
 
 키워드 후보: `체스,미니체스,체스퍼즐,체크메이트,보드게임,오프라인`
 
@@ -36,40 +36,35 @@ Open your first capsule, meet your piece monsters, and play a quick game of ches
 - Learn how each piece moves and work your way up to checkmate.
 - Play an AI opponent at three difficulty levels or take turns with a friend on one device.
 
-Progress is saved on your device. Play in English, Korean, or Japanese.
+Play the first capsule with 5 stages, the Daily Puzzle, the first 10 Dojo puzzles, lessons, and Free Play for free. A one-time in-app purchase unlocks 15 more league stages and 110 more Dojo puzzles. Play offline without ads or an account. Progress is saved on your device. Switch between English and Korean in Settings.
 
 Keyword candidates: `mini chess,board game,checkmate,puzzle,offline,local multiplayer`
 
-### 日本語
+## 제출 정보
 
-サブタイトル: **5×5の盤で遊ぶミニチェス**
+- 지원 URL: `https://dayainow.github.io/dayainow/site/`
+- 개인정보처리방침 URL: `https://dayainow.github.io/dayainow/site/privacy/`
+- 한국어와 영어 등록정보를 App Store Connect에 각각 추가한다.
+- 출시 노트: `캡슐체스 첫 출시. 5×5 대전, 캡슐 리그, 매일 퍼즐과 퍼즐 도장을 만나 보세요.`
+- Release notes: `First release. Play 5×5 chess, take on the Capsule League, and try the Daily Puzzle and Puzzle Dojo.`
 
-最初のカプセルを開けて、駒のモンスターたちと5×5の盤でチェスを楽しみましょう。
+심사 메모
 
-- カプセルリーグの20ステージに挑戦して、星とバッジを集めましょう。
-- 毎日のパズルに挑戦したり、パズル道場で120問を練習したりできます。
-- 駒の動かし方からチェックメイトまで、レッスンで学べます。
-- 3つの強さのAIと対戦したり、1台の端末で友達と交互に指したりできます。
+> Capsule Chess is an offline 5×5 chess game. Open the first capsule, then choose Start first battle to try the guided match. The home screen gives access to the Capsule League, Daily Puzzle, Puzzle Dojo, lessons, and AI or same-device two-player matches. No login is required. Settings contains the English and Korean language options and the privacy policy. The daily puzzle reminder is optional and uses local notifications. To review the non-consumable purchase, skip the first capsule animation by choosing Explore the home screen, then go to Settings → Unlock the full game. You can purchase or restore there without clearing stages.
 
-進行状況は端末に保存されます。日本語、英語、韓国語で遊べます。
-
-キーワード候補: `ミニチェス,ボードゲーム,パズル,チェックメイト,オフライン`
-
-## 가입 전 확인
+## 서명 빌드 전
 
 1. `npm ci`, `npm test -- --runInBand`, `npx tsc --noEmit`, `npx expo export --platform all`을 실행한다.
-2. [Expo iOS 시뮬레이터 빌드](https://docs.expo.dev/build-reference/simulators/)는 `npx eas-cli build --platform ios --profile ios-simulator`로 만들 수 있다. Expo 계정과 빌드 사용량을 확인하고 실행한다. 설치·실행에는 Xcode의 iOS Simulator가 필요하다.
-3. iPhone과 iPad에서 첫 실행, 첫 대전, AI 응답, 데일리 퍼즐, 저장 후 재실행, 공유 및 선택 알림을 확인한다. 앱의 실제 실행 화면으로 [Apple 규격](https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications)에 맞는 iPhone과 iPad 스크린샷을 캡처한다. 기존 1080×2160 PNG는 Play용이다.
-4. 공개 [지원 페이지](https://dayainow.github.io/dayainow/site/)와 [개인정보처리방침](https://dayainow.github.io/dayainow/site/privacy/)이 로그인 없이 열리는지 확인한다. 지원 요청은 공개 GitHub 이슈로 연결한다.
-5. 공개할 정책 링크를 앱에서 찾기 쉽게 연결하고 [App Privacy](https://developer.apple.com/help/app-store-connect/manage-app-information/manage-app-privacy/) 응답을 최종 번들과 대조한다. 현재 앱 소스의 분석 이벤트는 외부 전송 대상이 연결되어 있지 않다. 최종 SDK 동작과 네이티브 개인정보 매니페스트는 배포 빌드에서 확인한다.
+2. [Google Play 가이드의 공개 절차](google-play.md#4-소개지원-및-개인정보처리방침-공개)에 따라 지원 및 정책 페이지를 게시하고 앱 설정에서 링크가 열리는지 확인한다.
+3. `npx eas-cli build --platform ios --profile ios-simulator`로 시뮬레이터 빌드를 만들 수 있다. 로컬 실행에는 Xcode와 iOS Simulator가 필요하다. 배포 바이너리의 SDK는 [Apple 제출 요건](https://developer.apple.com/news/upcoming-requirements/?id=04282026a)에 따라 Xcode 26 및 iOS 26 SDK 이상이어야 한다. 이 프로젝트의 SDK 57용 빌드 이미지를 EAS에서 사용한다.
+4. 한국어·영어 각각 iPhone과 iPad에서 첫 캡슐, 첫 배틀, AI 응답, 퍼즐, 공유, 언어·진행 기록 재실행 후 유지, 알림 및 정책 링크를 확인한다. [스크린샷 규격](https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications)에 맞는 실제 앱 화면을 캡처한다. 예를 들어 iPhone은 1320×2868, iPad는 2064×2752 세로 크기를 쓸 수 있다.
 
-## 가입 후 제출
+## App Store Connect 제출
 
 1. App Store Connect에 앱을 만들고 위 번들 ID를 연결한다. [앱 추가 안내](https://developer.apple.com/help/app-store-connect/create-an-app-record/add-a-new-app/)
-2. `npx eas-cli build --platform ios --profile production`으로 서명된 빌드를 만들고 해당 빌드를 TestFlight에 올린다. 내부 테스터로 실기기에서 확인한다.
-3. 최종 빌드를 기준으로 스크린샷·소개·지원 URL·개인정보처리방침 URL·연령 등급·수출 규정 답변을 채운다. 심사 메모에 로그인 없이 첫 캡슐을 열고 대전을 시작할 수 있다고 안내한다.
-4. 유료 다운로드로 결정하면 유료 앱 계약, 정산 정보와 가격 설정을 마친 뒤 심사에 제출한다.
+2. `npx eas-cli build --platform ios --profile production`으로 서명된 빌드를 만들고 TestFlight에 업로드한다. 내부 테스터로 실기기를 확인한다.
+3. 최종 빌드와 SDK를 대조하여 [App Privacy](https://developer.apple.com/help/app-store-connect/manage-app-information/manage-app-privacy/), 연령 등급, 수출 규정, 심사 연락처를 입력한다. 개인정보 라벨 후보는 ‘수집하는 데이터 없음’이다. 최종 네이티브 개인정보 매니페스트와 SDK 동작을 확인한다.
+4. 앱 가격은 무료로 설정하고 [전체 게임 상품](monetization.md)을 등록한다. 유료 앱 계약, 세금·은행 정보와 [한국 스토어 등록 정보](https://developer.apple.com/help/app-store-connect/manage-compliance-information/manage-korea-compliance-information/)를 확인한다. 앱 버전과 최초 비소모성 앱 내 구입은 [같이 심사에 제출한다](https://developer.apple.com/help/app-store-connect/manage-submissions-to-app-review/submit-an-in-app-purchase).
+5. 언어별 스크린샷, 소개, 지원·정책 URL 및 심사 메모를 등록한 뒤 심사에 제출한다.
 
-2026-11-13에 자동 테스트 143개, 타입 검사, iOS·Android·웹 번들 생성, iOS prebuild를 확인했다. Expo SDK 57 권장 패치로 맞춘 뒤에도 테스트와 번들 생성이 통과했다. iOS 서명 빌드와 실기기 실행은 별도로 확인한다.
-
-2026-11-13 기준 운영 의존성 감사에서 6개 항목이 남았다. 높은 등급의 3개 항목은 Expo Router의 URL 처리 의존성 체인에 속한다. Expo SDK 57 권장 버전에는 자동 해결 경로가 없으므로 심사 제출 전에 호환 가능한 패치와 딥링크 동작을 확인한다.
+최신 의존성 감사와 제출 보류 항목은 [출시 체크리스트](release-checklist.md)를 따른다. 보안 수정 후 출시 빌드의 딥링크를 검증한다.

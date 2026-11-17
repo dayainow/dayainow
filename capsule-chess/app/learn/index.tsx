@@ -3,7 +3,8 @@ import React, { useCallback, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RuleList } from '../../src/components/RuleList';
-import { strings } from '../../src/i18n';
+import type { Strings } from '../../src/i18n';
+import { useStrings } from '../../src/i18n/LanguageProvider';
 import { useOpenRules } from '../../src/rules/RulesProvider';
 import { type Progress, emptyProgress, loadProgress } from '../../src/storage/progress';
 import { palette } from '../../src/theme';
@@ -12,9 +13,10 @@ import { Panel } from '../../src/ui/Panel';
 import { PieceImage } from '../../src/ui/PieceImage';
 import { Text } from '../../src/ui/Text';
 
-type LessonId = keyof typeof strings.tutorial.lessons;
+type LessonId = keyof Strings['tutorial']['lessons'];
 
 export default function LearnScreen() {
+  const strings = useStrings();
   const [progress, setProgress] = useState<Progress>(emptyProgress);
   const openRules = useOpenRules();
 

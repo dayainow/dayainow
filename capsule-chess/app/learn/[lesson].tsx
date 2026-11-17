@@ -9,7 +9,8 @@ import { type Move, findKing, isInCheck, simulateMove } from '../../src/engine/c
 import { isCheckmated } from '../../src/engine/mateSolver';
 import { track } from '../../src/analytics';
 import { feedback } from '../../src/feedback/feedback';
-import { strings } from '../../src/i18n';
+import type { Strings } from '../../src/i18n';
+import { useStrings } from '../../src/i18n/LanguageProvider';
 import { recordLessonDone, recordStat } from '../../src/storage/progress';
 import { palette } from '../../src/theme';
 import { DialogBox } from '../../src/ui/DialogBox';
@@ -20,7 +21,7 @@ import { PieceImage } from '../../src/ui/PieceImage';
 import { Text } from '../../src/ui/Text';
 import { LESSONS, LESSON_PIECE, type Lesson, getLesson, nextLesson } from '../../src/tutorial/lessons';
 
-type LessonId = keyof typeof strings.tutorial.lessons;
+type LessonId = keyof Strings['tutorial']['lessons'];
 
 export default function LessonRoute() {
   const { lesson: id } = useLocalSearchParams<{ lesson: string }>();
@@ -31,6 +32,7 @@ export default function LessonRoute() {
 }
 
 function LessonPlay({ lesson }: { lesson: Lesson }) {
+  const strings = useStrings();
   const text = strings.tutorial.lessons[lesson.id as LessonId];
   const next = nextLesson(lesson.id);
   const [board, setBoard] = useState(lesson.board);

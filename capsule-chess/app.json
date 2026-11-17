@@ -36,12 +36,16 @@
       "favicon": "./assets/icon.png"
     },
     "locales": {
-      "ko": "./locales/ko.json",
-      "ja": "./locales/ja.json"
+      "ko": "./locales/ko.json"
     },
     "plugins": [
       "expo-router",
-      "expo-localization",
+      [
+        "expo-localization",
+        {
+          "supportedLocales": ["en", "ko"]
+        }
+      ],
       [
         "expo-splash-screen",
         {
@@ -67,7 +71,8 @@
         }
       ],
       "expo-sharing",
-      "expo-font"
+      "expo-font",
+      ["expo-iap", { "android": { "store": "play" } }]
     ],
     "extra": {
       "router": {},

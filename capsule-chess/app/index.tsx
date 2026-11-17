@@ -4,11 +4,13 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ACHIEVEMENTS } from '../src/achievements/list';
 import { track } from '../src/analytics';
+import { useBilling } from '../src/billing/BillingProvider';
+import { FREE_PUZZLES, FREE_STAGES } from '../src/billing/products';
 import { CAPSULES, STAGES_PER_CAPSULE, earnedBadges, opponentFor } from '../src/campaign/league';
 import { getStage, nextStageId } from '../src/campaign/stages';
 import { RulesButton } from '../src/components/RulesButton';
 import { OpeningCapsule } from '../src/components/OpeningCapsule';
-import { strings } from '../src/i18n';
+import { useStrings } from '../src/i18n/LanguageProvider';
 import { getDailyPuzzle } from '../src/puzzles/daily';
 import { type Progress, currentStreak, emptyProgress, loadProgress, recordOnboarded, totalStars } from '../src/storage/progress';
 import { palette } from '../src/theme';
@@ -25,6 +27,8 @@ import { Text } from '../src/ui/Text';
 import { formatCountdown, msUntilNextDay } from '../src/utils/date';
 
 export default function HomeScreen() {
+  const strings = useStrings();
+  const { owned } = useBilling();
   const [progress, setProgress] = useState<Progress>(emptyProgress);
   // 저장된 기록을 읽기 전에는 환영 안내를 띄우지 않음 (이미 본 사람에게 깜빡 보이지 않게)
   const [loaded, setLoaded] = useState(false);
@@ -69,6 +73,62 @@ export default function HomeScreen() {
   };
 
   const openLeague = () => router.push(nextStage ? `/campaign/${nextStage.id}` : '/campaign');
+
+  const dailyCard = (
+    <Pressable key="daily" onPress={() => router.push('/daily')}>
+      <Panel color={palette.sun} style={styles.daily}>
+        {!solvedToday && (
+          <Alive kind="pulse" style={styles.newTag}>
+            <Text style={styles.newTagText}>NEW!</Text>
+          </Alive>
+        )}
+        <Text style={styles.dailyKicker}>
+          {strings.home.daily} #{daily.number}
+        </Text>
+        <Text style={styles.dailyTitle}>{solvedToday ? strings.home.done : strings.daily.mateIn(daily.mateIn)}</Text>
+        <View style={styles.rowBetween}>
+          <Text style={styles.dailySub}>
+            {solvedToday ? strings.home.nextPuzzleIn(countdown) : streak > 0 ? strings.home.keepStreak(streak) : strings.home.startStreak}
+          </Text>
+          <GameButton label={solvedToday ? '✓' : `${strings.home.play} ▶`} onPress={() => router.push('/daily')} variant="white" size="sm" />
+        </View>
+      </Panel>
+    </Pressable>
+  );
+
+  const leagueCard = (
+    <Pressable key="league" onPress={openLeague}>
+      <Panel style={styles.league}>
+        <View style={styles.opponent}>
+          <Alive kind="bob" delay={700}>
+            <PieceImage piece={opponent?.avatar ?? 'wK'} size={52} />
+          </Alive>
+        </View>
+        <View style={styles.leagueBody}>
+          <Text style={styles.muted} numberOfLines={1}>
+            {nextStage ? `${strings.league.capsule(nextStage.world)} · ${strings.league.capsuleNames[nextStage.world - 1]}` : strings.league.title}
+          </Text>
+          <Text style={styles.leagueTitle} numberOfLines={2}>
+            {opponent ? strings.league.nextOpponent(strings.league.opponents[opponent.index]) : strings.league.allCleared}
+          </Text>
+          {nextStage && (
+            <View style={styles.steps}>
+              {Array.from({ length: STAGES_PER_CAPSULE }, (_, i) => {
+                const id = (nextStage.world - 1) * STAGES_PER_CAPSULE + i + 1;
+                return <View key={id} style={[styles.step, (progress.campaign[id] ?? 0) > 0 && styles.stepDone, id === nextStage.id && styles.stepNow]} />;
+              })}
+            </View>
+          )}
+        </View>
+        <GameButton
+          label={nextStage && nextStage.id > FREE_STAGES && !owned ? strings.billing.unlock : strings.league.battle}
+          onPress={openLeague}
+          variant="blue"
+          size="sm"
+        />
+      </Panel>
+    </Pressable>
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -115,54 +175,7 @@ export default function HomeScreen() {
             </View>
           </Panel>
 
-          {/* 가장 중요한 행동: 오늘의 퍼즐 */}
-          <Pressable onPress={() => router.push('/daily')}>
-            <Panel color={palette.sun} style={styles.daily}>
-              {!solvedToday && (
-                <Alive kind="pulse" style={styles.newTag}>
-                  <Text style={styles.newTagText}>NEW!</Text>
-                </Alive>
-              )}
-              <Text style={styles.dailyKicker}>
-                {strings.home.daily} #{daily.number}
-              </Text>
-              <Text style={styles.dailyTitle}>{solvedToday ? strings.home.done : strings.daily.mateIn(daily.mateIn)}</Text>
-              <View style={styles.rowBetween}>
-                <Text style={styles.dailySub}>
-                  {solvedToday ? strings.home.nextPuzzleIn(countdown) : streak > 0 ? strings.home.keepStreak(streak) : strings.home.startStreak}
-                </Text>
-                <GameButton label={solvedToday ? '✓' : `${strings.home.play} ▶`} onPress={() => router.push('/daily')} variant="white" size="sm" />
-              </View>
-            </Panel>
-          </Pressable>
-
-          {/* 캡슐 리그: 다음 상대와 바로 배틀 */}
-          <Pressable onPress={openLeague}>
-            <Panel style={styles.league}>
-              <View style={styles.opponent}>
-                <Alive kind="bob" delay={700}>
-                  <PieceImage piece={opponent?.avatar ?? 'wK'} size={52} />
-                </Alive>
-              </View>
-              <View style={styles.leagueBody}>
-                <Text style={styles.muted} numberOfLines={1}>
-                  {nextStage ? `${strings.league.capsule(nextStage.world)} · ${strings.league.capsuleNames[nextStage.world - 1]}` : strings.league.title}
-                </Text>
-                <Text style={styles.leagueTitle} numberOfLines={2}>
-                  {opponent ? strings.league.nextOpponent(strings.league.opponents[opponent.index]) : strings.league.allCleared}
-                </Text>
-                {nextStage && (
-                  <View style={styles.steps}>
-                    {Array.from({ length: STAGES_PER_CAPSULE }, (_, i) => {
-                      const id = (nextStage.world - 1) * STAGES_PER_CAPSULE + i + 1;
-                      return <View key={id} style={[styles.step, (progress.campaign[id] ?? 0) > 0 && styles.stepDone, id === nextStage.id && styles.stepNow]} />;
-                    })}
-                  </View>
-                )}
-              </View>
-              <GameButton label={strings.league.battle} onPress={openLeague} variant="blue" size="sm" />
-            </Panel>
-          </Pressable>
+          {progress.campaign[1] ? [dailyCard, leagueCard] : [leagueCard, dailyCard]}
 
           {/* 작은 메뉴 3개: 배우기 · 퍼즐 도장 · 자유 대전 */}
           <View style={styles.tiles}>
@@ -180,7 +193,10 @@ export default function HomeScreen() {
                 href: '/practice' as const,
                 piece: 'wQ',
                 label: strings.practice.tile,
-                sub: strings.practice.tileInfo(Object.keys(progress.practice).length, PRACTICE_COUNT),
+                sub: strings.practice.tileInfo(
+                  Object.keys(progress.practice).filter(n => owned || Number(n) <= FREE_PUZZLES).length,
+                  owned ? PRACTICE_COUNT : FREE_PUZZLES
+                ),
                 color: palette.white,
               },
               { key: 'play', href: '/play' as const, piece: 'wN', label: strings.home.freePlay, sub: strings.home.freePlayInfo, color: palette.white },
@@ -203,7 +219,7 @@ export default function HomeScreen() {
 
       <OpeningCapsule
         visible={loaded && !progress.onboarded}
-        onBattle={() => finishOnboarding('battle', '/campaign/1')}
+        onBattle={() => finishOnboarding('battle', { pathname: '/campaign/[stage]', params: { stage: '1', firstBattle: '1' } })}
         onLearn={() => finishOnboarding('learn', '/learn/king')}
         onLater={() => finishOnboarding('later')}
       />

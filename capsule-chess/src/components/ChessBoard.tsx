@@ -3,7 +3,7 @@ import { Animated, Easing, Platform, StyleSheet, TouchableOpacity, View } from '
 import { type Move, BOARD_SIZE, getGameStatus, getLegalMovesForPiece } from '../engine/chessEngine';
 import { feedback } from '../feedback/feedback';
 import { moveFeedbackKind } from '../feedback/moveKind';
-import { strings } from '../i18n';
+import { useStrings } from '../i18n/LanguageProvider';
 import { palette } from '../theme';
 import { Text } from '../ui/Text';
 import { PieceImage } from '../ui/PieceImage';
@@ -40,10 +40,11 @@ type Props = {
 // 이동 연출에 필요한 정보: 움직인 기물(승급 전 모습), 잡힌 기물
 type Slide = { move: Move; mover: string; captured: string | null };
 // 판 위에 쾅 찍히는 도장 (체크 / 체크메이트)
-type Stamp = { text: string; key: number; final: boolean };
+type Stamp = { key: number; final: boolean };
 
 // 탭으로 기물 선택 → 이동. 남는 공간에 맞춰 크기가 정해짐 (최대 400)
 export function ChessBoard({ board, sideToMove, interactive, lastMove, checkedKing, onMove, markers = [], hint = null, pointer = null, onSelect }: Props) {
+  const strings = useStrings();
   const [selected, setSelected] = useState<Square | null>(null);
   const [targets, setTargets] = useState<Square[]>([]);
   const [size, setSize] = useState(MAX_BOARD_SIZE);
@@ -154,7 +155,7 @@ export function ChessBoard({ board, sideToMove, interactive, lastMove, checkedKi
         if (checkedKing) {
           const victim = board[checkedKing.r][checkedKing.c]?.[0] as 'w' | 'b' | undefined;
           const mate = !!victim && getGameStatus(victim, board) === 'checkmate';
-          later(() => playStamp({ text: mate ? strings.result.checkmate : strings.check, key: Date.now(), final: mate }), SLIDE_MS + 60);
+          later(() => playStamp({ key: Date.now(), final: mate }), SLIDE_MS + 60);
         }
       }
     } else if (!lastMove) {
@@ -321,7 +322,9 @@ export function ChessBoard({ board, sideToMove, interactive, lastMove, checkedKi
               }}
             >
               <View style={[styles.stamp, stamp.final && styles.stampFinal]}>
-                <Text style={[styles.stampText, stamp.final && styles.stampTextFinal, { fontSize: Math.round(size * (stamp.final ? 0.085 : 0.1)) }]}>{stamp.text}</Text>
+                <Text style={[styles.stampText, stamp.final && styles.stampTextFinal, { fontSize: Math.round(size * (stamp.final ? 0.085 : 0.1)) }]}>
+                  {stamp.final ? strings.result.checkmate : strings.check}
+                </Text>
               </View>
             </Animated.View>
           </View>
@@ -398,6 +401,6 @@ const styles = StyleSheet.create({
   stampLayer: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center', zIndex: 25, pointerEvents: 'none' },
   stamp: { backgroundColor: palette.red, borderWidth: 4, borderBottomWidth: 7, borderColor: palette.ink, borderRadius: 18, paddingHorizontal: 18, paddingVertical: 4 },
   stampFinal: { backgroundColor: palette.sun },
-  stampText: { color: palette.white, fontFamily: fonts.body },
+  stampText: { color: palette.white },
   stampTextFinal: { color: palette.ink },
 });

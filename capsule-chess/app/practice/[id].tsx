@@ -3,10 +3,13 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { track } from '../../src/analytics';
+import { useBilling } from '../../src/billing/BillingProvider';
+import { FullGameGate } from '../../src/billing/FullGameOffer';
+import { FREE_PUZZLES } from '../../src/billing/products';
 import { ChessBoard } from '../../src/components/ChessBoard';
 import { ResultModal } from '../../src/components/ResultModal';
 import { usePuzzle } from '../../src/game/usePuzzle';
-import { strings } from '../../src/i18n';
+import { useStrings } from '../../src/i18n/LanguageProvider';
 import { type PracticePuzzle, getPracticePuzzle, isPracticeUnlocked } from '../../src/puzzles/practice';
 import { loadProgress, recordPracticeSolve } from '../../src/storage/progress';
 import { palette } from '../../src/theme';
@@ -23,13 +26,24 @@ export default function PracticeRoute() {
   const puzzle = getPracticePuzzle(Number(id));
   if (!puzzle) return <Redirect href="/practice" />;
   // 다음 퍼즐로 넘어가면 상태가 새로 시작되도록 key로 다시 마운트
-  return <PracticePlay key={puzzle.number} puzzle={puzzle} />;
+  const play = <PracticePlay key={puzzle.number} puzzle={puzzle} />;
+  return puzzle.number <= FREE_PUZZLES ? play : <FullGameGate backTo="/practice">{play}</FullGameGate>;
 }
 
 function PracticePlay({ puzzle }: { puzzle: PracticePuzzle }) {
+  const strings = useStrings();
+  const { owned } = useBilling();
   const [showResult, setShowResult] = useState(false);
   const [alreadySolved, setAlreadySolved] = useState(false);
   const next = getPracticePuzzle(puzzle.number + 1);
+  const nextRequiresPurchase = !!next && next.number > FREE_PUZZLES && !owned;
+  const nextLabel = nextRequiresPurchase ? strings.billing.morePuzzles : `${strings.practice.next} ▶`;
+  const openNext = () => {
+    if (!next) return;
+    const path = `/practice/${next.number}` as const;
+    if (nextRequiresPurchase) router.push(path);
+    else router.replace(path);
+  };
   // 체크메이트 도장을 보고 나서 결과 창
   const resultVisible = useDelayedFlag(showResult, 1000);
 
@@ -83,7 +97,7 @@ function PracticePlay({ puzzle }: { puzzle: PracticePuzzle }) {
         />
         {play.solved ? (
           <View style={styles.row}>
-            {next && <GameButton label={`${strings.practice.next} ▶`} onPress={() => router.replace(`/practice/${next.number}`)} style={styles.flex} />}
+            {next && <GameButton label={nextLabel} onPress={openNext} style={styles.flex} />}
             <GameButton label={strings.practice.list} onPress={() => router.back()} variant="white" style={styles.flex} />
           </View>
         ) : (
@@ -100,7 +114,7 @@ function PracticePlay({ puzzle }: { puzzle: PracticePuzzle }) {
         detailColor={palette.ink}
         primary={
           next
-            ? { label: `${strings.practice.next} ▶`, onPress: () => router.replace(`/practice/${next.number}`) }
+            ? { label: nextLabel, onPress: openNext }
             : { label: strings.practice.list, onPress: () => router.back() }
         }
         secondary={{ label: strings.daily.close, onPress: () => setShowResult(false) }}

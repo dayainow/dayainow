@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Modal, Platform, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { feedback } from '../feedback/feedback';
-import { strings } from '../i18n';
+import { useStrings } from '../i18n/LanguageProvider';
 import { palette } from '../theme';
 import { DialogBox } from '../ui/DialogBox';
 import { GameButton } from '../ui/GameButton';
@@ -15,7 +15,6 @@ const CAPSULE = 190;
 const STAGE_W = CAPSULE * 2.2;
 const STAGE_H = CAPSULE * 1.75;
 const BOTTOM_H = 270; // 열린 뒤 대사 + 버튼 자리 (열기 전엔 안내 문구)
-const TAPS_TO_OPEN = 3;
 const RAYS = 10;
 // 캡슐에서 튀어나와 반원으로 늘어서는 블루 팀 (5×5 판의 첫 줄 + 양옆 폰, 가운데가 킹)
 const TEAM = ['wP', 'wR', 'wN', 'wK', 'wB', 'wQ', 'wP'];
@@ -28,24 +27,22 @@ type Props = {
   onLater: () => void;
 };
 
-// 첫 실행: 흔들리는 캡슐을 톡톡톡 세 번 눌러 열면 블루 팀 몬스터들이 튀어나오고, 바로 첫 배틀로
+// 첫 실행에서 캡슐을 한 번 누르면 블루 팀이 등장
 export function OpeningCapsule({ visible, onBattle, onLearn, onLater }: Props) {
+  const strings = useStrings();
   useModalPresence(visible);
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
   // 작은 화면에서는 캡슐 무대를 통째로 줄임
   const scale = Math.max(0.6, Math.min(1, (width - 24) / STAGE_W, (height - insets.top - insets.bottom - BOTTOM_H - 110) / STAGE_H));
 
-  const [taps, setTaps] = useState(0);
-  const opened = taps >= TAPS_TO_OPEN;
-  const wobble = useRef(new Animated.Value(0)).current;
+  const [opened, setOpened] = useState(false);
   const idle = useRef(new Animated.Value(0)).current;
   const lid = useRef(new Animated.Value(0)).current;
   const flash = useRef(new Animated.Value(0)).current;
   const spin = useRef(new Animated.Value(0)).current;
   const team = useRef(TEAM.map(() => new Animated.Value(0))).current;
 
-  // 열기 전: 캡슐이 기다리듯 살랑살랑, 뒤에서 빛이 천천히 돎
   useEffect(() => {
     if (!visible) return;
     const sway = Animated.loop(
@@ -56,28 +53,18 @@ export function OpeningCapsule({ visible, onBattle, onLearn, onLater }: Props) {
       ])
     );
     const rays = Animated.loop(Animated.timing(spin, { toValue: 1, duration: 16000, easing: Easing.linear, useNativeDriver: NATIVE }));
-    sway.start();
+    if (!opened) sway.start();
     rays.start();
     return () => {
       sway.stop();
       rays.stop();
     };
-  }, [visible]);
+  }, [visible, opened]);
 
   const tap = () => {
     if (opened) return;
-    const next = taps + 1;
-    setTaps(next);
-    if (next < TAPS_TO_OPEN) {
-      // 누를수록 더 세게 흔들림
-      feedback.select();
-      const power = next / TAPS_TO_OPEN + 0.4;
-      wobble.setValue(0);
-      Animated.sequence(
-        [1, -1, 0.7, -0.7, 0.3, 0].map(to => Animated.timing(wobble, { toValue: to * power, duration: 60, useNativeDriver: NATIVE }))
-      ).start();
-      return;
-    }
+    setOpened(true);
+    idle.setValue(0);
     // 팡! 뚜껑이 날아가고 빛이 번진 뒤 팀이 하나씩 튀어나옴 (킹이 마지막)
     feedback.badge();
     const order = TEAM.map((_, i) => i).sort((a, b) => Number(a === KING) - Number(b === KING));
@@ -93,9 +80,6 @@ export function OpeningCapsule({ visible, onBattle, onLearn, onLater }: Props) {
       ]),
     ]).start();
   };
-
-  const prompt = taps === 0 ? strings.opening.tap : strings.opening.tapMore[taps - 1] ?? strings.opening.tap;
-  const rock = Animated.add(wobble, idle.interpolate({ inputRange: [-1, 1], outputRange: [-0.12, 0.12] }));
 
   return (
     <Modal visible={visible} animationType="fade" onRequestClose={onLater} statusBarTranslucent navigationBarTranslucent>
@@ -155,7 +139,7 @@ export function OpeningCapsule({ visible, onBattle, onLearn, onLater }: Props) {
 
             <Pressable onPress={tap} disabled={opened} style={styles.capsuleHit} accessibilityRole="button" accessibilityLabel={strings.opening.tap}>
               <Animated.View
-                style={[styles.capsule, { transform: [{ rotate: rock.interpolate({ inputRange: [-1, 1], outputRange: ['-14deg', '14deg'] }) }] }]}
+                style={[styles.capsule, { transform: [{ rotate: idle.interpolate({ inputRange: [-1, 1], outputRange: ['-3deg', '3deg'] }) }] }]}
               >
                 {/* 아래 반쪽 (버터색) */}
                 <View style={styles.bottomHalf}>
@@ -189,24 +173,19 @@ export function OpeningCapsule({ visible, onBattle, onLearn, onLater }: Props) {
           {!opened ? (
             <View style={styles.promptWrap}>
               <Animated.View style={{ transform: [{ translateY: idle.interpolate({ inputRange: [-1, 1], outputRange: [-4, 4] }) }] }}>
-                <Text style={styles.prompt}>{prompt} 👆</Text>
+                <Text style={styles.prompt}>{strings.opening.tap} 👆</Text>
               </Animated.View>
-              <View style={styles.dots}>
-                {Array.from({ length: TAPS_TO_OPEN }, (_, i) => (
-                  <View key={i} style={[styles.dot, i < taps && styles.dotOn]} />
-                ))}
-              </View>
             </View>
           ) : (
             <>
               <DialogBox text={`${strings.opening.teamTitle}\n${strings.opening.teamBody}`} />
               <GameButton label={strings.opening.battle} onPress={onBattle} />
               <GameButton label={strings.opening.learn} onPress={onLearn} variant="white" size="sm" />
-              <Pressable onPress={onLater} style={styles.later} hitSlop={8}>
-                <Text style={styles.laterText}>{strings.opening.later}</Text>
-              </Pressable>
             </>
           )}
+          <Pressable onPress={onLater} style={styles.later} accessibilityRole="button">
+            <Text style={styles.laterText}>{strings.opening.later}</Text>
+          </Pressable>
         </View>
       </View>
     </Modal>
@@ -260,9 +239,6 @@ const styles = StyleSheet.create({
   bottom: { width: '100%', maxWidth: 480, minHeight: BOTTOM_H, paddingHorizontal: 16, gap: 10, justifyContent: 'flex-end' },
   promptWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
   prompt: { fontSize: 22 },
-  dots: { flexDirection: 'row', gap: 8 },
-  dot: { width: 14, height: 14, borderRadius: 7, borderWidth: 2.5, borderColor: palette.ink, backgroundColor: palette.white },
-  dotOn: { backgroundColor: palette.sun },
-  later: { alignSelf: 'center', paddingVertical: 6 },
+  later: { alignSelf: 'center', minHeight: 44, paddingHorizontal: 12, justifyContent: 'center' },
   laterText: { fontSize: 15, color: palette.inkSoft },
 });

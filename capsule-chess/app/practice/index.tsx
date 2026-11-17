@@ -2,7 +2,9 @@ import { router, useFocusEffect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { strings } from '../../src/i18n';
+import { useBilling } from '../../src/billing/BillingProvider';
+import { FREE_PUZZLES } from '../../src/billing/products';
+import { useStrings } from '../../src/i18n/LanguageProvider';
 import { PRACTICE_COUNT, PRACTICE_SECTIONS, isPracticeUnlocked, nextPracticeNumber } from '../../src/puzzles/practice';
 import { type Progress, emptyProgress, loadProgress } from '../../src/storage/progress';
 import { palette } from '../../src/theme';
@@ -12,6 +14,8 @@ import { Text } from '../../src/ui/Text';
 
 // 퍼즐 도장 목록: 1수 → 2수 → 3수 구간별 번호 칸. 푼 것은 ✓, 다음 문제는 노랑, 아직 잠긴 것은 회색
 export default function PracticeScreen() {
+  const strings = useStrings();
+  const { owned, supported } = useBilling();
   const [progress, setProgress] = useState<Progress>(emptyProgress);
 
   useFocusEffect(
@@ -20,42 +24,50 @@ export default function PracticeScreen() {
     }, [])
   );
 
-  const solvedCount = Object.keys(progress.practice).length;
-  const next = nextPracticeNumber(progress.practice);
+  const availableCount = owned ? PRACTICE_COUNT : FREE_PUZZLES;
+  const solvedCount = Object.keys(progress.practice).filter(n => Number(n) <= availableCount).length;
+  const candidate = nextPracticeNumber(progress.practice);
+  const next = candidate && candidate <= availableCount ? candidate : null;
 
   return (
     <SafeAreaView edges={['bottom']} style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
         <Panel color={palette.sun} style={styles.summary}>
-          <Text style={styles.summaryText}>{next ? strings.practice.tileInfo(solvedCount, PRACTICE_COUNT) : strings.practice.allSolved}</Text>
+          <Text style={styles.summaryText}>{next ? strings.practice.tileInfo(solvedCount, availableCount) : owned ? strings.practice.allSolved : strings.billing.sampleSolved}</Text>
           {next ? <GameButton label={`#${next} ▶`} onPress={() => router.push(`/practice/${next}`)} variant="white" size="sm" /> : null}
         </Panel>
 
-        {PRACTICE_SECTIONS.map(section => (
-          <Panel key={section.mateIn} style={styles.section}>
-            <Text style={styles.sectionTitle}>
-              {strings.practice.section(section.mateIn)} · {section.from}–{section.to}
-            </Text>
-            <View style={styles.grid}>
-              {Array.from({ length: section.to - section.from + 1 }, (_, i) => {
-                const n = section.from + i;
-                const done = !!progress.practice[n];
-                const open = isPracticeUnlocked(progress.practice, n);
-                return (
-                  <Pressable
-                    key={n}
-                    disabled={!open}
-                    onPress={() => router.push(`/practice/${n}`)}
-                    style={[styles.cell, done && styles.cellDone, n === next && styles.cellNext, !open && styles.cellLocked]}
-                    accessibilityLabel={strings.practice.puzzleTitle(n)}
-                  >
-                    <Text style={[styles.cellText, !open && styles.cellTextLocked]}>{done ? '✓' : open ? n : '·'}</Text>
-                  </Pressable>
-                );
+        {PRACTICE_SECTIONS.filter(section => section.from <= availableCount).map(section => {
+          const end = Math.min(availableCount, section.to);
+          return (
+            <Panel key={section.mateIn} style={styles.section}>
+              <Text style={styles.sectionTitle}>
+                {strings.practice.section(section.mateIn)} · {section.from}–{end}
+              </Text>
+              <View style={styles.grid}>
+                {Array.from({ length: end - section.from + 1 }, (_, i) => {
+                  const n = section.from + i;
+                  const done = !!progress.practice[n];
+                  const open = isPracticeUnlocked(progress.practice, n);
+                  return (
+                    <Pressable
+                      key={n}
+                      disabled={!open}
+                      onPress={() => router.push(`/practice/${n}`)}
+                      style={[styles.cell, done && styles.cellDone, n === next && styles.cellNext, !open && styles.cellLocked]}
+                      accessibilityLabel={strings.practice.puzzleTitle(n)}
+                    >
+                      <Text style={[styles.cellText, !open && styles.cellTextLocked]}>{done ? '✓' : open ? n : '·'}</Text>
+                    </Pressable>
+                  );
               })}
             </View>
           </Panel>
-        ))}
+          );
+        })}
+        {!owned && supported && (
+          <GameButton label={strings.billing.morePuzzles} onPress={() => router.push('/unlock')} variant="mint" />
+        )}
       </ScrollView>
     </SafeAreaView>
   );

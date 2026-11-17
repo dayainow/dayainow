@@ -1,12 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
-import { strings } from '../i18n';
+import { useStrings } from '../i18n/LanguageProvider';
 import { palette } from '../theme';
 import { Text } from './Text';
 import { fonts } from './fonts';
 
 // 전력 게이지: 기물을 잃으면 스르륵 줄어들고, 절반 아래면 노랑 → 4분의 1 아래면 빨강
 export function PowerBar({ value, max }: { value: number; max: number }) {
+  const strings = useStrings();
   const ratio = max > 0 ? Math.min(1, value / max) : 0;
   const width = useRef(new Animated.Value(ratio)).current;
 

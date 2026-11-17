@@ -6,7 +6,7 @@ import { onAchievements } from '../achievements/events';
 import { ACHIEVEMENTS, type AchievementId } from '../achievements/list';
 import { track } from '../analytics';
 import { feedback } from '../feedback/feedback';
-import { strings } from '../i18n';
+import { useStrings } from '../i18n/LanguageProvider';
 import { palette } from '../theme';
 import { Panel } from '../ui/Panel';
 import { useAnyModalOpen } from '../ui/modalPresence';
@@ -18,6 +18,7 @@ const SHOW_MS = 2600;
 
 // 업적을 달성하면 화면 위에서 쏙 내려오는 알림. 여러 개면 하나씩 차례로. 누르면 업적 화면
 export function AchievementToast() {
+  const strings = useStrings();
   const insets = useSafeAreaInsets();
   const [queue, setQueue] = useState<AchievementId[]>([]);
   const drop = useRef(new Animated.Value(0)).current;

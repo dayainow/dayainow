@@ -2,18 +2,23 @@ import { router, useFocusEffect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useBilling } from '../../src/billing/BillingProvider';
+import { FREE_STAGES } from '../../src/billing/products';
 import { CAPSULES, isCapsuleCleared, opponentFor } from '../../src/campaign/league';
 import { STAGES, isStageUnlocked } from '../../src/campaign/stages';
-import { strings } from '../../src/i18n';
+import { useStrings } from '../../src/i18n/LanguageProvider';
 import { type Progress, emptyProgress, loadProgress } from '../../src/storage/progress';
 import { palette } from '../../src/theme';
 import { CapsuleBadge } from '../../src/ui/CapsuleBadge';
+import { GameButton } from '../../src/ui/GameButton';
 import { Panel } from '../../src/ui/Panel';
 import { PieceImage } from '../../src/ui/PieceImage';
 import { Text } from '../../src/ui/Text';
 
 // 캡슐 리그 지도: 캡슐마다 배지 + 상대 5명 (마지막은 마스터)
 export default function CampaignScreen() {
+  const strings = useStrings();
+  const { owned, supported } = useBilling();
   const [progress, setProgress] = useState<Progress>(emptyProgress);
 
   useFocusEffect(
@@ -29,6 +34,7 @@ export default function CampaignScreen() {
           const stages = STAGES.filter(s => s.world === capsule.id);
           const cleared = stages.filter(s => (progress.campaign[s.id] ?? 0) > 0).length;
           const earned = isCapsuleCleared(progress.campaign, capsule.id);
+          const paid = stages[0].id > FREE_STAGES && !owned;
           return (
             <Panel key={capsule.id} style={styles.capsule}>
               <View style={styles.header}>
@@ -38,14 +44,14 @@ export default function CampaignScreen() {
                     {strings.league.capsule(capsule.id)} · {strings.league.capsuleNames[capsule.id - 1]}
                   </Text>
                   <Text style={styles.badgeName}>
-                    {earned ? `🏅 ${strings.league.badgeNames[capsule.id - 1]}` : `${cleared} / ${stages.length}`}
+                    {paid ? strings.billing.title : earned ? `🏅 ${strings.league.badgeNames[capsule.id - 1]}` : `${cleared} / ${stages.length}`}
                   </Text>
                 </View>
               </View>
               <View style={styles.row}>
                 {stages.map(stage => {
                   const stars = progress.campaign[stage.id] ?? 0;
-                  const unlocked = isStageUnlocked(progress.campaign, stage.id);
+                  const unlocked = !paid && isStageUnlocked(progress.campaign, stage.id);
                   const opponent = opponentFor(stage);
                   return (
                     <Pressable
@@ -63,6 +69,9 @@ export default function CampaignScreen() {
                   );
                 })}
               </View>
+              {paid && stages[0].id === FREE_STAGES + 1 && supported && (
+                <GameButton label={strings.billing.title} onPress={() => router.push('/unlock')} variant="mint" size="sm" />
+              )}
             </Panel>
           );
         })}

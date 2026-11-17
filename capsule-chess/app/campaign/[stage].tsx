@@ -3,6 +3,9 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { track } from '../../src/analytics';
+import { useBilling } from '../../src/billing/BillingProvider';
+import { FullGameGate } from '../../src/billing/FullGameOffer';
+import { FREE_STAGES } from '../../src/billing/products';
 import { earnedBadges, newBadge, opponentFor, stageInCapsule } from '../../src/campaign/league';
 import { type Stage, buildStageBoard, getStage, starsFor } from '../../src/campaign/stages';
 import { BattleIntro } from '../../src/components/BattleIntro';
@@ -15,10 +18,10 @@ import type { Move } from '../../src/engine/chessEngine';
 import { feedback } from '../../src/feedback/feedback';
 import { battleText } from '../../src/game/battleText';
 import { battleEvent } from '../../src/game/commentary';
-import { type GuideStep, captureGuideMove, firstGuideMove } from '../../src/game/guide';
+import { type GuideStep, captureGuideMove, firstGuideMove, suggestedBlueMove } from '../../src/game/guide';
 import { powerOf } from '../../src/game/material';
 import { useChessGame } from '../../src/game/useChessGame';
-import { strings } from '../../src/i18n';
+import { useStrings } from '../../src/i18n/LanguageProvider';
 import { loadProgress, recordGuideDone, recordStageResult, recordStat } from '../../src/storage/progress';
 import { requestReviewLater } from '../../src/review';
 import { palette } from '../../src/theme';
@@ -34,14 +37,17 @@ const EVOLVE_DELAY = 420; // 기물이 끝 줄에 미끄러져 도착한 뒤 진
 const RESULT_DELAY_MS = 1100; // 체크메이트 도장을 보고 나서 결과 창
 
 export default function StageRoute() {
-  const { stage: stageParam } = useLocalSearchParams<{ stage: string }>();
+  const { stage: stageParam, firstBattle } = useLocalSearchParams<{ stage: string; firstBattle?: string }>();
   const stage = getStage(Number(stageParam));
   if (!stage) return <Redirect href="/campaign" />;
   // 다음 단계로 넘어가면 판 상태가 새로 시작되도록 key로 다시 마운트
-  return <StagePlay key={stage.id} stage={stage} />;
+  const play = <StagePlay key={stage.id} stage={stage} quickStart={stage.id === 1 && firstBattle === '1'} />;
+  return stage.id <= FREE_STAGES ? play : <FullGameGate backTo="/campaign">{play}</FullGameGate>;
 }
 
-function StagePlay({ stage }: { stage: Stage }) {
+function StagePlay({ stage, quickStart }: { stage: Stage; quickStart: boolean }) {
+  const strings = useStrings();
+  const { owned } = useBilling();
   const initialBoard = useMemo(() => buildStageBoard(stage), [stage]);
   const game = useChessGame({ initialBoard, ai: stage.ai });
   const [earnedStars, setEarnedStars] = useState(0);
@@ -50,11 +56,13 @@ function StagePlay({ stage }: { stage: Stage }) {
   const [sharing, setSharing] = useState<ShareContent | null>(null);
   const [hideResult, setHideResult] = useState(false); // 공유 창을 보는 동안 결과 창을 잠깐 숨김
   const swapTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const [hint, setHint] = useState<Move | null>(null);
+  const [hints, setHints] = useState(0);
   const [undos, setUndos] = useState(0); // 이번 판에서 무르기한 횟수 (다시 시작하면 0)
   const [notice, setNotice] = useState<string | null>(null); // 실황 대신 잠깐 보여 줄 안내
-  const [showIntro, setShowIntro] = useState(true);
+  const [showIntro, setShowIntro] = useState(!quickStart);
   // 첫 배틀 가이드: 1단계를 처음 하는 사람에게만 (한 번 끝내면 다시 안 나옴)
-  const [guideEligible, setGuideEligible] = useState(false);
+  const [guideEligible, setGuideEligible] = useState<boolean | null>(stage.id === 1 ? null : false);
   const [guide, setGuide] = useState<GuideStep | null>(null);
   const [selected, setSelected] = useState<{ r: number; c: number } | null>(null);
   const [evolving, setEvolving] = useState<'w' | null>(null);
@@ -69,8 +77,18 @@ function StagePlay({ stage }: { stage: Stage }) {
   const resultReady = useDelayedFlag(game.isGameOver, RESULT_DELAY_MS);
 
   useEffect(() => {
-    if (stage.id === 1) loadProgress().then(p => setGuideEligible(!p.guideDone && !(p.campaign[1] > 0)));
+    if (stage.id !== 1) return;
+    let active = true;
+    loadProgress().then(p => {
+      if (!active) return;
+      setGuideEligible(!p.guideDone && !(p.campaign[1] > 0));
+    });
+    return () => { active = false; };
   }, []);
+
+  useEffect(() => {
+    if (!showIntro && guideEligible) startGuide('move');
+  }, [showIntro, guideEligible]);
 
   useEffect(() => {
     track('stage_start', { stage: stage.id });
@@ -86,10 +104,11 @@ function StagePlay({ stage }: { stage: Stage }) {
   useEffect(() => {
     if (!game.isGameOver || !game.result) return;
     const outcome = game.result.winner === 'w' ? 'win' : game.result.winner ? 'lose' : 'draw';
-    const stars = outcome === 'win' ? starsFor(stage, game.result.blueMoves, undos) : 0;
+    const stars = outcome === 'win' ? starsFor(stage, game.result.blueMoves, undos + hints) : 0;
     track('stage_end', { stage: stage.id, result: outcome, moves: game.result.blueMoves, stars, undos });
     if (outcome !== 'win') {
-      feedback.lose();
+      if (outcome === 'draw') feedback.clear();
+      else feedback.lose();
       return;
     }
     feedback.win();
@@ -143,6 +162,7 @@ function StagePlay({ stage }: { stage: Stage }) {
   const handleMove = (move: Move) => {
     const mover = game.board[move.fromR][move.fromC];
     setNotice(null);
+    setHint(null);
     advanceGuide();
     game.move(move);
     if (mover === 'wP' && move.toR === 0) {
@@ -172,13 +192,19 @@ function StagePlay({ stage }: { stage: Stage }) {
     setEarnedStars(0);
     game.reset();
     setUndos(0);
+    setHints(0);
+    setHint(null);
+    setSelected(null);
     setNotice(null);
     if (guide === 'move' || guide === 'capture') setGuide('move');
   };
 
   // 가이드 손가락 위치: 추천 기물 → (그 기물을 고르면) 도착 칸. 다른 기물을 고르면 숨김
   const pickedGuidePiece = !!guideMove && selected?.r === guideMove.fromR && selected?.c === guideMove.fromC;
-  const pointer = guideMove
+  const hintSelected = !!hint && selected?.r === hint.fromR && selected?.c === hint.fromC;
+  const pointer = hint
+    ? hintSelected ? { r: hint.toR, c: hint.toC } : { r: hint.fromR, c: hint.fromC }
+    : guideMove
     ? pickedGuidePiece
       ? { r: guideMove.toR, c: guideMove.toC }
       : selected
@@ -200,6 +226,7 @@ function StagePlay({ stage }: { stage: Stage }) {
         : null;
 
   const line = battleText(
+    strings,
     battleEvent({
       vsAi: true,
       status: game.status,
@@ -231,7 +258,7 @@ function StagePlay({ stage }: { stage: Stage }) {
       <ChessBoard
         board={game.board}
         sideToMove={game.turn}
-        interactive={game.canPlayerMove && !showIntro}
+        interactive={game.canPlayerMove && !showIntro && guideEligible !== null}
         lastMove={game.lastMove}
         checkedKing={game.checkedKing}
         onMove={handleMove}
@@ -244,16 +271,30 @@ function StagePlay({ stage }: { stage: Stage }) {
           side="w"
           avatar="wK"
           name={strings.battle.me}
-          detail={`${strings.battle.movesUsed(game.blueMoves)} · ${undos > 0 ? strings.battle.goal(2, stage.par + 6) : strings.battle.goal(3, stage.par)}`}
+          detail={`${strings.battle.movesUsed(game.blueMoves)} · ${undos + hints > 0 ? strings.battle.goal(2, stage.par + 6) : strings.battle.goal(3, stage.par)}`}
           power={powerOf(game.board, 'w')}
           maxPower={maxPower.w}
           active={game.turn === 'w' && !game.isGameOver}
         />
-        <DialogBox text={notice ?? guideText ?? line} />
+        <DialogBox text={hint ? (hintSelected ? strings.campaign.hintTarget : strings.campaign.hintPiece) : notice ?? guideText ?? (game.isGameOver && game.result?.drawReason ? strings.endings[game.result.drawReason] : game.drawRemaining <= 8 ? strings.endings.warning(game.drawRemaining, game.drawCanReset) : line)} />
         <GameControls
+          hint={{
+            label: strings.campaign.hint,
+            disabled: !game.canPlayerMove || showIntro || guideEligible === null || !!hint,
+            onPress: () => {
+              const move = suggestedBlueMove(game.board);
+              if (!move) return;
+              setHint(move);
+              setHints(n => n + 1);
+              setGuide(null);
+              setNotice(null);
+            },
+          }}
           canUndo={game.canUndo}
           onUndo={() => {
             clearTimeout(evolveTimer.current);
+            setHint(null);
+            setSelected(null);
             game.undo();
             if (undos === 0) setNotice(strings.campaign.undoNotice);
             setUndos(n => n + 1);
@@ -266,19 +307,16 @@ function StagePlay({ stage }: { stage: Stage }) {
       <BattleIntro
         visible={showIntro}
         stage={stage}
-        onStart={() => {
-          setShowIntro(false);
-          if (guideEligible) startGuide('move');
-        }}
+        onStart={() => setShowIntro(false)}
       />
       <EvolutionOverlay side={evolving} onClose={() => setEvolving(null)} />
 
       <ResultModal
         visible={resultReady && !evolving && !hideResult}
-        art={<MascotFace mood={won ? 'happy' : 'sad'} size={100} />}
+        art={<MascotFace mood={won ? 'happy' : game.result?.winner ? 'sad' : 'thinking'} size={100} />}
         celebrate={won}
-        title={won ? (nextStage ? strings.campaign.cleared : strings.campaign.allCleared) : strings.campaign.failed}
-        detail={won ? `${'★'.repeat(earnedStars)}${'☆'.repeat(3 - earnedStars)}` : strings.campaign.failedDetail}
+        title={won ? (nextStage ? strings.campaign.cleared : strings.campaign.allCleared) : game.result?.winner ? strings.campaign.failed : strings.result.draw}
+        detail={won ? `${'★'.repeat(earnedStars)}${'☆'.repeat(3 - earnedStars)}` : game.result?.drawReason ? strings.endings[game.result.drawReason] : strings.campaign.lossHelp}
         detailColor={won ? palette.star : palette.inkSoft}
         extra={
           won && badge ? (
@@ -298,7 +336,8 @@ function StagePlay({ stage }: { stage: Stage }) {
             <View style={styles.extra}>
               <Text style={styles.moves}>
                 {strings.campaign.movesUsed(game.result?.blueMoves ?? 0)}
-                {undos > 0 ? `\n${strings.campaign.undoCapped}` : ''}
+                {undos + hints > 0 ? `\n${strings.campaign.helpCapped}` : ''}
+                {earnedStars < 3 ? `\n${strings.campaign.starTarget(stage.par)}` : ''}
               </Text>
               <GameButton
                 label={strings.shareCard.share}
@@ -317,18 +356,28 @@ function StagePlay({ stage }: { stage: Stage }) {
                 size="sm"
               />
             </View>
-          ) : null
+          ) : (
+            <GameButton label={strings.campaign.practiceFirst} variant="white" size="sm"
+              onPress={() => router.replace('/practice/1')} />
+          )
         }
         primary={
           won
             ? nextStage
-              ? { label: strings.campaign.next, onPress: () => router.replace(`/campaign/${nextStage.id}`) }
+              ? {
+                  label: nextStage.id > FREE_STAGES && !owned ? strings.billing.nextCapsule : strings.campaign.next,
+                  onPress: () => {
+                    const path = `/campaign/${nextStage.id}` as const;
+                    if (nextStage.id > FREE_STAGES && !owned) router.push(path);
+                    else router.replace(path);
+                  },
+                }
               : { label: strings.campaign.list, onPress: () => router.back() }
             : { label: strings.campaign.retry, onPress: restart }
         }
         secondary={
           won
-            ? { label: strings.campaign.retry, onPress: restart }
+            ? { label: earnedStars < 3 ? strings.campaign.retryStars : strings.campaign.retry, onPress: restart }
             : { label: strings.campaign.list, onPress: () => router.back() }
         }
       />

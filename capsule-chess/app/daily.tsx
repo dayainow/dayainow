@@ -8,7 +8,7 @@ import { ChessBoard } from '../src/components/ChessBoard';
 import { ResultModal } from '../src/components/ResultModal';
 import { MODAL_SWAP_MS, ShareCardModal } from '../src/components/ShareCard';
 import { usePuzzle } from '../src/game/usePuzzle';
-import { strings } from '../src/i18n';
+import { useStrings } from '../src/i18n/LanguageProvider';
 import { enableDailyReminder, isReminderSupported } from '../src/notifications';
 import { getDailyPuzzle } from '../src/puzzles/daily';
 import { type Progress, currentStreak, loadProgress, recordDailySolve } from '../src/storage/progress';
@@ -25,6 +25,7 @@ import { useDelayedFlag } from '../src/ui/useDelayedFlag';
 import { formatCountdown, msUntilNextDay } from '../src/utils/date';
 
 export default function DailyScreen() {
+  const strings = useStrings();
   const puzzle = useMemo(() => getDailyPuzzle(), []);
   const [showResult, setShowResult] = useState(false);
   const [showShare, setShowShare] = useState(false);
@@ -84,7 +85,7 @@ export default function DailyScreen() {
   const shareContent = { kind: 'daily' as const, number: puzzle.number, mateIn: puzzle.mateIn, attempts, hints, streak: Math.max(streak, 1) };
 
   const turnOnReminder = async () => {
-    const enabled = await enableDailyReminder();
+    const enabled = await enableDailyReminder(strings.notification);
     track('reminder_prompt', { action: enabled ? 'enabled' : 'denied' });
     setSettings(await updateSettings(enabled ? { reminderEnabled: true } : { reminderPromptDismissed: true }));
     setMessage(enabled ? strings.daily.reminderEnabled : strings.daily.reminderDenied);
@@ -154,7 +155,16 @@ export default function DailyScreen() {
             )}
           </>
         ) : (
-          <GameButton label={strings.daily.hint} onPress={play.showHint} variant="white" disabled={!play.canHint} />
+          <>
+            <GameButton label={strings.daily.hint} onPress={play.showHint} variant="white" disabled={!play.canHint} />
+            <Pressable
+              accessibilityRole="button"
+              style={styles.practiceLink}
+              onPress={() => router.push('/practice/1')}
+            >
+              <Text style={styles.more}>{strings.daily.tryOneMove} ›</Text>
+            </Pressable>
+          </>
         )}
       </View>
 
@@ -191,6 +201,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 22 },
   countdown: { fontSize: 15, color: palette.inkSoft, textAlign: 'center' },
   more: { fontSize: 15, color: palette.blueDark, textAlign: 'center' },
+  practiceLink: { alignSelf: 'center', justifyContent: 'center', minHeight: 44, paddingHorizontal: 12 },
   row: { flexDirection: 'row', gap: 10, justifyContent: 'center' },
   flex: { flex: 1 },
   reminder: { alignItems: 'center', gap: 6, padding: 12 },

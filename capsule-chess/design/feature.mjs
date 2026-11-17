@@ -1,5 +1,5 @@
 // Google Play 대표 이미지(1024x500)를 "캡슐 리그" 디자인으로 렌더링
-// 사용: node design/feature.mjs  → assets/store/feature-ko.png, feature-en.png, feature-ja.png
+// 사용: node design/feature.mjs  → assets/store/feature-ko.png, feature-en.png
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -11,9 +11,8 @@ const ROOT = join(HERE, '..');
 const MASCOT = `data:image/png;base64,${readFileSync(join(ROOT, 'assets/splash-icon.png')).toString('base64')}`;
 
 const TEXT = {
-  ko: { title: '캡슐체스', titleSize: 108, font: 'Jua', tagline: '귀여운 몬스터와 3분 미니 체스', chips: ['⚔️ 캡슐 리그', '🧩 오늘의 퍼즐', '✨ 폰 진화'] },
-  en: { title: 'Capsule Chess', titleSize: 76, font: 'Fredoka', tagline: 'Cute monster mini chess in 3 minutes', chips: ['⚔️ League', '🧩 Daily puzzle', '✨ Evolve'] },
-  ja: { title: 'カプセルチェス', titleSize: 72, font: 'Mochiy Pop One', tagline: 'かわいいモンスターと3分ミニチェス', chips: ['⚔️ リーグ', '🧩 今日のパズル', '✨ 進化'] },
+  ko: { title: '캡슐체스', titleSize: 108, font: 'Jua', tagline: '몬스터와 즐기는 5×5 미니 체스', chips: ['⚔️ 캡슐 리그', '🧩 오늘의 퍼즐', '✨ 폰 진화'] },
+  en: { title: 'Capsule Chess', titleSize: 76, font: 'Fredoka', tagline: '5×5 chess with monster pieces', chips: ['⚔️ League', '🧩 Daily puzzle', '✨ Evolve'] },
 };
 
 const html = t => `<!doctype html><html><head><meta charset="utf-8">${FONT_LINK}<style>
@@ -50,7 +49,7 @@ const html = t => `<!doctype html><html><head><meta charset="utf-8">${FONT_LINK}
   </div>
 </body></html>`;
 
-for (const locale of ['ko', 'en', 'ja']) {
+for (const locale of Object.keys(TEXT)) {
   await renderHtml(html(TEXT[locale]), join(ROOT, 'assets', 'store', `feature-${locale}.png`), { width: 1024, height: 500, scale: 1 });
   console.log(`✓ assets/store/feature-${locale}.png`);
 }

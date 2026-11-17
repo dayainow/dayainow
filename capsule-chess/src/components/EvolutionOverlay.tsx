@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Modal, Platform, StyleSheet, View } from 'react-native';
 import { feedback } from '../feedback/feedback';
-import { strings } from '../i18n';
+import { useStrings } from '../i18n/LanguageProvider';
 import { palette } from '../theme';
 import { DialogBox } from '../ui/DialogBox';
 import { GameButton } from '../ui/GameButton';
@@ -17,6 +17,7 @@ const SPARKLES: [string, string][] = [['12%', '22%'], ['82%', '18%'], ['16%', '5
 
 // 폰이 끝 줄에 닿으면: 폰과 퀸 실루엣이 번갈아 깜빡이다가 퀸이 짠 하고 나타나는 진화 연출
 export function EvolutionOverlay({ side, onClose }: { side: 'w' | 'b' | null; onClose: () => void }) {
+  const strings = useStrings();
   const flicker = useRef(new Animated.Value(0)).current; // 0: 폰 실루엣, 1: 퀸 실루엣
   const reveal = useRef(new Animated.Value(0)).current;
   const spin = useRef(new Animated.Value(0)).current;

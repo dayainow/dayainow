@@ -24,8 +24,15 @@ describe('settings storage', () => {
     expect(await loadSettings()).toEqual({ ...DEFAULT_SETTINGS, difficulty: 'easy' });
   });
 
+  it('persists the selected language alongside concurrent settings updates', async () => {
+    await Promise.all([updateSettings({ language: 'ko' }), updateSettings({ soundEnabled: false })]);
+    expect(await loadSettings()).toEqual({ ...DEFAULT_SETTINGS, language: 'ko', soundEnabled: false });
+    await updateSettings({ language: 'system' });
+    expect((await loadSettings()).language).toBe('system');
+  });
+
   it('falls back to defaults for unknown or broken data', async () => {
-    await AsyncStorage.setItem('settings:v1', JSON.stringify({ difficulty: 'toString', soundEnabled: 'yes' }));
+    await AsyncStorage.setItem('settings:v1', JSON.stringify({ difficulty: 'toString', soundEnabled: 'yes', language: 'ja' }));
     expect(await loadSettings()).toEqual(DEFAULT_SETTINGS);
 
     await AsyncStorage.setItem('settings:v1', '{not json');

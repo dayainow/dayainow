@@ -1,28 +1,40 @@
 import { Fredoka_600SemiBold, Fredoka_700Bold } from '@expo-google-fonts/fredoka';
 import { Jua_400Regular } from '@expo-google-fonts/jua';
-import { MochiyPopOne_400Regular } from '@expo-google-fonts/mochiy-pop-one';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
+import { Platform } from 'react-native';
 import { track } from '../src/analytics';
+import { BillingProvider } from '../src/billing/BillingProvider';
 import { AchievementToast } from '../src/components/AchievementToast';
 import { RulesButton } from '../src/components/RulesButton';
 import { initFeedback } from '../src/feedback/feedback';
-import { isJapanese, strings } from '../src/i18n';
+import { LanguageProvider, useLanguage, useStrings } from '../src/i18n/LanguageProvider';
 import { RulesProvider } from '../src/rules/RulesProvider';
 import { backfillAchievements, loadProgress } from '../src/storage/progress';
 import { palette } from '../src/theme';
-import { fonts } from '../src/ui/fonts';
+import { bodyFont } from '../src/ui/fonts';
 
 // 글꼴을 다 불러올 때까지 시작 화면을 유지 (글꼴이 바뀌며 깜빡이지 않게)
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
-// 일본어 글꼴은 크기가 커서 일본어일 때만 불러옴
-const FONTS = { Jua_400Regular, Fredoka_600SemiBold, Fredoka_700Bold, ...(isJapanese ? { MochiyPopOne_400Regular } : {}) };
+const FONTS = { Jua_400Regular, Fredoka_600SemiBold, Fredoka_700Bold };
 
 export default function RootLayout() {
+  return (
+    <LanguageProvider>
+      <BillingProvider>
+        <GameLayout />
+      </BillingProvider>
+    </LanguageProvider>
+  );
+}
+
+function GameLayout() {
+  const { language } = useLanguage();
+  const strings = useStrings();
   const [fontsLoaded, fontError] = useFonts(FONTS);
   const ready = fontsLoaded || !!fontError;
 
@@ -36,6 +48,10 @@ export default function RootLayout() {
     if (ready) SplashScreen.hideAsync().catch(() => {});
   }, [ready]);
 
+  useEffect(() => {
+    if (Platform.OS === 'web') document.documentElement.lang = language;
+  }, [language]);
+
   if (!ready) return null;
 
   return (
@@ -45,7 +61,7 @@ export default function RootLayout() {
         screenOptions={{
           headerStyle: { backgroundColor: palette.bg },
           headerTintColor: palette.ink,
-          headerTitleStyle: { fontFamily: fonts.body, fontSize: 20 },
+          headerTitleStyle: { fontFamily: bodyFont(language), fontSize: 20 },
           headerShadowVisible: false,
           contentStyle: { backgroundColor: palette.bg },
           // 어느 화면에서든 규칙을 바로 볼 수 있게
@@ -64,6 +80,7 @@ export default function RootLayout() {
         <Stack.Screen name="practice/index" options={{ title: strings.practice.title }} />
         <Stack.Screen name="themes" options={{ title: strings.themes.title }} />
         <Stack.Screen name="practice/[id]" options={{ title: '' }} />
+        <Stack.Screen name="unlock" options={{ title: strings.billing.title }} />
       </Stack>
       <AchievementToast />
     </RulesProvider>

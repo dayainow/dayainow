@@ -1,11 +1,10 @@
-import { strings } from '../i18n';
+import type { Strings } from '../i18n';
 import type { BattleEvent } from './commentary';
 
-const sideName = (side: 'w' | 'b') => strings.side[side];
-const other = (side: 'w' | 'b') => sideName(side === 'w' ? 'b' : 'w');
-
 // 대사 상황 → 화면 문구. opponent가 있으면 첫 대사에 상대 이름을 넣음
-export const battleText = (event: BattleEvent, vsAi: boolean, opponent?: string): string => {
+export const battleText = (strings: Strings, event: BattleEvent, vsAi: boolean, opponent?: string): string => {
+  const sideName = (side: 'w' | 'b') => strings.side[side];
+  const other = (side: 'w' | 'b') => sideName(side === 'w' ? 'b' : 'w');
   const b = strings.battle;
   const p = strings.pieces;
   switch (event.kind) {

@@ -1,7 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DIFFICULTY_DEPTH, Difficulty } from '../engine/chessAI';
+import { isLanguagePreference, type LanguagePreference } from '../i18n';
 
 export type Settings = {
+  language: LanguagePreference;
   difficulty: Difficulty;
   soundEnabled: boolean;
   hapticsEnabled: boolean;
@@ -15,6 +17,7 @@ export type Settings = {
 const STORAGE_KEY = 'settings:v1';
 
 export const DEFAULT_SETTINGS: Settings = {
+  language: 'system',
   difficulty: 'normal',
   soundEnabled: true,
   hapticsEnabled: true,
@@ -38,6 +41,7 @@ export const loadSettings = async (): Promise<Settings> => {
     const raw = await AsyncStorage.getItem(STORAGE_KEY);
     const saved = raw ? JSON.parse(raw) : null;
     cached = {
+      language: isLanguagePreference(saved?.language) ? saved.language : DEFAULT_SETTINGS.language,
       difficulty: isDifficulty(saved?.difficulty) ? saved.difficulty : DEFAULT_SETTINGS.difficulty,
       soundEnabled: bool(saved?.soundEnabled, DEFAULT_SETTINGS.soundEnabled),
       hapticsEnabled: bool(saved?.hapticsEnabled, DEFAULT_SETTINGS.hapticsEnabled),
@@ -55,14 +59,19 @@ export const loadSettings = async (): Promise<Settings> => {
   return cached;
 };
 
-// 바꾼 항목만 넘기면 나머지 설정은 그대로 유지
-export const updateSettings = async (patch: Partial<Settings>): Promise<Settings> => {
-  const next = { ...(await loadSettings()), ...patch };
-  cached = next;
-  try {
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-  } catch {
-    // 저장 실패는 게임 진행에 영향 없음
-  }
-  return next;
+// 동시에 바꾼 설정도 서로 덮어쓰지 않게 읽기와 저장을 차례로 처리
+let writeQueue: Promise<unknown> = Promise.resolve();
+export const updateSettings = (patch: Partial<Settings>): Promise<Settings> => {
+  const write = writeQueue.then(async () => {
+    const next = { ...(await loadSettings()), ...patch };
+    try {
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    } catch {
+      // 저장 실패는 게임 진행에 영향 없음
+    }
+    cached = next;
+    return next;
+  });
+  writeQueue = write.catch(() => {});
+  return write;
 };

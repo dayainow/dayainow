@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { type Move, findKing, isInCheck, simulateMove } from '../engine/chessEngine';
 import { findMatingMoves, forcesMate, isCheckmated, pickStubbornReply } from '../engine/mateSolver';
 import { feedback } from '../feedback/feedback';
-import { strings } from '../i18n';
+import { useStrings } from '../i18n/LanguageProvider';
 
 type Board = (string | null)[][];
 type Square = { r: number; c: number };
@@ -21,6 +21,7 @@ const REPLY_MS = 600;
 // "N수 만에 메이트" 퍼즐 한 판의 상태 (오늘의 퍼즐과 퍼즐 도장이 함께 씀)
 // 오답이면 잠깐 보여 준 뒤 처음부터, 정답이면 레드가 가장 끈질긴 수로 응수
 export const usePuzzle = ({ board: start, mateIn, onSolved, onWrong, onHint }: Options) => {
+  const strings = useStrings();
   const [board, setBoard] = useState(start);
   const [turn, setTurn] = useState<'w' | 'b'>('w');
   const [movesLeft, setMovesLeft] = useState(mateIn);

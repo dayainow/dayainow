@@ -4,7 +4,8 @@ import { Modal, Platform, Share, StyleSheet, View } from 'react-native';
 import { captureRef } from 'react-native-view-shot';
 import { track } from '../analytics';
 import { CAPSULES } from '../campaign/league';
-import { strings } from '../i18n';
+import type { Strings } from '../i18n';
+import { useStrings } from '../i18n/LanguageProvider';
 import { palette } from '../theme';
 import { CapsuleBadge } from '../ui/CapsuleBadge';
 import { Chip } from '../ui/Chip';
@@ -26,7 +27,7 @@ export const MODAL_SWAP_MS = 350;
 const stars = (n: number) => '★'.repeat(n) + '☆'.repeat(3 - n);
 
 // 텍스트로 공유할 때의 문구
-export const shareTextFor = (content: ShareContent): string => {
+const shareTextFor = (strings: Strings, content: ShareContent): string => {
   const s = strings.shareCard;
   switch (content.kind) {
     case 'daily':
@@ -49,6 +50,7 @@ const CONFETTI: [number, number, number, string][] = [
 ];
 
 function Frame({ color, brand, children }: { color: string; brand: string; children: React.ReactNode }) {
+  const strings = useStrings();
   return (
     <View style={[styles.card, { backgroundColor: color }]}>
       {CONFETTI.map(([left, top, rotate, c], i) => (
@@ -63,6 +65,7 @@ function Frame({ color, brand, children }: { color: string; brand: string; child
 
 // 공유용 카드 (화면에 보이는 그대로 이미지로 캡처)
 function Card({ content }: { content: ShareContent }) {
+  const strings = useStrings();
   const s = strings.shareCard;
   if (content.kind === 'daily') {
     return (
@@ -104,6 +107,7 @@ type Props = { visible: boolean; onClose: () => void; content: ShareContent; onC
 
 // 결과 카드 미리보기 + 공유 (휴대폰: 이미지/텍스트, 웹: 텍스트)
 export function ShareCardModal({ visible, onClose, content, onCopied }: Props) {
+  const strings = useStrings();
   const cardRef = useRef<View>(null);
   useModalPresence(visible);
   const canShareImage = Platform.OS !== 'web';
@@ -119,7 +123,7 @@ export function ShareCardModal({ visible, onClose, content, onCopied }: Props) {
   };
 
   const shareText = async () => {
-    const text = shareTextFor(content);
+    const text = shareTextFor(strings, content);
     try {
       if (Platform.OS === 'web') {
         if (navigator.share) await navigator.share({ text });

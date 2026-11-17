@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { track } from '../src/analytics';
 import { MiniBoard } from '../src/components/MiniBoard';
 import { INITIAL_BOARD } from '../src/engine/chessEngine';
-import { strings } from '../src/i18n';
+import { useStrings } from '../src/i18n/LanguageProvider';
 import { type Progress, emptyProgress, loadProgress } from '../src/storage/progress';
 import { getCachedSettings, updateSettings } from '../src/storage/settings';
 import { palette } from '../src/theme';
@@ -16,6 +16,7 @@ import { BOARD_THEMES, isThemeUnlocked } from '../src/ui/boardThemes';
 
 // 판 꾸미기: 업적으로 연 판 중에서 골라 쓰기. 잠긴 판은 흐리게 + 여는 조건
 export default function ThemesScreen() {
+  const strings = useStrings();
   const [progress, setProgress] = useState<Progress>(emptyProgress);
   const [selected, setSelected] = useState(getCachedSettings().boardTheme);
 

@@ -6,6 +6,7 @@ node_modules/
 dist/
 web-build/
 expo-env.d.ts
+/release/
 
 # 네이티브 프로젝트 (CNG: 빌드할 때 expo prebuild로 생성되므로 저장소에 넣지 않음)
 /ios
